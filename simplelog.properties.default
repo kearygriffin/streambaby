@@ -1,0 +1,14 @@
+com.unwiredappeal=Warn
+com.tivo=Warn
+
+# Uncomment below to send logging to streambaby.log.  By default, it will overwrite prev. log. Set simpelog.logFile.append=true (below) to append
+simplelog.logFile=streambaby.log
+
+# these only apply if we are logging to a file...
+simplelog.logFile.append=false
+simplelog.logFile.andConsole=true
+# formatting options
+simplelog.dateFormat=MM/dd/yy kk:mm:ss
+simplelog.format.debug={0} {2}: {5}
+# should we reload this file if it is changed?
+#simplelog.reloading=true

@@ -1,0 +1,11 @@
+cache/*
+streambaby.log
+native/*.dll
+native/*.exe
+native/completed.tag
+simplelog.properties
+streambaby.ini
+dist/*
+scripts/first-run.bsh
+scripts/first-run.bsh.ran
+ffmpeg-dist.tar.bz2

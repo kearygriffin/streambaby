@@ -1,0 +1,13 @@
+#
+# ./streambaby --help for more configuration file options
+#
+
+#dir.1=/home/someone/videos
+#dir.1.name=Someones videos
+#dir.2=/media/disk
+#dir.2.name=External Drive
+# Ip address to bind to
+# most people don't need to change this. 
+#ip=192.168.1.37
+# port to use
+port=7290

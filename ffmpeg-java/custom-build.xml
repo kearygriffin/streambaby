@@ -1,0 +1,198 @@
+<project name="ffmpeg-java-sb" default="all" basedir=".">
+
+	<property name="project.name" value="ffmpeg-java-sb" />
+	<property name="src" location="src" />
+	<property name="native" location="native" />
+	
+	<property name="dist" location="build/dist/ffmpeg-java-sb" />
+	<property name="dist-zip" location="build/dist/zip" />
+	<property name="javac.out" location="build/classes" />
+	<property name="javadoc.out" location="build/doc" />
+	<property name="jar.out" location="build/jars" />
+
+	<property name="ffmpeg.home" location="/Users/ken/sf/ffmpeg"/> <!-- configure this to match your system, only needed to compile c++ example -->
+	
+
+
+	<target name="all" depends="clean,javac,javadoc,jar" />
+	<target name="build" depends="all"/>
+	<target name="clean">
+		<delete dir="${javac.out}"/>
+		
+		<delete dir="${jar.out}"/>
+		<delete dir="build"/>
+		<delete dir="bin"/>
+	</target>
+
+
+	<target name="javadoc"/>
+	<target name="javadoc-orig">
+		<javadoc destdir="${javadoc.out}" packagenames="*"  verbose="no"> <!-- overview="${src}/overview.html"-->
+			<arg value="-quiet"/>
+		    <fileset dir="${src}"/>
+			<classpath location="${javac.out}" />
+			<classpath>
+				<pathelement path="lib/jna.jar" />
+				<pathelement path="../lib/bcel-5.2.jar" />
+
+			</classpath>			
+		</javadoc>
+	</target>
+
+	<!-- use 1.5 -->
+	<target name="javac" >
+		<mkdir dir="${javac.out}" />
+		<!--javac debug="true" optimize="true" destdir="${javac.out}">
+			<compilerarg line="-source 1.4" />
+			<classpath>
+				<pathelement path="${DevLibs}/qtjava/QTJava.zip" />
+				<pathelement path="${DevLibs}/qtjava/QTJSupport.jar" />
+				<pathelement path="${DevLibs}/JMF-2.1.1e/lib/jmf.jar" />
+			</classpath>			
+		</javac-->
+		
+		<javac source="1.5" target="1.5" debug="true" optimize="true" destdir="${javac.out}">
+			<compilerarg line="-source 1.5" />
+			<src path="${src}"/>
+			<classpath>
+				<pathelement path="lib/jna.jar" />
+			</classpath>			
+		</javac>
+					
+
+	</target>
+	
+	<target name="jar">
+		<mkdir dir="${jar.out}" />
+		<jar jarfile="${jar.out}/ffmpeg-java-sb.jar">
+			<fileset dir="${javac.out}">
+				
+			</fileset>
+		</jar>
+	</target>
+
+	
+	<target name="timestamp">
+		<tstamp />
+		<echo message="build=${DSTAMP}-${TSTAMP}"/>
+	</target>
+			
+	<target name="dist" depends="timestamp,clean,javac,javadoc,jar">
+		
+		<mkdir dir="${dist}/.." />
+		<mkdir dir="${dist}" />
+		<copy todir="${dist}" file="build/jars/ffmpeg-java-sb.jar"/>
+		
+		
+		<copy todir="${dist}" file="README"/>
+		<copy todir="${dist}" file="LICENSE"/>
+				
+		
+		<mkdir dir="${dist}/lib" />
+		<copy todir="${dist}/lib" file="lib/jna.jar" />
+				
+		
+		<mkdir dir="${dist}/doc"/>
+		<copy todir="${dist}/doc">
+			<fileset dir="build/doc"/>
+		</copy>
+		
+		<mkdir dir="${dist}/src"/>
+		<copy todir="${dist}/src">
+			<fileset dir="${src}" excludes="**/CVS"/>
+		</copy>
+		
+		<copy todir="${dist}" file="build.xml"/>
+		<copy todir="${dist}" file="version-history.txt"/>
+
+			
+		<mkdir dir="${dist}/native"/>
+		<copy todir="${dist}/native">
+			<fileset dir="native" excludes="**/CVS"/>
+		</copy>
+				
+		<mkdir dir="${dist}/ffmpeg_headers"/>
+		<copy todir="${dist}/ffmpeg_headers">
+			<fileset dir="ffmpeg_headers" excludes="**/CVS"/>
+		</copy>
+		
+		<!-- zip/tar: -->
+		
+		<delete dir="${dist-zip}" />
+		<mkdir dir="${dist-zip}" />
+		
+		<zip zipfile="${dist-zip}/ffmpeg-java-${DSTAMP}-${TSTAMP}.zip">
+     		<zipfileset dir="${dist}">
+       		</zipfileset>
+		</zip>
+		
+		<tar longfile="gnu" destfile="${dist-zip}/ffmpeg-java-${DSTAMP}-${TSTAMP}.tar.gz" compression="gzip">
+ 			  <tarfileset dir="${dist}/.." mode="755">
+ 			    <include name="ffmpeg-java/*.sh"/>
+ 			  </tarfileset>
+			  <tarfileset dir="${dist}/..">
+ 			    <include name="ffmpeg-java/**"/>
+ 			    <exclude name="ffmpeg-java/*.sh"/>
+ 			  </tarfileset>			
+		</tar>
+ 			  	
+	</target>
+	
+	<!-- requires commons-net.jar -->
+	<target name="sf-upload" description="upload zipped build to sourcforge">
+		  <ftp server="upload.sourceforge.net"
+		       remotedir="incoming"
+		       userid="anonymous"
+		       password=""
+		       depends="no"
+		  	   binary="yes">
+		    <fileset dir="${dist-zip}"/>
+		  </ftp>
+	</target>
+
+
+	<target name="compile-test-macosx">
+		<mkdir dir="build" />
+		<mkdir dir="build/native" />
+		<mkdir dir="build/native/macosx" />
+		<exec dir="build/native/macosx" executable="g++" failonerror="true">
+			<arg line="-Wall" />
+			<arg line="-o avcodec_sample" />
+			<arg line="-I ${ffmpeg.home}" />
+			<arg line="-I ${ffmpeg.home}/libavformat" />
+			<arg line="-I ${ffmpeg.home}/libavcodec" />
+			<arg line="-I ${ffmpeg.home}/libavutil" />
+			<arg line="-L${ffmpeg.home}/libavformat" />
+			<arg line="-L${ffmpeg.home}/libavcodec" />
+			<arg line="-L${ffmpeg.home}/libavutil" />
+			<arg line="${native}/avcodec_sample.0.4.9.cpp" />
+			<arg line="-lavformat" />
+			<arg line="-lavcodec" />
+			<arg line="-lavutil" />
+			
+		</exec>
+	</target>
+	
+	<target name="compile-test-linux">
+		<mkdir dir="build" />
+		<mkdir dir="build/native" />
+		<mkdir dir="build/native/linux" />
+		<exec dir="build/native/linux" executable="g++" failonerror="true">
+			<arg line="-Wall" />
+			<arg line="-o avcodec_sample" />
+			<arg line="-I ${ffmpeg.home}" />
+			<arg line="-I ${ffmpeg.home}/libavformat" />
+			<arg line="-I ${ffmpeg.home}/libavcodec" />
+			<arg line="-I ${ffmpeg.home}/libavutil" />
+			<arg line="-L${ffmpeg.home}/libavformat" />
+			<arg line="-L${ffmpeg.home}/libavcodec" />
+			<arg line="-L${ffmpeg.home}/libavutil" />
+			<arg line="${native}/avcodec_sample.0.4.9.cpp" />
+			<arg line="-lavformat" />
+			<arg line="-lavcodec" />
+			<arg line="-lavutil" />
+			
+		</exec>
+	</target>
+
+</project>

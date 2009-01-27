@@ -1,0 +1,43 @@
+README for ffmpeg-java
+
+NOTE: ffmpeg-java is not the same thing as FMJ, which stands for "Freedom for Media in Java".  ffmpeg-java is a subproject of FMJ.
+
+ffmpeg-java is a Java wrapper around ffmpeg, using JNA.
+
+It assumes that dynamic libraries for ffmpeg have been compiled, and are in your library path.
+
+Note: mmx is disabled in this example, as it has caused problems in the past.
+
+
+Step 1: Get ffmpeg sources from http://ffmpeg.mplayerhq.hu/
+
+
+Step 2: build/install ffmpeg
+
+./configure --disable-mmx --enable-shared
+make
+sudo make install
+
+
+Step 3. run one of the sample programs with a media file as the first parameter.
+
+You may need to set your library path in order to find the installed ffmpeg dynamic libraries, for example:
+export LD_LIBRARY_PATH=/usr/local/lib
+
+PlayerExample: plays a movie in a window
+java -cp ./ffmpeg-java.jar:./lib/jna.jar net.sf.ffmpeg_java.example.PlayerExample http://www.javasaver.com/testjs/jmf/anim/2005-11-26.mov
+
+AVCodecSample: creates 5 ppm files in the current directory with the first 5 frames of the movie:
+java -cp ./ffmpeg-java.jar:./lib/jna.jar net.sf.ffmpeg_java.example.AVCodecSample http://www.javasaver.com/testjs/jmf/anim/2005-11-26.mov
+
+
+Notes from Stephan Goetter:
+
+
+Very good documentation how to setup build environment (msys and mingw) and how to build ffmpeg on windows can be found here:
+
+http://arrozcru.no-ip.org/ffmpeg_wiki/tiki-index.php
+
+The ffmpeg builts provided at http://arrozcru.no-ip.org/ffmpeg_builds/ have worked too,  but some image codec/format were missing.
+
+

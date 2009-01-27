@@ -1,0 +1,3 @@
+icon.png = mplayer icon from nuvola icon set
+folder.png = folder icon from Neu icon set
+movie.png = video mime type icon from Neu icon set

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="ffmpegJavaModule">
+    <property environment="env"/>
+    <property name="ffmpeg-java.location" value="../ffmpeg-java"/>
+    <property name="ffmpegJavaModule.location" value="../ffmpegJavaModule"/>
+    <property name="ECLIPSE_HOME" value="../../../opt/eclipse"/>
+    <property name="main.location" value="../main"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.5"/>
+    <property name="source" value="1.5"/>
+    <path id="ffmpeg-java.classpath">
+        <pathelement location="${ffmpeg-java.location}/build/classes"/>
+        <pathelement location="${ffmpeg-java.location}/lib/jna.jar"/>
+        <pathelement location="${ffmpeg-java.location}/../lib/bcel-5.2.jar"/>
+    </path>
+    <path id="main.classpath">
+        <pathelement location="${main.location}/bin"/>
+        <pathelement location="${main.location}/../lib/bananas.jar"/>
+        <pathelement location="${main.location}/../lib/bananas-plus-0.1.1-streambabyr1.jar"/>
+        <pathelement location="${main.location}/../lib/hme.jar"/>
+        <pathelement location="${main.location}/../lib/jna.jar"/>
+        <pathelement location="${main.location}/../lib/simulator.jar"/>
+        <pathelement location="${ffmpegJavaModule.location}/bin"/>
+        <pathelement location="${main.location}/../lib/bcel-5.2.jar"/>
+        <pathelement location="${main.location}/../lib/simple-log.jar"/>
+        <path refid="ffmpeg-java.classpath"/>
+        <pathelement location="${ffmpeg-java.location}/build/classes"/>
+        <pathelement location="${main.location}/../lib/bsh-2.0b4.jar"/>
+        <pathelement location="${main.location}/../lib/tarbz.jar"/>
+    </path>
+    <path id="ffmpegJavaModule.classpath">
+        <pathelement location="bin"/>
+        <path refid="main.classpath"/>
+        <pathelement location="../lib/jna.jar"/>
+        <pathelement location="${ffmpeg-java.location}/build/classes"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src" excludes="**/*.launch, **/*.java"/>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="${ffmpeg-java.location}/build.xml" inheritAll="false" target="clean"/>
+        <ant antfile="${main.location}/build.xml" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="${ffmpeg-java.location}/build.xml" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="${main.location}/build.xml" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="ffmpegJavaModule.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+</project>

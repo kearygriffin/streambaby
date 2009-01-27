@@ -1,0 +1,105 @@
+
+String ffmpegUrl= "http://streambaby.googlecode.com/files//ffmpeg-r15986-gpl-shared-win32.tar.bz2";
+//String ffmpegUrl = "http://127.0.01/keary/ffmpeg-r15986-gpl-shared-win32.tar.bz2";
+
+if (!isWindows)
+	return 0;
+String nativePath = baseDir + "/" + "native";
+File nativePathFile = new File(nativePath);
+if (!nativePathFile.exists())
+	nativePathFile.mkdirs();
+ffmpegFile = new File(nativePath + "/" + "ffmpeg.exe");
+if (ffmpegFile.exists())
+	return 0;
+String localFFmpegDistFilename = baseDir + "/" + "ffmpeg-dist.tar.bz2";
+File localFFmpegDist = new File(localFFmpegDistFilename);
+log.print("Download ffmpeg for first-run...");
+addClassPath(baseDir + "/lib/" + "tarbz.jar");
+import com.ice.tar.*;
+
+URL url = new URL(ffmpegUrl);
+if (url == null) {
+	log.print("Error retrieving ffmpeg from: " + ffmpegUrl);
+	return -2;
+}
+boolean error = true;
+InputStream is = null;
+CBZip2InputStream bzis = null;
+tis = null;
+FileOutputStream fos = null;
+
+try {
+	if (!localFFmpegDist.exists()) {
+		log.print("Connecting: " + ffmpegUrl);
+
+		 is = url.openStream();
+		log.print("Downloading...");
+		File tmpf = new File(localFFmpegDistFilename + ".tmp");
+		 fos = new FileOutputStream(tmpf);
+		byte[] b = new byte[4096];
+		int len;
+		while((len=is.read(b)) > 0) {
+			fos.write(b, 0, len);
+		}
+		fos.close();
+		is.close();
+		tmpf.renameTo(localFFmpegDist);
+		log.print("Finished downloading, begin extract.");
+	}	
+	is = new BufferedInputStream(new FileInputStream(localFFmpegDist));
+	
+	bzis = new CBZip2InputStream(is);
+	tis = new TarInputStream(bzis);
+	TarEntry e;
+	while ((e= tis.getNextEntry()) != null) {
+		String name = e.getName();
+		if (name.startsWith("bin/")) {
+			String base = name.substring(4);
+			if (base.length() < 1)
+				continue;
+			if (base.indexOf('/') > 0)
+				continue;
+			log.print("extracting: " + base + " (" + name + ")");
+			File f = new File(nativePath + "/" + base + ".fftmp");
+			fos = new FileOutputStream(f);
+			tis.copyEntryContents(fos);
+			fos.close();
+			fos = null;
+		}
+	}
+	error = false;
+} catch(Exception e) {
+	e.printStackTrace();
+	ffmpegFile.delete();
+}
+if (fos != null) try { fos.close(); } catch(Exception e) {}
+if (tis != null) try { tis.close(); } catch(Exception e) {}
+if (bzis != null) try { bzis.close(); } catch(Exception e) {}
+if (is != null) try { is.close(); } catch(Exception e) {}
+
+if (error) {
+	log.print("Error retrieving/decoding ffmpeg from: " + ffmpegUrl);
+	return -2;
+} else {
+	log.print("Retrieval of ffmpeg complete");
+	File[] files = nativePathFile.listFiles();
+	if (files != null) {
+		for (int i = 0;i<files.length;i++) {
+			if (files[i].getName().endsWith(".fftmp")) {
+				int index = files[i].getAbsolutePath().lastIndexOf(".fftmp");
+				String newName = files[i].getAbsolutePath().substring(0, index);
+				File newFile = new File(newName);
+				newFile.delete();
+				files[i].renameTo(newFile);
+			}
+		}
+	}
+	if (ffmpegFile.exists())
+		return 0;
+	else {
+		log.print("Error, ffmpeg.exe does not exist after extract.");
+		return -2;
+	}
+}
+
+return -2;

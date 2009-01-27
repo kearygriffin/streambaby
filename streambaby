@@ -1,0 +1,3 @@
+#!/bin/bash
+DIRNAME=`dirname $0`
+java -Xmx256m -jar "$DIRNAME/jbin/streambaby.jar" $@

@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<project name="StreamBaby" basedir="." default="all">
+	<property name="version" value="0.20"/>
+	<property name="jbin" value="jbin"/>
+	<property name="ini" value="streambaby.ini"/>
+	<property name="ffmpeg-module" value="ffmpegJavaModule"/>
+	<property name="ffmpeg-java" value="ffmpeg-java"/>
+	<property name="main" value="main"/>
+	<property name="libs" value="lib"/>
+	<property name="dist" value="streambaby-${version}"/>
+	<property name="main.class" value="com.unwiredappeal.tivo.streambaby.StreamBabyMain"/>
+  <pathconvert property="libs.project" pathsep=" ">  
+     <mapper>  
+       <chainedmapper>  
+   
+         <!-- remove absolute path -->  
+         <flattenmapper />  
+   
+         <!-- add lib/ prefix -->  
+         <globmapper from="*" to="../lib/*" />  
+       </chainedmapper>  
+     </mapper>  
+   
+     <path>  
+   
+       <!-- lib.home contains all jar files, in several subdirectories -->  
+       <fileset dir="${libs}">  
+         <include name="**/*.jar" />  
+       </fileset> 
+     </path>  
+   </pathconvert>
+    <target name="clean-projects">
+	<ant dir="${ffmpeg-java}" antfile="custom-build.xml" target="clean"/>
+	<ant dir="${ffmpeg-module}" target="clean"/>
+	<ant dir="${main}" target="clean"/>
+    </target>
+    <target name="clean" depends="clean-projects">
+        <delete dir="${output}"/>
+	<delete dir="${jbin}"/>
+	<delete dir="dist"/>
+	<delete dir="native"/>
+	<delete file="scripts/first-run.bsh.ran"/>
+	<delete file="scripts/first-run.bsh.ran"/>
+	<copy file="scripts/first-run.bsh.default" tofile="scripts/first-run.bsh"/>
+    </target>
+
+
+    <target name="create">
+        <mkdir dir="${jbin}"/>
+	<touch file="native/placeholder.txt" mkdirs="true"/>
+    </target>
+    <target name="create-dist">
+	<mkdir dir="dist"/>
+	<mkdir dir="dist/${dist}"/>
+    </target>
+    <target name="create-dist-src" depends="create-dist">
+	<mkdir dir="dist/${dist}-src"/>
+	<touch file="native/placeholder.txt" mkdirs="true"/>
+
+    </target>
+
+
+    <target name="build-ffmpeg-java" depends="create">
+	<ant dir="${ffmpeg-java}" antfile="custom-build.xml" target="build"/>
+	<copy file="${ffmpeg-java}/build/jars/ffmpeg-java-sb.jar" todir="${jbin}"/>
+    </target>
+   <target name="writeversion">
+   	<echo file="${main}/src/version.txt" append="false" message="${ant.project.name}|${version}"/>	
+   </target>
+    <target name="build-projects" depends="writeversion">
+	<ant dir="${main}" target="build-project"/>
+	<ant dir="${ffmpeg-module}" target="build-project"/>	
+    </target>
+    <target name="jar">
+	<jar destfile="${jbin}/streambaby.jar">
+		<fileset dir="${main}/bin"/>
+		<fileset dir="${ffmpeg-module}/bin"/>
+     <manifest>  
+       <attribute name="Main-Class" value="${main.class}" />  
+       <!-- finally, use the magically generated libs path -->  
+       <attribute name="Class-Path" value=". ${libs.project} ffmpeg-java-sb.jar" />  
+     </manifest>  
+	</jar>
+    </target>
+    <target name="build" depends="create,build-ffmpeg-java,build-projects,jar">
+	<antcall target="clean-projects"/>
+    </target>
+   <target name="all" depends="clean,dist,build"/>
+  <target name="dist-src" depends="clean,create-dist-src">
+	<copy todir="dist/${dist}-src">
+		<fileset dir=".">
+			<include name="assets/**"/>
+			<include name="main/**"/>
+			<include name="native/**"/>
+			<include name="ffmpeg-java/**"/>
+			<include name="win32/**"/>
+			<include name="lib/**"/>
+			<include name="ffmpegJavaModule/**"/>
+			<include name="extra/**"/>
+			<include name="scripts/**"/>
+			<exclude name="scripts/first-run.bsh"/>
+			<exclude name="scripts/first-run.bsh.ran"/>
+			<include name="build.xml"/>
+			<include name="streambaby"/>
+			<include name="streambaby.bat"/>
+			<include name="streambaby.ini.default"/>
+			<include name="simplelog.properties.default"/>
+		</fileset>
+	</copy>
+	<chmod file="dist/${dist}-src/streambaby" perm="ugo+x"/>
+	<chmod file="dist/${dist}-src/streambaby.bat" perm="ugo+x"/>
+
+	<zip destfile="dist/${dist}-src.zip">
+		<zipfileset dir="dist/${dist}-src" prefix="${dist}"
+			includes="**"
+			excludes="streambaby streambaby.bat extra/service/linux32/streambaby extra/service/linux32/bin/wrapper extra/service/linux64/streambaby extra/service/linux64/bin/wrapper"/>
+		<zipfileset file="dist/${dist}-src/streambaby" filemode="755"
+			prefix="${dist}"/>
+		<zipfileset file="dist/${dist}-src/streambaby.bat" filemode="755"
+			prefix="${dist}"/>
+		<zipfileset file="dist/${dist}-src/extra/service/linux32/streambaby" filemode="755" prefix="${dist}/extra/service/linux32"/>
+		<zipfileset file="dist/${dist}-src/extra/service/linux32/bin/wrapper" filemode="755" prefix="${dist}/extra/service/linux32/bin"/>
+		<zipfileset file="dist/${dist}-src/extra/service/linux64/streambaby" filemode="755" prefix="${dist}/extra/service/linux64"/>
+		<zipfileset file="dist/${dist}-src/extra/service/linux64/bin/wrapper" filemode="755" prefix="${dist}/extra/service/linux64/bin"/>
+
+	</zip>
+
+	<delete dir="dist/${dist}-src"/>
+  </target>
+
+   <target name="dist" depends="clean,create-dist,dist-src">
+	<!--  Create src dist -->
+	<antcall target="build"/>
+	<copy file="native/placeholder.txt" todir="dist/${dist}/native"/>
+	<copy todir="dist/${dist}/jbin">
+		<fileset dir="jbin"/>
+	</copy>
+	<copy todir="dist/${dist}/assets">
+		<fileset dir="assets"/>
+	</copy>
+
+	<copy todir="dist/${dist}/lib">
+		<fileset dir="lib"/>
+	</copy>
+	<copy file="streambaby.ini.default" tofile="dist/${dist}/streambaby.ini">
+	</copy>
+	<copy file="simplelog.properties.default" tofile="dist/${dist}/simplelog.properties">
+	</copy>
+	<copy todir="dist/${dist}/scripts">
+		<fileset dir="scripts">
+			<exclude name="first-run.bsh"/>
+			<exclude name="first-run.bsh.ran"/>
+			<exclude name="first-run.bsh.default"/>
+
+		</fileset>
+	</copy>
+	<copy todir="dist/${dist}/extra">
+		<fileset dir="extra"/>
+	</copy>
+	<copy file="scripts/first-run.bsh.default" tofile="dist/${dist}/scripts/first-run.bsh"/>
+	<copy file="streambaby" todir="dist/${dist}"/>
+	<copy file="streambaby.bat" todir="dist/${dist}"/>
+	<fixcrlf file="dist/${dist}/simplelog.properties" eol="dos"/>
+	<fixcrlf file="dist/${dist}/streambaby.bat" eol="dos"/>
+	<fixcrlf file="dist/${dist}/streambaby.ini" eol="dos"/>
+
+	<chmod file="dist/${dist}/streambaby" perm="ugo+x"/>
+	<chmod file="dist/${dist}/streambaby.bat" perm="ugo+x"/>
+
+	<zip destfile="dist/${dist}.zip">
+		<zipfileset dir="dist/${dist}" prefix="${dist}"
+			includes="**"
+			excludes="streambaby streambaby.bat extra/service/linux32/streambaby extra/service/linux32/bin/wrapper extra/service/linux64/streambaby extra/service/linux64/bin/wrapper"/>
+
+		<zipfileset file="dist/${dist}/streambaby" filemode="755"
+			prefix="${dist}"/>
+		<zipfileset file="dist/${dist}/streambaby.bat" filemode="755"
+			prefix="${dist}"/>
+		<zipfileset file="dist/${dist}/extra/service/linux32/streambaby" filemode="755" prefix="${dist}/extra/service/linux32"/>
+		<zipfileset file="dist/${dist}/extra/service/linux32/bin/wrapper" filemode="755" prefix="${dist}/extra/service/linux32/bin"/>
+		<zipfileset file="dist/${dist}/extra/service/linux64/streambaby" filemode="755" prefix="${dist}/extra/service/linux64"/>
+		<zipfileset file="dist/${dist}/extra/service/linux64/bin/wrapper" filemode="755" prefix="${dist}/extra/service/linux64/bin"/>
+
+
+	</zip>
+	<delete dir="dist/${dist}"/>
+   </target>
+  
+</project>

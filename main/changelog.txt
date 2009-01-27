@@ -1,0 +1,52 @@
+ ===V0.20===
+ * Added initial support for .tivo files
+  * Thanks to work by davidblackledge & wmcbrine
+  * Due to streaming bandwidth issues, tivo may have a hard time keeping up.
+  * No support for random positioning within a .tivo file--  Must always start from the beginning.
+  * Because of the above, there is no support for rebuffering at 1.1G point (and .tivo files are usually large)
+  * Due to all of the above, streaming .tivo files is not really that useful ;-)
+ * Fixed audio channels parsing support for ffmpegexe
+ * Modified MP4 streaming code to not interleave if initial audio/video chunks are with 4 megabytes of each other.
+ * Drop -ac parameter from default for ffmpegexe transcode
+ * Moved all assets (icons/images) into asset directory
+ * Changed icon theme.  Icons are searched in assets directory
+ * Added icon/bkg config options icon.icon=, icon.folder=, icon.movie=  
+  * Files are relative to the assets directory
+ * Added new config option ignore.dotfiles.  Set to false if you want files/folders with a dot included
+ * Added new config option remember.password.  Set to false to not remember password from session to session
+ * Added support for testing-- ".raw" files
+  * Will stream to tivo without any processing
+  * Assumes video/mpeg for mimeType and Content-Type by default
+  * if file videofile.raw.fmt exists, the first line is taken as the mime type to use, and the second as the Content-Type
+ * Support for EDL file cutlists.  Looks for movie.ext.edl (so movie.mpg.edl for example)
+  * TiVo doesn't seem to really like jumping around in MP4's too much.  Not sure how good this will work for MP4
+  * MPG seems better, but I still am not sure how accurate the timings are.
+  * cut.startoffset, cut.endoffset can be used to adjust the timings in milliseconds.  Defaults are 0
+   * startoffset will wait this long after seeing a cut point to jump
+   * endoffset will jump this many milliseconds before the cut point says the end should be
+ * Changed default port to 7290
+ * Added config option streambaby.dir to set up where the streambaby directory is.  Also changed the way native path is initialized.
+ 
+ ===V0.19===
+ * Added MKV to default list of extensions to scan
+ * Catch NumberFormatExceptions and return default values while trying to parse ffmpeg output
+ * cahoon/KG:  Fix off-by-one issue (causing ArrayIndexOutOfbounds) in MP4 psuedo-streaming 
+ * Changed preview cache cleanup code to work faster/use less memory & deal with recursive symlinks
+ * Added additional debugging for loading of native ffmpeg libraries  
+ * Fixed bug where saved bookmark position ended up negative (caused Play/Replay screen to not have correct text positioning)
+ * TiVo doesn't seem to report correct duration for MP4's (always seems to report ~8secs less).
+   * Added code to work-around by using my own calculated duration if I receive RSRC_EVENT_COMPLETE from tivo and its duration is shorter than expected
+   * Still some weirdness around end of MP4s--  Shuttle bar will stop moving around 8 seconds before end...
+ * Fixed centering of shuttlebar -- Also made it wider while I was at it.
+  
+===V0.18===
+ * Made changes to compile under JDK1.5, and marked as JDK1.5 compatible
+ * Added ability to gather video information (length/type/etc) without ffmpeg, enabling running without ffmpeg installed (but minus some features)
+ * Ignore files/directories that begin with a dot (.)
+ * Added liba52 as synonym for AC3, mp4aac as synonym for AAC in ffmpegexe module
+ * Added hints for the list, so you can visually see if there are more entries than fit on the screen
+ * Advance key moves back and from bottom to top of list in selection view
+ * Fixed issue with ffmpeg native integration where libavcodec was V51, and libavformat was V52 (used to assume major versions would be equal)
+  * NOTE:  FFmpeg revisions `r10939-r11109` (Nov 7 2007 - Nov 28 2007) will not work, and will also not report any errors. 
+ * Implement new codec detection code for ffmpegjava video module, should have less problems detecting which codecs are in use.
+ 
