@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <project name="StreamBaby" basedir="." default="all">
-	<property name="version" value="0.20"/>
+	<property name="rversion" value="0.20"/>
+	<tstamp/>
+	<property name="bversion" value="${DSTAMP}-${TSTAMP}"/>
 	<property name="jbin" value="jbin"/>
 	<property name="ini" value="streambaby.ini"/>
 	<property name="ffmpeg-module" value="ffmpegJavaModule"/>
 	<property name="ffmpeg-java" value="ffmpeg-java"/>
 	<property name="main" value="main"/>
 	<property name="libs" value="lib"/>
-	<property name="dist" value="streambaby-${version}"/>
 	<property name="main.class" value="com.unwiredappeal.tivo.streambaby.StreamBabyMain"/>
   <pathconvert property="libs.project" pathsep=" ">  
      <mapper>  
@@ -85,7 +86,16 @@
     <target name="build" depends="create,build-ffmpeg-java,build-projects,jar">
 	<antcall target="clean-projects"/>
     </target>
-   <target name="all" depends="clean,dist,build"/>
+   <target name="init">
+		<property name="version" value="${bversion}"/>
+	<property name="dist" value="streambaby-${version}"/>
+
+	</target>
+   <target name="all" depends="init,clean,dist-both,build"/>
+  <target name="release">
+	<property name="version" value="${rversion}"/>
+	<antcall target="all"/>
+  </target>
   <target name="dist-src" depends="clean,create-dist-src">
 	<copy todir="dist/${dist}-src">
 		<fileset dir=".">
@@ -128,7 +138,7 @@
 	<delete dir="dist/${dist}-src"/>
   </target>
 
-   <target name="dist" depends="clean,create-dist,dist-src">
+   <target name="dist-both" depends="clean,create-dist,dist-src">
 	<!--  Create src dist -->
 	<antcall target="build"/>
 	<copy file="native/placeholder.txt" todir="dist/${dist}/native"/>
