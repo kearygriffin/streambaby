@@ -57,4 +57,9 @@ public class ScreenTemplate extends BScreenPlus {
    public boolean handleKeyPress(int code, long rawcode) {  
       return super.handleKeyPress(code, rawcode);
    }      
+   
+   @Override
+   protected void viewRemoveNotify() {
+       super.viewRemoveNotify();
+   }
 }

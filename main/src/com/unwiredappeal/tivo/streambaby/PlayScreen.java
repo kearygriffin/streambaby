@@ -7,6 +7,7 @@ import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.ViewUtils;
 import com.tivo.hme.bananas.layout.Layout;
 import com.tivo.hme.bananas.layout.LayoutManager;
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.Log;
 
@@ -114,7 +115,7 @@ public class PlayScreen extends ScreenTemplate {
 	    			((StreamBabyStream) getBApp()).cachePersistentData(ViewScreen.persistKey(de.getUri()),
 	    					"0", true);
 	    	   }
-	    	   ViewScreen newScreen = new ViewScreen(getBApp(), de);
+	    	   ViewScreen newScreen = new ViewScreen(getBApp(), de, StreamBabyConfig.inst.getDefaultQuality());
 	    	   getBApp().push(newScreen, TRANSITION_LEFT);
 	       } else if (entry.cmd == CMD_GOBACK)
 	    	   moveLeft();

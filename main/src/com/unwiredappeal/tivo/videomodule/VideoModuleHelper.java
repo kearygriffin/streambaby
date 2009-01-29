@@ -123,7 +123,7 @@ public class VideoModuleHelper {
 		return st;
 		
 	}
-	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vinfo, long startPos) {
+	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vinfo, long startPos, int qual) {
 		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
 		if (disableTranscode)
 			return null;
@@ -137,7 +137,7 @@ public class VideoModuleHelper {
 			VideoHandlerModule m = it.next();
 			if (m.canTranscode(uri, vinfo)) {
 				try {
-					st = m.openTranscodedVideo(uri, vinfo,  startPos);
+					st = m.openTranscodedVideo(uri, vinfo,  startPos, qual);
 				} catch (IOException e) {
 
 				}
@@ -220,11 +220,23 @@ public class VideoModuleHelper {
 	public int getModuleCount() {
 		return modules.size();
 	}
+	public int getBitRateForQual(int qual) {
+		int br = StreamBabyConfig.inst.getVideoBr(qual) + StreamBabyConfig.inst.getAudioBr(qual);
+		Log.debug("Bitrate for quality: " + br);
+		return br;
+	}
 	public VideoInputStream openVideo(URI deUri,
-			VideoInformation videoInformation, long startPosition) {
-		VideoInputStream vis = openStreamableVideo(deUri, videoInformation, startPosition);
+			VideoInformation videoInformation, long startPosition, int qual) {
+		if (qual == VideoFormats.QUALITY_AUTO) {
+			qual = StreamBabyConfig.inst.getAutoQuality();
+		}
+		VideoInputStream vis = null;
+		if (qual == VideoFormats.QUALITY_SAME || videoInformation.getBitRate() <= getBitRateForQual(qual)) {
+			Log.debug("quality setting is above quality of video, streaming normally");
+			vis = openStreamableVideo(deUri, videoInformation, startPosition);
+		}
 		if (vis != null)
 			return vis;
-		return openTranscodedVideo(deUri, videoInformation, startPosition);
+		return openTranscodedVideo(deUri, videoInformation, startPosition, qual);
 	}
 }

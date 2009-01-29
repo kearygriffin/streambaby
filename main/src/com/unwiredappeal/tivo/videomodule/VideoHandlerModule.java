@@ -16,7 +16,7 @@ public interface VideoHandlerModule {
 	
 	public boolean initialize();
 	public VideoInputStream openStreamableVideo(URI uri, VideoInformation vi, long startPosition) throws IOException;
-	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition) throws IOException;
+	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition, int qual) throws IOException;
 	public PreviewGenerator getPreviewHandler(URI uri, VideoInformation vi, boolean realtime);
 	public boolean fillVideoInformation(URI uri, VideoInformation vidinfo);
 	public boolean canStream(URI uri, VideoInformation vinfo);

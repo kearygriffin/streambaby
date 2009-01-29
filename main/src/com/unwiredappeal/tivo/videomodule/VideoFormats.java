@@ -31,6 +31,22 @@ public class VideoFormats {
 	public static final String VIDEO_CODEC_MPEG1 = "mp1v";
 	public static final String VIDEO_CODEC_VC1 = "vc1";
 	public static final String CONTAINER_MP3 = "mp3";
+	
+	public static final int QUALITY_AUTO = -2;
+	public static final int QUALITY_SAME = -1;
+	
+	public static final int QUALITY_LOWEST = 1;
+	public static final int QUALITY_LOW = 2;
+	public static final int QUALITY_MEDIUMLOW = 3;
+	public static final int QUALITY_MEDIUM = 4;
+	public static final int QUALITY_MEDIUMHIGH = 5;
+	public static final int QUALITY_HIGH = 6;
+	public static final int QUALITY_HIGHEST = 7;
+
+	public static final int LAST_QUALITY = 7;
+	public static final int LOWEST_AUTO_BITRATE = 512;
+	
+	
 	public static final Collection<String> wildCardList = Arrays.asList(new String[] { "*" } );
 
 	protected static boolean checkFormatOk(Collection<String> allowed, Collection<String> disallowed, String s) {

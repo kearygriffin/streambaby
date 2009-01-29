@@ -107,11 +107,12 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	List<DirEntry> videoList;
 	private String folderName;
 	boolean playingMultiple = false;
-	
+	int quality;
 	public PreviewWindow preview = null;
 
-	public ViewScreen(BApplicationPlus app, List<DirEntry> elist, String name) {
+	public ViewScreen(BApplicationPlus app, List<DirEntry> elist, String name, int quality) {
 		super(app);
+		this.quality = quality;
 		this.folderName = name;
 		this.videoList = elist;
 		if (elist.size() > 1)
@@ -130,8 +131,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	}
 
 	//TivoCmd tivoCmd;
-	public ViewScreen(BApplicationPlus app, DirEntry e) {
-		this(app, Arrays.asList(new DirEntry[] { e  }), null);
+	public ViewScreen(BApplicationPlus app, DirEntry e, int kbps) {
+		this(app, Arrays.asList(new DirEntry[] { e  }), null, kbps);
 	}
 
 	public void setDefaultBackground() {
@@ -422,7 +423,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		else {
 			VideoInputStream is = null;
 			Log.debug("Openening stream at position: " + startPosition + "(" + startPosition/1000 + " secs)");
-			is = VideoModuleHelper.inst.openVideo(deUri, de.getVideoInformation(), startPosition);
+			is = VideoModuleHelper.inst.openVideo(deUri, de.getVideoInformation(), startPosition, quality);
 			canSeek = is.canPosition();
 			if (!canSeek)
 				startPosition = 0;

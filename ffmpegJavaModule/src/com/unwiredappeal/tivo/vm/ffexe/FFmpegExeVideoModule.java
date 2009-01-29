@@ -21,6 +21,7 @@ import com.unwiredappeal.mediastreams.VideoInputStream;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.streambaby.PreviewWindow;
+import com.unwiredappeal.tivo.utils.PropertyReplacer;
 import com.unwiredappeal.tivo.utils.SocketProcessInputStream;
 import com.unwiredappeal.tivo.utils.Utils;
 import com.unwiredappeal.tivo.utils.Log;
@@ -82,8 +83,20 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 	*/
 	public static ConfigEntry cfgFFmpegTranscodeArgs = new ConfigEntry(
 			"ffmpegexe.transcode",
-			"-acodec ac3 -ab 192k -vcodec mpeg2video -f vob -sameq -async 1 -v 0",
+			"-acodec ac3 -vcodec mpeg2video -f vob -async 1 -v 0",
 			"Arguments to use when transcoding from ffmpeg"
+			);
+	
+	public static ConfigEntry cfgFFmpegSameQArgs = new ConfigEntry(
+			"ffmpegexe.transcode.sameqargs",
+			"-sameq -ab 192k",
+			"Argument to pass for ffmpeg to transcode at same qual as orig"
+			);
+	
+	public static ConfigEntry cfgFFmpegBpsQualArgs = new ConfigEntry(
+			"ffmpegexe.transcode.qualargs",
+			"-bufsize 4096k -b ${bitrate}k -maxrate 8000k -ab ${abitrate}k",
+			"Arguments to pass to ffmpeg to transcode at a particular kbps"
 			);
 
 	public static ConfigEntry cfgFFmpegTranscodeMime = new ConfigEntry(
@@ -552,9 +565,28 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 		return null;
 	}
 
-	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition) throws IOException {
+	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition, int qual) throws IOException {
 		//String addArgs = " -aspect " + vi.getAspect();
-		String addArgs = "";
+		String addArgs;
+		if (qual == VideoFormats.QUALITY_SAME)
+			addArgs = cfgFFmpegSameQArgs.getValue();
+		else {
+			PropertyReplacer pr = new PropertyReplacer();
+			int abr = StreamBabyConfig.inst.getAudioBr(qual);
+			abr = ((abr+31)/32) * 32;
+			abr = Math.max(abr, 64);
+			pr.set("bitrate", StreamBabyConfig.inst.getVideoBr(qual));
+			pr.set("abitrate", abr);
+			addArgs = pr.parseProperties(cfgFFmpegBpsQualArgs.getValue());
+			int chans = StreamBabyConfig.inst.getAudioChannels(qual);
+			if (chans > 0) {
+				addArgs += " -ac " + chans;
+			}
+			Log.debug("Using ffmpeg transcode args: " + addArgs);
+		}
+		if (addArgs.length() > 0)
+			addArgs = " " + addArgs;
+				
 		return openVideo(uri, vi, startPosition, cfgFFmpegTranscodeArgs.getValue() + addArgs, cfgFFmpegTranscodeMime.getValue());
 	}
 	

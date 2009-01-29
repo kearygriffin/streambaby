@@ -10,6 +10,7 @@ import com.tivo.hme.bananas.BHighlights;
 import com.tivo.hme.bananas.BListPlus;
 import com.tivo.hme.bananas.BText;
 import com.tivo.hme.bananas.BView;
+import com.tivo.hme.bananas.PlusSupport;
 import com.tivo.hme.bananas.layout.Layout;
 import com.tivo.hme.bananas.layout.LayoutManager;
 import com.tivo.hme.sdk.util.Ticker;
@@ -231,6 +232,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
       setTitle(this.toString());
        */
       getBApp().pop();
+      PlusSupport.viewRemoveNotify(this);
    }
    
    public boolean handleKeyPress(int code, long rawcode) {
@@ -261,14 +263,14 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 	      if (entry.isFolder()) {
 	    	  List<DirEntry> dlist = entry.getEntryList(sapp.getPassword());
 	    	  if (dlist != null && !dlist.isEmpty()) {
-	    		  ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName());
+	    		  ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
 		          getBApp().push(newScreen, TRANSITION_LEFT);
 		          lastEntryPush(entry.getName());	    		  
 	    	  } else {
 	    		  play("bonk.snd");
 	    	  }
 	      } else {
-	     	  ViewScreen newScreen = new ViewScreen(getBApp(), entry);
+	     	  ViewScreen newScreen = new ViewScreen(getBApp(), entry, StreamBabyConfig.inst.getDefaultQuality());
 	          getBApp().push(newScreen, TRANSITION_LEFT);
 	          // Update lastEntry stack
 	          lastEntryPush(entry.getName());
@@ -284,7 +286,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 		    		dlist.add(entry);
 		    }
 	    	  if (dlist != null && !dlist.isEmpty()) {
-	    		  ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName());
+	    		  ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
 		          getBApp().push(newScreen, TRANSITION_LEFT);
 		          lastEntryPush(list.get(list.getFocus()).getName());	    		  
 	    	  } else {

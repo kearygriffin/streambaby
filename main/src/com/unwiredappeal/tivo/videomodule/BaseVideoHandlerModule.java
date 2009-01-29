@@ -26,7 +26,7 @@ public class BaseVideoHandlerModule extends ConfigurableObject implements VideoH
 	public VideoInputStream openStreamableVideo(URI uri, VideoInformation vi, long startPosition) throws IOException {
 		return null;
 	}
-	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition) throws IOException {
+	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition, int br_kbps) throws IOException {
 		return null;
 	}
 	public PreviewGenerator getPreviewHandler(URI uri, VideoInformation vi, boolean realtime) {

@@ -17,6 +17,7 @@ import com.unwiredappeal.tivo.utils.AvailableSocket;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 import com.unwiredappeal.tivo.utils.TempFileManager;
+import com.unwiredappeal.tivo.videomodule.VideoFormats;
 import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
 import com.unwiredappeal.virtmem.MappedFileMemoryManager;
 
@@ -257,7 +258,43 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"0",
 			"set to the number of milliseconds to jump to before the end of a cutpoint"
 			);
+	
+	public static ConfigEntry cfgQualityHighestVbr = new ConfigEntry(
+			"quality.highestvbr",
+			"8000",
+			"video kbps for highest quality setting"
+			);
+	
+	public static ConfigEntry cfgQualityLowestVbr = new ConfigEntry(
+			"quality.lowestvbr",
+			"512",
+			"video kbps for lowest quality setting"
+			);
 
+	public static ConfigEntry cfgQualityHighestAbr = new ConfigEntry(
+			"quality.highestabr",
+			"192",
+			"audio kbps for highest quality setting"
+			);
+	
+	public static ConfigEntry cfgQualityLowestAbr = new ConfigEntry(
+			"quality.lowestvbr",
+			"128",
+			"audio kbps for lowest quality setting"
+			);
+
+	public static ConfigEntry cfgTwoChannel = new ConfigEntry(
+			"quality.2channel",
+			"4",
+			"below or equal to this quality level, force drop to 2 channels"
+			);
+
+	public static ConfigEntry cfgDefaultQuality = new ConfigEntry(
+			"quality.default",
+			"same",
+			"default quality to use"
+			);
+	
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
@@ -561,10 +598,81 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 		streamBabyDir = dir;
 	}
+
 	
+	public int getDefaultQuality() {
+		String qualString = cfgDefaultQuality.getValue().toLowerCase();
+		if (qualString.compareTo("auto") == 0)
+			return VideoFormats.QUALITY_AUTO;
+		else if (qualString.compareTo("same") == 0)
+			return VideoFormats.QUALITY_SAME;
+		else {
+			int q = cfgDefaultQuality.getInt();
+			if (q >= VideoFormats.QUALITY_LOWEST && q <= VideoFormats.QUALITY_HIGHEST)
+				return q;
+		}
+		return VideoFormats.QUALITY_SAME;
+	}
+	
+	public int getAutoQuality() {
+		return VideoFormats.QUALITY_SAME;
+	}
+	
+	public int getAudioChannels(int qual) {
+		if (cfgTwoChannel.getInt() < VideoFormats.QUALITY_LOWEST)
+			return 0;
+		
+		if (qual > VideoFormats.LAST_QUALITY) {
+			int thisAudioBitrate = getAudioBr(qual);
+			int twobitrate = getAudioBr(cfgTwoChannel.getInt());
+			if (thisAudioBitrate <= twobitrate)
+				return 2;
+			else
+				return 0;
+		} else {
+			if (qual <= cfgTwoChannel.getInt())
+				return 2;
+			else
+				return 0;
+		}
+	}
 
+	public int getVideoBr(int qual) {
+		if (qual > VideoFormats.LAST_QUALITY) {
+			return qual - getAudioBr(qual);
+		}
+		int range = cfgQualityHighestVbr.getInt() - cfgQualityLowestVbr.getInt();
+		int qrange = VideoFormats.QUALITY_HIGHEST - VideoFormats.QUALITY_LOWEST;
+		qual = qual - VideoFormats.QUALITY_LOWEST;
+		int delta = (int)((qual / (float)qrange) * range);
+		return cfgQualityLowestVbr.getInt() + delta;
+		
+	}
 
+	public int getAudioBr(int qual) {
+		int delta;
+		if (qual > VideoFormats.LAST_QUALITY) {
+			if (qual <= cfgQualityLowestVbr.getInt())
+				return cfgQualityLowestAbr.getInt();
+			if (qual >= cfgQualityHighestVbr.getInt())
+				return cfgQualityHighestAbr.getInt();
+			
+			int range = cfgQualityHighestVbr.getInt() - cfgQualityLowestVbr.getInt();
+			int arange = cfgQualityHighestAbr.getInt() - cfgQualityLowestAbr.getInt();
 
+			int q = qual - cfgQualityLowestVbr.getInt();
+			delta = (int)((q / (float)range) * arange);
+			
+		} else {
+			int range = cfgQualityHighestAbr.getInt() - cfgQualityLowestAbr.getInt();
+			int qrange = VideoFormats.QUALITY_HIGHEST - VideoFormats.QUALITY_LOWEST;
+			qual = qual - VideoFormats.QUALITY_LOWEST;
+			delta = (int)((qual / (float)qrange) * range);
+		}
+		return cfgQualityLowestAbr.getInt() + delta;
+
+	}
+	
 
 }
  
