@@ -39,6 +39,7 @@ import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.NamedStream;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
+import com.unwiredappeal.tivo.videomodule.VideoFormats;
 import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
 
 public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanupable {
@@ -423,6 +424,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		else {
 			VideoInputStream is = null;
 			Log.debug("Openening stream at position: " + startPosition + "(" + startPosition/1000 + " secs)");
+			if (quality == VideoFormats.QUALITY_AUTO)
+				quality = sapp.getAutoQuality();
 			is = VideoModuleHelper.inst.openVideo(deUri, de.getVideoInformation(), startPosition, quality);
 			canSeek = is.canPosition();
 			if (!canSeek)
@@ -602,11 +605,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			keypad.removeAllElements();
 		}
 
-		// Prevent timeout by sending acknowledge signal every few mins
-		if (date > timeout_idle) {
+		if (event.getOpCode() == HmeEvent.EVT_IDLE) {
 			getApp().acknowledgeIdle(true);
-			timeout_idle = date + 4000;
+			return true;
 		}
+
 
 		// Update stream position and duration information
 		if (event instanceof HmeEvent.ResourceInfo) {

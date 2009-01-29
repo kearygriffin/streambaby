@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 
 import com.unwiredappeal.mediastreams.MP4StreamingModule;
 import com.unwiredappeal.mediastreams.MpegStreamingModule;
@@ -261,7 +262,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgQualityHighestVbr = new ConfigEntry(
 			"quality.highestvbr",
-			"8000",
+			"5000",
 			"video kbps for highest quality setting"
 			);
 	
@@ -283,6 +284,18 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"audio kbps for lowest quality setting"
 			);
 
+	public static ConfigEntry cfgQualityHighestRes= new ConfigEntry(
+			"quality.highres",
+			"720",
+			"Highest allowable height resolution for quality settings"
+			);
+
+	public static ConfigEntry cfgQualityLowestRes= new ConfigEntry(
+			"quality.lowres",
+			"400",
+			"lowest allowable height resolution for quality settings"
+			);
+	
 	public static ConfigEntry cfgTwoChannel = new ConfigEntry(
 			"quality.2channel",
 			"4",
@@ -292,15 +305,34 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static ConfigEntry cfgDefaultQuality = new ConfigEntry(
 			"quality.default",
 			"same",
-			"default quality to use"
+			"default quality to use.  Can be auto/same, 1-7 (lowest=1,highest=7), or kbps"
 			);
 	
+	public static ConfigEntry cfgAutoQuality = new ConfigEntry(
+			"quality.auto",
+			"false",
+			"Turn on auto-quality.  Will check bandwidth at startup and base quality on bandwidth"
+			);
+	
+	public static ConfigEntry cfgAutoQualityPercent = new ConfigEntry(
+			"quality.auto.percent",
+			"70",
+			"Use this percentage of bandwidth for stream transfer"
+			);
+
+	public static ConfigEntry cfgQualitySelection = new ConfigEntry(
+			"quality.select",
+			"true",
+			"Enable user to select quality from 'play' screen"
+			);
+
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
 			new moduleEntryHandler(),
 			"select which video modules to load"
 			);
+	
 	
 
 	
@@ -546,6 +578,14 @@ public class StreamBabyConfig extends ConfigurableObject {
 		processConfiguration();
 		return false;
 	}
+	
+	public boolean readConfiguration(Map<String, String> props) {
+		if (configRead)
+			return true;
+		ConfigurationManager.inst.setConfigProperties(props);
+		processConfiguration();
+		return true;
+	}
 
 	public String getConfigHelp() {
 		return ConfigurationManager.inst.getHelpString();
@@ -614,10 +654,6 @@ public class StreamBabyConfig extends ConfigurableObject {
 		return VideoFormats.QUALITY_SAME;
 	}
 	
-	public int getAutoQuality() {
-		return VideoFormats.QUALITY_SAME;
-	}
-	
 	public int getAudioChannels(int qual) {
 		if (cfgTwoChannel.getInt() < VideoFormats.QUALITY_LOWEST)
 			return 0;
@@ -673,6 +709,29 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	}
 	
+	public int getYRes(int qual) {
+		int delta;
+		if (qual > VideoFormats.LAST_QUALITY) {
+			if (qual <= cfgQualityLowestVbr.getInt())
+				return cfgQualityLowestRes.getInt();
+			if (qual >= cfgQualityHighestVbr.getInt())
+				return cfgQualityHighestRes.getInt();
+			
+			int range = cfgQualityHighestVbr.getInt() - cfgQualityLowestVbr.getInt();
+			int yrange = cfgQualityHighestRes.getInt() - cfgQualityLowestRes.getInt();
+
+			int q = qual - cfgQualityLowestRes.getInt();
+			delta = (int)((q / (float)range) * yrange);
+			
+		} else {
+			int range = cfgQualityHighestRes.getInt() - cfgQualityLowestRes.getInt();
+			int qrange = VideoFormats.QUALITY_HIGHEST - VideoFormats.QUALITY_LOWEST;
+			qual = qual - VideoFormats.QUALITY_LOWEST;
+			delta = (int)((qual / (float)qrange) * range);
+		}
+		return cfgQualityLowestRes.getInt() + delta;
+
+	}
 
 }
  

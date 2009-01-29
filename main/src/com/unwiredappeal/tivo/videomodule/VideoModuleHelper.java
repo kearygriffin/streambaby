@@ -87,6 +87,33 @@ public class VideoModuleHelper {
 		
 	}
 
+	public boolean canTranscode(URI uri, VideoInformation vinfo) {
+		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
+		if (disableTranscode)
+			return false;
+		Iterator<VideoHandlerModule> it = modules.iterator();
+		while(it.hasNext()) {
+			VideoHandlerModule m = it.next();
+			if (m.canTranscode(uri, vinfo))
+				return true;
+				
+		}
+		return false;
+		
+	}
+
+	
+	public boolean canStream(URI uri, VideoInformation vinfo) {
+		Iterator<VideoHandlerModule> it = modules.iterator();
+		while(it.hasNext()) {
+			VideoHandlerModule m = it.next();
+			if (m.canStream(uri, vinfo)) {
+				return true;
+			}
+		}
+		return false;		
+	}
+
 	
 	public static interface GetPriority {
 		int getPriority(VideoHandlerModule m);
@@ -228,7 +255,9 @@ public class VideoModuleHelper {
 	public VideoInputStream openVideo(URI deUri,
 			VideoInformation videoInformation, long startPosition, int qual) {
 		if (qual == VideoFormats.QUALITY_AUTO) {
-			qual = StreamBabyConfig.inst.getAutoQuality();
+			// openVideo should never be called with QUALITY_AUTO
+			Log.error("ERROR!: openVideo called with QUALITY_AUTO.  This should never happen. Assuming QUALITY_SAME");
+			qual = VideoFormats.QUALITY_SAME;
 		}
 		VideoInputStream vis = null;
 		if (qual == VideoFormats.QUALITY_SAME || videoInformation.getBitRate() <= getBitRateForQual(qual)) {

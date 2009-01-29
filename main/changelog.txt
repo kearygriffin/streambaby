@@ -1,4 +1,4 @@
- ===V0.20===
+ ===SVN===
  * Added initial support for .tivo files
   * Thanks to work by davidblackledge & wmcbrine
   * Due to streaming bandwidth issues, tivo may have a hard time keeping up.
@@ -26,7 +26,10 @@
    * endoffset will jump this many milliseconds before the cut point says the end should be
  * Changed default port to 7290
  * Added config option streambaby.dir to set up where the streambaby directory is.  Also changed the way native path is initialized.
- 
+ * Changed IDLE/timeout code, thanks to wmcbrine
+ * Added support for different transcoding qualities.  If a quality other than SAME is chosen, it may force transcoding.
+ * Added FLV container support, and changed defaults for ffmpeg preview/transcode to try and work with all containers "*"
+  
  ===V0.19===
  * Added MKV to default list of extensions to scan
  * Catch NumberFormatExceptions and return default values while trying to parse ffmpeg output

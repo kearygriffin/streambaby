@@ -31,6 +31,7 @@ public class VideoFormats {
 	public static final String VIDEO_CODEC_MPEG1 = "mp1v";
 	public static final String VIDEO_CODEC_VC1 = "vc1";
 	public static final String CONTAINER_MP3 = "mp3";
+	public static final String CONTAINER_FLV = "flv";
 	
 	public static final int QUALITY_AUTO = -2;
 	public static final int QUALITY_SAME = -1;

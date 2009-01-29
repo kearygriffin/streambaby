@@ -68,6 +68,15 @@ public class ConfigurationManager {
 			return false;
 		}
 	}
+	
+	public void setConfigProperties(Map<String, String> map) {
+		configProps.clear();
+		Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry<String, String> e = it.next();
+			configProps.setProperty(e.getKey(), e.getValue());
+		}
+	}
 
 	public boolean getBooleanProperty(String string, boolean b) {
 		String def = b ? "true" : "false";

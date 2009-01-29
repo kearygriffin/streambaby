@@ -31,6 +31,7 @@ import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.InfoCache;
 import com.unwiredappeal.tivo.utils.NamedStream;
 import com.unwiredappeal.tivo.utils.Log;
+import com.unwiredappeal.tivo.videomodule.VideoFormats;
 
 public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	
@@ -38,13 +39,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
     public boolean simulator = false;
     public String pw;
     private DirEntry builtRoot;
-    //private BView innerSimView;
-    
-	//public SelectionScreen screen;
-	//public int level = 0;
-	//private Stack<String> lastEntry = new Stack<String>();
-	//private DirEntry curDir;
-	//public static String password = "sundance";
+    public int autoQuality = VideoFormats.QUALITY_SAME;
 	Map<String, String> persistentCache = Collections.synchronizedMap(new HashMap<String, String>());
 	public Vector<String> lastEntry = new Vector<String> ();
 	public ImageResource filmResource;
@@ -127,6 +122,12 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 			pop();
 		}
 	}
+	
+	public int getAutoQuality() {
+		return autoQuality;
+	}
+	
+
 
    public static class StreamBabyStreamFactory extends FactoryPlus {
 	   	  private Timer timer = new Timer();

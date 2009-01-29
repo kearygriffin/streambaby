@@ -15,7 +15,7 @@ import com.unwiredappeal.tivo.videomodule.VideoFormats;
 public class BaseFFmpegVideoModule extends BaseVideoHandlerModule {
 
 	
-	public static final String containerFormatsArray[] = {"mp4" , "mpeg", "avi", "matroska", "asf", "mp3", "mpegvideo" };
+	public static final String containerFormatsArray[] = {"mp4" , "mpeg", "avi", "matroska", "asf", "mp3", "mpegvideo", "flv" };
 	// codecs:  ac3, mp4a, h264 mpeg2video, mp2, (special case: 0x0000 == ac3)
 	protected  static Map<String, String> containerMap = new HashMap<String, String>();
 	protected static Map<String, String> codecMap = new HashMap<String, String>();
@@ -30,6 +30,7 @@ public class BaseFFmpegVideoModule extends BaseVideoHandlerModule {
 		containerMap.put("asf", VideoFormats.CONTAINER_WMV);
 		containerMap.put("mp3", VideoFormats.CONTAINER_MP3);
 		containerMap.put("mpegvideo", VideoFormats.CONTAINER_MPEGES);
+		containerMap.put("flv", VideoFormats.CONTAINER_FLV);
 		
 		audioCodecMap.put("mp2", VideoFormats.AUDIO_CODEC_MP2);
 		audioCodecMap.put("mp3", VideoFormats.AUDIO_CODEC_MP3);

@@ -62,4 +62,8 @@ public class ScreenTemplate extends BScreenPlus {
    protected void viewRemoveNotify() {
        super.viewRemoveNotify();
    }
+   
+   public void play(String snd) {
+	   getBApp().play(snd);
+   }
 }

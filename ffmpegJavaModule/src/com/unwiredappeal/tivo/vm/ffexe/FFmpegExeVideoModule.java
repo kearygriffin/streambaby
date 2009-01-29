@@ -95,7 +95,7 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 	
 	public static ConfigEntry cfgFFmpegBpsQualArgs = new ConfigEntry(
 			"ffmpegexe.transcode.qualargs",
-			"-bufsize 4096k -b ${bitrate}k -maxrate 8000k -ab ${abitrate}k",
+			"-bufsize 4096k -b ${bitrate}k -maxrate 8000k -ab ${abitrate}k -s ${xres}x${yres}",
 			"Arguments to pass to ffmpeg to transcode at a particular kbps"
 			);
 
@@ -116,7 +116,7 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 
 	public static ConfigEntry cfgPreviewableFormats = new ConfigEntry(
 			"ffmpegexe.previewformats",
-			"default",
+			"*,*,*",
 			"list of formats the ffmpegexe module should attempt to preview"
 			);
 	
@@ -128,7 +128,7 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 
 	public static ConfigEntry cfgTranscodableFormats = new ConfigEntry(
 			"ffmpegexe.transcodeformats",
-			"default",
+			"*,*,*",
 			"list of formats the ffmpegexe module should attempt to transcode"
 			);
 	
@@ -575,8 +575,19 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 			int abr = StreamBabyConfig.inst.getAudioBr(qual);
 			abr = ((abr+31)/32) * 32;
 			abr = Math.max(abr, 64);
+			int yres = vi.getHeight();
+			int xres = vi.getWidth();
+			int maxy = StreamBabyConfig.inst.getYRes(qual);
+			maxy = ((maxy+31)/32) * 32;
+			if (maxy < yres) {
+				xres = (int)(xres * (maxy/(float)yres));
+				xres = ((xres+31)/32) * 32;
+				yres = maxy;
+			}
 			pr.set("bitrate", StreamBabyConfig.inst.getVideoBr(qual));
 			pr.set("abitrate", abr);
+			pr.set("xres", xres);
+			pr.set("yres", yres);
 			addArgs = pr.parseProperties(cfgFFmpegBpsQualArgs.getValue());
 			int chans = StreamBabyConfig.inst.getAudioChannels(qual);
 			if (chans > 0) {
