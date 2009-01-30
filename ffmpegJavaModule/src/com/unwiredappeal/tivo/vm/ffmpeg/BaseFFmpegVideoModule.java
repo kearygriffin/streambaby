@@ -50,6 +50,10 @@ public class BaseFFmpegVideoModule extends BaseVideoHandlerModule {
 	}
 	public static final List<String> containerFormatsList =  Arrays.asList(containerFormatsArray);
 	
+	public static final double[] mpegFps = new double[] {
+		23.976, 24, 25, 29.97, 30
+	};
+	
 	//public static AllowableFormats streamableFormats = new AllowableFormats(new Formats(new String[] { VideoFormats.CONTAINER_MPEGPS }, new String[] { VideoFormats.VIDEO_CODEC_MPEG2 }, new String[] {VideoFormats.AUDIO_CODEC_AC3, VideoFormats.AUDIO_CODEC_MP2}), null);
 	//public static AllowableFormats previewableFormats = new AllowableFormats(new Formats(containerMap.values().toArray(new String[0]), videoCodecMap.values().toArray(new String[0]), new String[] { "*" }), null);
 	//public static AllowableFormats transcodableFormats = new AllowableFormats(new Formats(containerMap.values().toArray(new String[0]), videoCodecMap.values().toArray(new String[0]), new String[] { "*" }), null);

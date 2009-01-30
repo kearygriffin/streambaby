@@ -322,10 +322,17 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public static ConfigEntry cfgQualitySelection = new ConfigEntry(
 			"quality.select",
-			"true",
+			"false",
 			"Enable user to select quality from 'play' screen"
 			);
 
+	public static ConfigEntry cfgTopLevelSkip = new ConfigEntry(
+			"toplevel.skip",
+			"false",
+			"Set to true to skip top-level folders if there is only one"
+			);
+
+	
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
@@ -604,35 +611,39 @@ public class StreamBabyConfig extends ConfigurableObject {
 		String launchDir = System.getenv("LAUNCHDIR");
 		if (launchDir != null && launchDir.length() > 0)
 			workingDir  = launchDir;
-		String dir = workingDir;
-		try {
-			Class<ConfigurationManager> c = ConfigurationManager.class;
-			if (c != null) {
-				URL url = c.getResource(c.getSimpleName() + ".class");
-				String urlString = url.toString();
-				if (urlString != null) {
-					int i;
-					i = urlString.lastIndexOf("/jbin/");
-
-					if (i < 0) {
-						i = urlString.lastIndexOf("/main/bin/");
-					}
-					if (i >= 0) {
-						urlString = urlString.substring(0, i);
-					}
-					if (urlString.startsWith("jar:")) {
-						urlString = urlString.substring(4);
-					}
-					dir = new File(new URL(urlString).toURI()).getCanonicalPath();
-				} else
-					dir = workingDir;
+		
+		String dir = System.getProperty("streambaby.dir");
+		if (dir == null) {
+			dir = workingDir;
+			try {
+				Class<ConfigurationManager> c = ConfigurationManager.class;
+				if (c != null) {
+					URL url = c.getResource(c.getSimpleName() + ".class");
+					String urlString = url.toString();
+					if (urlString != null) {
+						int i;
+						i = urlString.lastIndexOf("/jbin/");
+	
+						if (i < 0) {
+							i = urlString.lastIndexOf("/main/bin/");
+						}
+						if (i >= 0) {
+							urlString = urlString.substring(0, i);
+						}
+						if (urlString.startsWith("jar:")) {
+							urlString = urlString.substring(4);
+						}
+						dir = new File(new URL(urlString).toURI()).getCanonicalPath();
+					} else
+						dir = workingDir;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		//debug.print("CurDir: " + dir);
 

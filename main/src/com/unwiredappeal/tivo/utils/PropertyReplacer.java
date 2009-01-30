@@ -30,4 +30,8 @@ public class PropertyReplacer {
 		set(prop, Integer.toString(n));
 	}
 
+	public void set(String prop, double d) {
+		set(prop, Double.toString(d));
+	}
+
 }

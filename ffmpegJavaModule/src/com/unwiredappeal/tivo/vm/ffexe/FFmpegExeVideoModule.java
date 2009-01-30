@@ -83,7 +83,7 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 	*/
 	public static ConfigEntry cfgFFmpegTranscodeArgs = new ConfigEntry(
 			"ffmpegexe.transcode",
-			"-acodec ac3 -vcodec mpeg2video -f vob -async 1 -v 0",
+			"-acodec ac3 -vcodec mpeg2video -f vob -async 1 -r ${closest.mpeg.fps} -v 0",
 			"Arguments to use when transcoding from ffmpeg"
 			);
 	
@@ -568,15 +568,27 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition, int qual) throws IOException {
 		//String addArgs = " -aspect " + vi.getAspect();
 		String addArgs;
-		if (qual == VideoFormats.QUALITY_SAME)
+		int abr;
+		int xres;
+		int yres;
+		int vbr;
+		if (qual == VideoFormats.QUALITY_SAME) {
 			addArgs = cfgFFmpegSameQArgs.getValue();
-		else {
-			PropertyReplacer pr = new PropertyReplacer();
-			int abr = StreamBabyConfig.inst.getAudioBr(qual);
+			xres = vi.getWidth();
+			yres = vi.getHeight();
+			abr = vi.getAudioBps();
+			vbr = vi.getBitRate() - abr;
+		} else {
+			addArgs = cfgFFmpegBpsQualArgs.getValue();
+			int chans = StreamBabyConfig.inst.getAudioChannels(qual);
+			if (chans > 0) {
+				addArgs += " -ac " + chans;
+			}			
+			abr = StreamBabyConfig.inst.getAudioBr(qual);
 			abr = ((abr+31)/32) * 32;
 			abr = Math.max(abr, 64);
-			int yres = vi.getHeight();
-			int xres = vi.getWidth();
+			yres = vi.getHeight();
+			xres = vi.getWidth();
 			int maxy = StreamBabyConfig.inst.getYRes(qual);
 			maxy = ((maxy+31)/32) * 32;
 			if (maxy < yres) {
@@ -584,21 +596,37 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 				xres = ((xres+31)/32) * 32;
 				yres = maxy;
 			}
-			pr.set("bitrate", StreamBabyConfig.inst.getVideoBr(qual));
-			pr.set("abitrate", abr);
-			pr.set("xres", xres);
-			pr.set("yres", yres);
-			addArgs = pr.parseProperties(cfgFFmpegBpsQualArgs.getValue());
-			int chans = StreamBabyConfig.inst.getAudioChannels(qual);
-			if (chans > 0) {
-				addArgs += " -ac " + chans;
-			}
-			Log.debug("Using ffmpeg transcode args: " + addArgs);
+			vbr = StreamBabyConfig.inst.getVideoBr(qual);
+
 		}
+		PropertyReplacer pr = new PropertyReplacer();
+		pr.set("bitrate", vbr);
+		pr.set("abitrate", abr);
+		pr.set("xres", xres);
+		pr.set("yres", yres);
+		pr.set("closest.mpeg.fps", getClosestMpegRate(vi.getFps()));
 		if (addArgs.length() > 0)
 			addArgs = " " + addArgs;
+		
+		String args = pr.parseProperties(cfgFFmpegTranscodeArgs.getValue() + addArgs);
+
+		Log.debug("Using ffmpeg transcode args: " + args);
+
 				
-		return openVideo(uri, vi, startPosition, cfgFFmpegTranscodeArgs.getValue() + addArgs, cfgFFmpegTranscodeMime.getValue());
+		return openVideo(uri, vi, startPosition, args, cfgFFmpegTranscodeMime.getValue());
+	}
+	
+	public double getClosestMpegRate(double fps) {
+		double delta = Double.MAX_VALUE;
+		double foundFps = 29.97;
+		for (int i=0;i<mpegFps.length;i++) {
+			double thisDelta = Math.abs(mpegFps[i]-fps);
+			if (thisDelta < delta) {
+				delta = thisDelta;
+				foundFps = mpegFps[i];
+			}
+		}
+		return foundFps;
 	}
 	
 	private static void addArgsToList(String argsString, List<String> args) {

@@ -90,6 +90,7 @@ public class PlayScreen extends ScreenTemplate {
 	}
 
 	public boolean handleEnter(Object arg, boolean isReturn) {
+		((StreamBabyStream)getBApp()).setCurrentScreen(this);
 		setupList(isReturn);
 		return true;
 	}

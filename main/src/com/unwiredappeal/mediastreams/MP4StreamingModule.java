@@ -162,7 +162,10 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 			return null;
 
 		StreamableMP4 mis = new StreamableMP4(new File(uri), startPosition, StreamBabyConfig.cfgMp4Interleave.getBool());
-		return new VideoInputStreamWrapper(mis.getSubDuration(), mis, vidinfo, "video/mp4");
+		long subDur = mis.getSubDuration();
+		if (subDur <= 0)
+			subDur = vidinfo.getDuration();
+		return new VideoInputStreamWrapper(subDur, mis, vidinfo, "video/mp4");
 	}
 	public VideoHandlerModule getVideoModule() {
 		// TODO Auto-generated method stub

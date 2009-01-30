@@ -85,6 +85,12 @@ public class PasswordScreen extends ScreenTemplate {
     
     public void enterMainScreen() {
 		DirEntry curDir = ((StreamBabyStream)getBApp()).getRootEntry();
+		if (StreamBabyConfig.cfgTopLevelSkip.getBool()) {
+			List<DirEntry> entries = curDir.getEntryList(((StreamBabyStream)getBApp()).getPassword());
+			if (entries.size() == 1 && entries.get(0).isFolder()) {
+				curDir = entries.get(0);
+			}
+		}
 	    SelectionScreen screen = new SelectionScreen(getBApp(), curDir, 0);
 	    getBApp().push(screen, TRANSITION_NONE);
 

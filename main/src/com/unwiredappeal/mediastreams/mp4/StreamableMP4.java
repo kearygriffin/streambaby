@@ -418,7 +418,23 @@ public class StreamableMP4 extends InputStream {
 					mdat_start) == 0) {
 				fp.seek(0);
 				log("moov_seek returned failure!");
-
+				if (start != 0 && startTimePos != 0) {
+					log("Reattempting MP4 using startPos=0");
+					startTimePos = 0;
+					cleanup();
+					if (mdat_bytes != null)
+						mdat_bytes.free();
+					if (ftyp_data != null)
+						ftyp_data.free();
+					if (moov_data != null)
+						moov_data.free();
+					mdat_bytes = null;
+					ftyp_data = null;
+					moov_data = null;
+					
+					processMP4Headers();
+					return;
+				}
 				hasError = true;
 				return;
 			}
@@ -471,7 +487,6 @@ public class StreamableMP4 extends InputStream {
 				fp.seek(0);
 			} catch (Exception ee) {
 			}
-			return;
 		} finally {
 			if (hasError) {
 				log("Error processing moov");
@@ -482,10 +497,16 @@ public class StreamableMP4 extends InputStream {
 					ftyp_data.free();
 				if (moov_data != null)
 					moov_data.free();
+				try {
+					log("Complete mp4 failure.  Using entire file");
+					chunkQueue = new ChunkQueue(1);
+					chunkQueue.add(new Chunk(0, fp.length()));
+
+				} catch (IOException e) {
+				}				
 			}
 
 		}
-
 	}
 
 	public class MP4Atom {
@@ -2259,6 +2280,7 @@ public class StreamableMP4 extends InputStream {
 		}
 		if (chunkQueue != null)
 			chunkQueue.free();
+		chunkQueue = null;
 	}
 
 	@Override

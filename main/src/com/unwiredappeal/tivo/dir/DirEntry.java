@@ -16,6 +16,7 @@ public class DirEntry implements Comparable<DirEntry> {
 	//public String userPassword;
 	public boolean entriesLoaded = false;
 	public boolean isFolder;
+	public boolean isRoot = false;
 	public String name;
 	public DirEntry parent;
 	public URI uri;
@@ -230,6 +231,14 @@ public class DirEntry implements Comparable<DirEntry> {
 
 		return this.toString().compareToIgnoreCase(de.toString());
 		//return 0;
+	}
+
+	public boolean isRoot() {
+		return isRoot;
+	}
+	
+	public void setIsRoot(boolean b) {
+		isRoot = b;
 	}
 
 	/*

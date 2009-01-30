@@ -7,6 +7,8 @@
   * Due to all of the above, streaming .tivo files is not really that useful ;-)
  * Fixed audio channels parsing support for ffmpegexe
  * Modified MP4 streaming code to not interleave if initial audio/video chunks are with 4 megabytes of each other.
+ * If MP4 pseudo-streaming can't perform the correct positioning, try again at beginning
+  * This usually happens at the beginning of a file anyway
  * Drop -ac parameter from default for ffmpegexe transcode
  * Moved all assets (icons/images) into asset directory
  * Changed icon theme.  Icons are searched in assets directory
@@ -25,10 +27,14 @@
    * startoffset will wait this long after seeing a cut point to jump
    * endoffset will jump this many milliseconds before the cut point says the end should be
  * Changed default port to 7290
- * Added config option streambaby.dir to set up where the streambaby directory is.  Also changed the way native path is initialized.
  * Changed IDLE/timeout code, thanks to wmcbrine
  * Added support for different transcoding qualities.  If a quality other than SAME is chosen, it may force transcoding.
  * Added FLV container support, and changed defaults for ffmpeg preview/transcode to try and work with all containers "*"
+ * Added config option to skip top-level folders screen if there is only one accessible directory (toplevel.skip=true)
+ * Streambaby looks for property streambaby.dir and uses that as the rootdir for streambaby if set
+  * Can be used (for instance) in galleon wrapper.conf file to set where streambabby looks for files
+ * Also Added config option streambaby.dir to set up where the streambaby directory is.  Also changed the way native path is initialized.
+ * When transcoding, find the closest allowable mpeg frame rate.
   
  ===V0.19===
  * Added MKV to default list of extensions to scan

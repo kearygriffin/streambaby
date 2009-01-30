@@ -36,6 +36,7 @@ import com.unwiredappeal.tivo.videomodule.VideoFormats;
 public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	
     
+	private BView currentScreen;
     public boolean simulator = false;
     public String pw;
     private DirEntry builtRoot;
@@ -78,6 +79,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	public static int MAX_LEVEL = 100;
 	private void buildEntries() {
 		builtRoot = StreamBabyConfig.inst.buildRootDirEntry();
+		builtRoot.setIsRoot(true);
 		//builtRoot.setUserPassword(getPassword());
 		//recursiveFill(builtRoot, 0, getPassword(), MAX_LEVEL);
 	}
@@ -115,6 +117,26 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	    	push(ps, TRANSITION_NONE, pw);
 //	    }
 
+	}
+	
+	public void  setCurrentScreen(BView sc) {
+		currentScreen = sc;
+	}
+	
+	public boolean appIdle() {
+		if (currentScreen instanceof IdleHandler) {
+			IdleHandler h = (IdleHandler)currentScreen;
+			return h.isIdle();
+		}
+		// Assume we are idle
+		return true;
+	}
+	public boolean handleIdle(boolean isIdle) {
+	    if (isIdle && !appIdle()) {
+	        getApp().acknowledgeIdle(true);
+	    }
+
+	    return true;
 	}
 	
 	public void popTop() {

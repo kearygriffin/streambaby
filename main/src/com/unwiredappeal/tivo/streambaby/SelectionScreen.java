@@ -94,7 +94,10 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 	   setTitle(this.toString());
    }
    public boolean handleEnter(Object arg, boolean isReturn) {
+	   ((StreamBabyStream)getBApp()).setCurrentScreen(this);
+
 	   resetTitle();
+	   
        if (!isReturn)
        	focusOnDefault();
        
@@ -120,7 +123,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
    public void updateFileList(DirEntry de) {
 	   
 	   List<DirEntry> dirEntries = de.getEntryList(((StreamBabyStream)getBApp()).getPassword());
-	   if (level != 0)
+	   if (!de.isRoot())
 		   Collections.sort(dirEntries);
       // Update directory text
       //dirText.setValue(de.getName());

@@ -42,7 +42,7 @@ import com.unwiredappeal.tivo.utils.Utils;
 import com.unwiredappeal.tivo.videomodule.VideoFormats;
 import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
 
-public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanupable {
+public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanupable, IdleHandler {
 
 	/* Guesses at constants */
 	public static final int RSRC_STATUS_END = 11;
@@ -75,7 +75,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	public SelectionScreen initialScreen;
 	public float _lastSpeed = 0;
 	public boolean _isPreviewing = false;
-	VText infoText;
+	VText _infoText;
+	BView infoView;
 	VText errorText;
 	VText keypadText;
 	VText waitText;
@@ -148,10 +149,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 
 		//getBelow().setResource(Color.black);
 		
-		infoText = new VText(getNormal(), SAFE_ACTION_H, SAFE_ACTION_V, 3,
+		_infoText = new VText(getNormal(), SAFE_ACTION_H, SAFE_ACTION_V, 3,
 				"small");
-		infoText.setFlags(RSRC_HALIGN_CENTER | RSRC_VALIGN_TOP | RSRC_TEXT_WRAP);
-		infoText.setVisible(false);
+		_infoText.setFlags(RSRC_HALIGN_CENTER | RSRC_VALIGN_TOP | RSRC_TEXT_WRAP);
+		infoView = _infoText;
+		infoView.setVisible(false);
 
 		// keypad text (when numbers pressed)
 		keypadText = new VText(getNormal(), SAFE_ACTION_H,
@@ -208,7 +210,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			if (folderName != null)
 				desc = folderName + ": " + desc;
 		}
-		infoText.setValue(desc);
+		_infoText.setValue(desc);
 		if (preview != null) {
 			preview.remove();
 			preview = null;
@@ -227,7 +229,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		
 	    if (playingMultiple) {
             timeout_info = new Date().getTime() + 1000*GLOBAL.timeout_info;
-            infoText.setVisible(true);
+            infoView.setVisible(true);
 	    }
 
 
@@ -312,6 +314,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	}
 	
 	   public boolean handleEnter(Object arg, boolean isReturn) {
+		   sapp.setCurrentScreen(this);
 			startStream();
 		   return true;
 	   }
@@ -590,7 +593,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		// Clear text if timeouts reached
 		long date = new Date().getTime();
 		if (timeout_info > 0 && date >= timeout_info) {
-			infoText.setVisible(false);
+			infoView.setVisible(false);
 			timeout_info = -1;
 		}
 		if (timeout_status > 0 && date >= timeout_status
@@ -605,10 +608,6 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			keypad.removeAllElements();
 		}
 
-		if (event.getOpCode() == HmeEvent.EVT_IDLE) {
-			getApp().acknowledgeIdle(true);
-			return true;
-		}
 
 
 		// Update stream position and duration information
@@ -656,7 +655,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			} else if (status == RSRC_STATUS_ERROR) {
 				// Display error associated with starting a stream
 				displayError("ERROR: " + info.getMap().get("error.text") + "\n"
-						+ infoText.getValue().toString());
+						+ de.getName());
 			} else if (status == RSRC_STATUS_END) {
 				Log.debug("END: ");
 				boolean rebuffered = possibleRebuffer(date);
@@ -973,7 +972,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 				// Really want to leave error on screen if we are not playing multiple files
 				if (playingMultiple)
 					errorText.setVisible(false);
-				infoText.setVisible(false);
+				infoView.setVisible(false);
 				displayStatusBar(false);
 				// Clear keypad numbers
 				keypadText.setVisible(false);
@@ -992,9 +991,9 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	             // Display file name temporarily
 	             if (timeout_info == -1) {
 	                timeout_info = new Date().getTime() + 1000*GLOBAL.timeout_info;
-	                infoText.setVisible(true);
+	                infoView.setVisible(true);
 	             } else {
-	                infoText.setVisible(false);
+	                infoView.setVisible(false);
 	                timeout_info = -1;
 	             }
 	             //play("select.snd");
@@ -1077,6 +1076,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	private void beginPreviewMode(long offset) {
 		if (isPreviewing())
 			return;
+		infoView.setVisible(false);
 		lastPreviewMillis = System.currentTimeMillis();
 		stream.pause();
 
@@ -1328,12 +1328,17 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			pleaseWait.remove();
 			pleaseWait = null;
 		}
-		if (infoText != null) {
-			infoText.setValue(null);
-			infoText.clearResource();
-			infoText.remove();
-			infoText = null;
+		if (_infoText != null) {
+			_infoText.setValue(null);
+			_infoText.clearResource();
+			_infoText.remove(null);
 		}
+		if (infoView != null && _infoText != infoView) {
+			infoView.clearResource();
+			infoView.remove(null);
+		}
+		_infoText = null;
+		infoView = null;
 		if (errorText != null) {
 			errorText.setValue(null);
 			errorText.clearResource();
@@ -1372,6 +1377,14 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		if (de != null)
 			return de.getName();
 		return null;
+	}
+
+	public boolean isIdle() {
+		if (stream == null)
+			return true;
+		if (errorText.isVisibile())
+			return true;
+		return false;
 	}
 
 }
