@@ -70,6 +70,8 @@ public class FFmpegMgr {
 	public static int _avCodecMajor = -1;
 	public static int _avFormatVersion = -1 ;
 	public static int _avFormatMajor = -1;
+	public static String _avCodecHeaderVer = "";
+	public static String _avFormatHeaderVer = "";
 	
 	public static NativeLibrary avUtilNative;
 	public static NativeLibrary avCodecNative;
@@ -157,6 +159,13 @@ public class FFmpegMgr {
 				_avFormatMajor = _avFormatVersion >>> 16;
 			}
 			log("Loaded avFormat version: " + _avFormatMajor + " (" + _avFormatVersion + ")");
+			_avCodecHeaderVer = Integer.toString(_avCodecMajor);
+			_avFormatHeaderVer = Integer.toString(_avFormatMajor);
+			int avFormatMinor = _avFormatVersion >>> 8 & 0xff;
+			if (_avFormatMajor == 52 && avFormatMinor >= 21) {
+				// added sample_aspect_ratio to avformat.h
+				_avFormatHeaderVer = "52a";
+			}
 			
 			hasSwScale = false;
 			try {
@@ -209,6 +218,17 @@ public class FFmpegMgr {
 		return _avFormatMajor;
 	}
 
+	public static String getAvCodecHeaderVersion() {
+		initLibrary();
+		return _avCodecHeaderVer;
+	}
+
+	public static String getAvFormatHeaderVersion() {
+		initLibrary();
+		return _avFormatHeaderVer;
+	}
+
+	
 	@SuppressWarnings("unchecked")
 	public static <T> T fixupFFmpegClass(String className) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		FFmpegMgr.initLibrary();

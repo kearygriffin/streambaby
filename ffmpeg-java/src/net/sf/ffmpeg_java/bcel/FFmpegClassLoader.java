@@ -26,7 +26,7 @@ public class FFmpegClassLoader extends org.apache.bcel.util.ClassLoader {
 	
 	@Override 
 	protected JavaClass modifyClass(JavaClass clazz) {
-        FFmpegFixup fixup = new FFmpegFixup(clazz, FFmpegMgr.getAvCodecVersion(), FFmpegMgr.getAvFormatVersion());
+        FFmpegFixup fixup = new FFmpegFixup(clazz, FFmpegMgr.getAvCodecHeaderVersion(), FFmpegMgr.getAvFormatHeaderVersion());
         JavaClass newClazz = fixup.create();
         return newClazz;
 	}

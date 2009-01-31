@@ -17,6 +17,7 @@ import com.tivo.hme.sdk.util.Ticker;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.Log;
+import com.unwiredappeal.tivo.views.VText;
 
 public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
    public StandardList list;

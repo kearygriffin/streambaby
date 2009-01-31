@@ -12,7 +12,6 @@ import com.unwiredappeal.tivo.utils.Utils;
 import com.unwiredappeal.tivo.videomodule.BaseVideoHandlerModule;
 import com.unwiredappeal.tivo.videomodule.StreamBabyModule;
 import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoHandlerModule;
 
 public class RawStreamingModule extends BaseVideoHandlerModule implements StreamBabyModule {
 
@@ -78,8 +77,11 @@ public class RawStreamingModule extends BaseVideoHandlerModule implements Stream
 		return null;	
 	}
 	
-	public VideoHandlerModule getVideoModule() {
-		return this;
+	public Object getModule(int moduleType) {
+		if (moduleType == StreamBabyModule.STREAMBABY_MODULE_VIDEO)
+			return this;
+		else
+			return null;
 	}
 
 }

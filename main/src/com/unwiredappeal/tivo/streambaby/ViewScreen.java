@@ -41,6 +41,7 @@ import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
 import com.unwiredappeal.tivo.videomodule.VideoFormats;
 import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.views.VText;
 
 public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanupable, IdleHandler {
 

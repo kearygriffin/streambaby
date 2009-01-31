@@ -1,10 +1,11 @@
 // $Id: VText.java 10 2008-09-16 08:13:42Z moyekj@yahoo.com $
 
-package com.unwiredappeal.tivo.streambaby;
+package com.unwiredappeal.tivo.views;
 
 import com.tivo.hme.bananas.BText;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BScreen;
+import com.unwiredappeal.tivo.streambaby.GLOBAL;
 
 public class VText extends BText {
    BText text;

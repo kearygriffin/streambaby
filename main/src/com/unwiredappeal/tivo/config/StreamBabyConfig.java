@@ -298,7 +298,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgTwoChannel = new ConfigEntry(
 			"quality.2channel",
-			"4",
+			"0",
 			"below or equal to this quality level, force drop to 2 channels"
 			);
 

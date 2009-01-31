@@ -40,7 +40,7 @@ public class VideoModuleHelper {
 			
 			VideoHandlerModule m = null;
 			if (sm != null)
-				m  = sm.getVideoModule();
+				m  = (VideoHandlerModule)sm.getModule(StreamBabyModule.STREAMBABY_MODULE_VIDEO);
 			if (m != null && m.initialize()) {
 				modules.add(m);
 				return true;

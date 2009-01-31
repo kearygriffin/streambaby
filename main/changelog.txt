@@ -1,4 +1,8 @@
  ===SVN===
+ * Changed default for quality.2channel to zero, effectively disabling it.  Newer ffmpeg doesn't like to do this for 5.1 aac -> 2 channel ac3
+ * Added support for new ffmpeg, AVStream->sample_aspect_ratio 
+ 
+ ===V0.20===
  * Added initial support for .tivo files
   * Thanks to work by davidblackledge & wmcbrine
   * Due to streaming bandwidth issues, tivo may have a hard time keeping up.

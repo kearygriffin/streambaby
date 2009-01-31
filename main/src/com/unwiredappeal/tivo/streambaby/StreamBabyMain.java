@@ -155,6 +155,8 @@ public class StreamBabyMain  {
 		   bsh.set("currentDir", StreamBabyConfig.workingDir);
 		   bsh.set("isWindows", StreamBabyConfig.isWindows);
 		   bsh.set("log", new BshLogger());
+		   bsh.set("config", StreamBabyConfig.inst);
+		   bsh.setClassLoader(Thread.currentThread().getContextClassLoader());
 		 
 		   Object o = bsh.source(script);
 		   if (o instanceof Integer)

@@ -12,6 +12,7 @@ import java.awt.image.SampleModel;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Locale;
@@ -174,7 +175,8 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 		     AVStream audioStream = null;
 		     AVStream videoStream = null;
 		    for (int i=0; i<formatCtx.nb_streams; i++)
-		    {   AVStream stream = new AVStream(formatCtx.getStreams()[i]);
+		    {   
+		    	AVStream stream = new AVStream(formatCtx.getStreams()[i]);
 		    	AVCodecContext codec= new AVCodecContext(stream.codec);
 		    	//System.out.println("codecCtx " + i + ": " + codec);
 		    	if (videoStream ==null && codec.codec_type == AVCodecLibrary.CODEC_TYPE_VIDEO)
@@ -235,6 +237,16 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 		    	AVRational avAspect = codecCtx.sample_aspect_ratio;
 		    	if (avAspect.den != 0 && avAspect.num != 0) {
 		    		vidinfo.setPixelAspect((float)avAspect.num / (float)avAspect.den);
+		    	} else {
+		    		try {
+			    		Field f = videoStream.getClass().getField("sample_aspect_ratio");
+			    		if (f != null) {
+			    			AVRational r = (AVRational)f.get(videoStream);
+			    			if (r != null && r.den != 0 && r.num != 0) {
+			    				vidinfo.setPixelAspect((float)r.num / (float)r.den);
+			    			}
+			    		}
+		    		} catch(Exception e) { }
 		    	}
 			    String codecName = getCodecById(codecCtx.codec_id);
 			    if (codecName != null)
@@ -736,7 +748,10 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 		}		
 	}
 
-	public VideoHandlerModule getVideoModule() {
+	public Object getModule(int moduleType) {
+		if (moduleType != StreamBabyModule.STREAMBABY_MODULE_VIDEO)
+			return null;
+		
 		if (!FFmpegJavaConfig.inst.useFFmpegLibrary()) {
 			Log.warn("Unable to load FFmpeg native libraries");
 			return null;

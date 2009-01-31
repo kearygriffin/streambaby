@@ -14,7 +14,6 @@ import com.unwiredappeal.tivo.utils.Utils;
 import com.unwiredappeal.tivo.videomodule.BaseVideoHandlerModule;
 import com.unwiredappeal.tivo.videomodule.StreamBabyModule;
 import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoHandlerModule;
 import com.unwiredappeal.tivo.videomodule.VideoFormats.AllowableFormats;
 import com.unwiredappeal.tivo.videomodule.VideoFormats.Format;
 
@@ -125,9 +124,11 @@ public class MpegStreamingModule extends BaseVideoHandlerModule implements Strea
 			
 	}
 
-	public VideoHandlerModule getVideoModule() {
-		// TODO Auto-generated method stub
-		return this;
+	public Object getModule(int moduleType) {
+		if (moduleType == StreamBabyModule.STREAMBABY_MODULE_VIDEO)
+			return this;
+		else
+			return null;
 	}
 	
 	

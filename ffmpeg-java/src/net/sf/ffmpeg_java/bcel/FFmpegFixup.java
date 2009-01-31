@@ -14,9 +14,9 @@ public class FFmpegFixup {
 
 
     //private int ver;
-    private int codecVer;
-    private int formatVer;
-    public FFmpegFixup(JavaClass clazz, int codecVer, int formatVer) {
+    private String codecVer;
+    private String formatVer;
+    public FFmpegFixup(JavaClass clazz, String codecVer, String formatVer) {
     	this.codecVer = codecVer;
     	this.formatVer = formatVer;
         _clazz = clazz;
@@ -49,17 +49,15 @@ public class FFmpegFixup {
 	    			String sub1 = safe_substring(str, index, index + 2);
 	    			String sub2 = safe_substring(str, index+2, index+2+1);
 	    			if (sub2.equals("/")) {
-	    				int thisver = -1;
-	    				int ver;
-	    				String type = safe_substring(str, index+3, index+3+1);
-	    				if (type.startsWith("AVCodecLibrary"))
+	    				String thisver = "";
+	    				String ver;
+	    				String type = safe_substring(str, index+3, index+3+7);
+	    				if (type.startsWith("AVCodec"))
 	    					ver = codecVer;
 	    				else
 	    					ver = formatVer;
-	    				try {
-	    					thisver = Integer.parseInt(sub1);
-	    				} catch(NumberFormatException e) {   }
-	    				if (thisver != -1 && thisver != ver) {
+	    				thisver = sub1;
+	    				if (thisver.length() > 0 && thisver != ver) {
 	    					String beg = safe_substring(str, 0, index);
 	    					String end = safe_substring(str, index+3, str.length());
 	    					String newStr = beg  + ver + "/" + end;

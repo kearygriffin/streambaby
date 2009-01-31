@@ -28,7 +28,6 @@ import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.AvailableSocket.SocketNotAvailable;
 import com.unwiredappeal.tivo.videomodule.StreamBabyModule;
 import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoHandlerModule;
 import com.unwiredappeal.tivo.videomodule.VideoFormats.AllowableFormats;
 import com.unwiredappeal.tivo.vm.ffmpeg.BaseFFmpegVideoModule;
 
@@ -403,8 +402,8 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 
 		width = parseInt(info, "\\s*Stream.*:.*Video: .* (\\d+)x\\d+.*");
 		height = parseInt(info, "\\s*Stream.*:.*Video: .* \\d+x(\\d+).*");
-		int aspectNum = parseInt(info, "\\s*Stream.*:.*Video: .* \\[PAR (\\d+):\\d+.*");
-		int aspectDen = parseInt(info, "\\s*Stream.*:.*Video: .* \\[PAR \\d+:(\\d+).*");
+		int aspectNum = parseInt(info, "\\s*Stream.*:.*Video: .* PAR (\\d+):\\d+.*");
+		int aspectDen = parseInt(info, "\\s*Stream.*:.*Video: .* PAR \\d+:(\\d+).*");
 
 		
 		setContainerFormat(ffmpegFormatStr, vidinfo);
@@ -703,8 +702,11 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 	}  
 	} 
 	
-	public VideoHandlerModule getVideoModule() {
-		return this;
+	public Object getModule(int moduleType) {
+		if (moduleType == StreamBabyModule.STREAMBABY_MODULE_VIDEO)
+			return this;
+		else
+			return null;
 	}
 
 
