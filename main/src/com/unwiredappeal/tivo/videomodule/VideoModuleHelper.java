@@ -198,7 +198,7 @@ public class VideoModuleHelper {
 				vidinfo.setContainerFormat(VideoFormats.CONTAINER_TIVO);
 			}
 			if (vidinfo.getBitRate() <= 0) {
-				int br = (int)(8 * ((new File(uri).length()) / (vidinfo.getDuration() / 1000.0f)));
+				int br = (int)((8 * ((new File(uri).length()) / (vidinfo.getDuration() / 1000.0f)))/1000);
 				Log.debug("Guessing bitrate for " + uri + " to: " + br);
 				vidinfo.setBitRate(br);
 			}
