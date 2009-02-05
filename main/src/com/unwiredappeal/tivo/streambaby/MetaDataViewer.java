@@ -3,18 +3,16 @@ package com.unwiredappeal.tivo.streambaby;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.xhtmlrenderer.simple.Graphics2DRenderer;
-import org.xhtmlrenderer.swing.Java2DRenderer;
 
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BViewPlus;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
+import com.unwiredappeal.tivo.html.SBHtmlRenderer;
+import com.unwiredappeal.tivo.html.SBHtmlRendererFactory;
 import com.unwiredappeal.tivo.metadata.MetaData;
+import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.TempFileManager;
 import com.unwiredappeal.tivo.views.VText;
 
@@ -46,50 +44,46 @@ public class MetaDataViewer {
 		} else if (meta.getMetadataType() == MetaData.METADATA_URL || meta.getMetadataType() == MetaData.METADATA_HTML) {
 			String baseUrl = null;
 			if (meta.getUrl() != null) {
+				/*
 				try {
 					URL url = new URL(meta.getUrl());
 					baseUrl = url.toExternalForm();
 					if (baseUrl.lastIndexOf('/') != baseUrl.length()-1) {
 						int index = baseUrl.lastIndexOf('/');
 						if (index >= 0) {
-							baseUrl = baseUrl.substring(0, index);
+							baseUrl = baseUrl.substring(0, index+1);
 						}
 					}
 				} catch (MalformedURLException e) {
 				}
+				*/
+				baseUrl = meta.getUrl();
+			}
+			if (baseUrl == null) {
+				try {
+					baseUrl = new File(TempFileManager.tmpDirName).toURL().toExternalForm();
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			String url = null;
-			File f = null;
 			if (meta.getMetadataType() == MetaData.METADATA_URL)
 				url = meta.getUrl();
-			else {
-				FileWriter w = null;
-				try {
-					f = TempFileManager .createTempFile("info-", ".html");
-					url = f.toURL().toExternalForm();
-					baseUrl = new File(f.getParent()).toURL().toExternalForm();
-					w = new FileWriter(f);
-					w.write(meta.getMetadata());
-					w.close();
-				} catch (IOException e) {
-					if (w != null)
-						try {
-							w.close();
-						} catch (IOException e1) {
-						}
-					if (f != null)
-						f.delete();
+			try {
+				SBHtmlRenderer r = SBHtmlRendererFactory.getRenderer();
+				if (r == null)
 					return null;
-				}				
+				if (url != null)
+					r.setUrlDocument(url, baseUrl);
+				else
+					r.setHtmlDocument(meta.getMetadata(), baseUrl);
+				BufferedImage bi = r.getImage(width, height);
+				if (bi != null)
+					v = setImage(parent, x, y, width, height, bi, false);
+			} catch(Exception e) {
+				Log.error("Unable to render HTML: " + e.getMessage());
 			}
-			//BufferedImage bi = Graphics2DRenderer.renderToImage(url, width, height);
-			Java2DRenderer j2d = new Java2DRenderer(url, baseUrl, width, height);
-			j2d.setBufferedImageType(BufferedImage.TYPE_INT_ARGB);
-			BufferedImage bi = j2d.getImage();
-			if (bi != null)
-				v = setImage(parent, x, y, width, height, bi, false);
-			if (f != null)
-				f.delete();
 		}
 		return v;
 	}

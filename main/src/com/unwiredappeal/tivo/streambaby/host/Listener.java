@@ -227,8 +227,13 @@ public class Listener extends HttpServer implements IListener
     private String getHostAddressWithPort(HttpRequest http) {
     	/* We might be behind a NAT, so use the host header to figure out our public IP address */
     	String host = http.get("host");
-    	if (host != null && host.length() > 0)
+    	if (host != null && host.length() > 0) {
+    		int index = host.indexOf(':');
+    		if (index < 0) {
+    			host = host + ":" + http.getPort();
+    		}
     		return host;
+    	}
     	return http.getInterface().getHostAddress() + ":" + http.getPort();
     }
     

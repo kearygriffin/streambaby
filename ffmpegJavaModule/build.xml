@@ -32,10 +32,12 @@
         <pathelement location="${main.location}/../lib/bsh-2.0b4.jar"/>
         <pathelement location="${main.location}/../lib/tarbz.jar"/>
         <pathelement location="${main.location}/../lib/Tidy.jar"/>
-        <pathelement location="${main.location}/../lib/core-renderer.jar"/>
         <pathelement location="${main.location}/../lib/jmdns.jar"/>
         <pathelement location="${main.location}/../lib/hme-host-sb.jar"/>
         <pathelement location="${main.location}/../dlib/simulator.jar"/>
+        <pathelement location="${main.location}/../dlib/core-renderer.jar"/>
+        <pathelement location="${main.location}/../dlib/cobra.jar"/>
+        <pathelement location="${main.location}/../dlib/js.jar"/>
     </path>
     <path id="ffmpegJavaModule.classpath">
         <pathelement location="bin"/>

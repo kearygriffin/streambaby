@@ -3,7 +3,6 @@ package com.unwiredappeal.tivo.streambaby;
 import static com.tivo.hme.bananas.IBananasPlus.H_BAR_FONT;
 import static com.tivo.hme.bananas.IBananasPlus.H_BAR_TEXT_COLOR;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +78,7 @@ public class PlayScreen extends ScreenTemplate {
 
 			int bottom = calcListLayout(4).getBounds().y;
 			int height = bottom - layout.getBounds().y;
-			BView v = mv.getView(meta, this.getNormal(), layout.getBounds().x, layout.getBounds().y, layout.getBounds().width+50, height);
+			/* BView v = */ mv.getView(meta, this.getNormal(), layout.getBounds().x, layout.getBounds().y, layout.getBounds().width+50, height);
 		}
 
 		/*
@@ -447,7 +446,7 @@ public class PlayScreen extends ScreenTemplate {
 		}
 		// We can only adjust quality if we can transcode this puppy.
 		canTranscode = VideoModuleHelper.inst.canTranscode(de.getUri(), de.getVideoInformation());
-		canStream = VideoModuleHelper.inst.canTranscode(de.getUri(), de.getVideoInformation());
+		canStream = VideoModuleHelper.inst.canStream(de.getUri(), de.getVideoInformation());
 		if (StreamBabyConfig.cfgQualitySelection.getBool() && canTranscode)
 			addQualityButton(false);
 		addSimpleTextButton("Go back", new ButtonHandler() { 

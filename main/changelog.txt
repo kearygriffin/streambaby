@@ -11,6 +11,8 @@
    * .html
    * .xml- Currently assumed to be a .tivo format XML file
    * .gif, .png, .jpg:  Use as straight images.  New config property info.preserveaspect=true to control if img is allowed to be stretched
+ * Switch to current jmdns from sourceforge
+   * Required changes to build process, removal of simulator.jar from main dist, addition of hme-host-sb.jar
 
  
  ===V0.20===

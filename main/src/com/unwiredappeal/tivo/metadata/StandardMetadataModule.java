@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,8 +63,12 @@ public class StandardMetadataModule implements StreamBabyModule, MetadataModule 
 		}
 	}
 	
-	public boolean handleHtmlMetadata(String html, MetaData m) {
-		m.setHtml(html);
+	public boolean handleHtmlMetadata(File htmlFile, MetaData m) {
+		try {
+			m.setUrl(htmlFile.toURL().toExternalForm());
+		} catch (MalformedURLException e) {
+			return false;
+		}
 		return true;
 	}
 	
@@ -76,7 +81,7 @@ public class StandardMetadataModule implements StreamBabyModule, MetadataModule 
 		if (!Utils.isFile(uri))
 			return false;
 		File f= new File(uri);
-		String metaHtml = readMeta(f.getParentFile(), f.getName(), ".html");
+		File metaHtml = findMeta(f.getParentFile(), f.getName(), ".html");
 		if (metaHtml != null && handleHtmlMetadata(metaHtml, m))
 			return true;		
 		File img;

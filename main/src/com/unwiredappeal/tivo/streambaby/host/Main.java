@@ -11,6 +11,7 @@ package com.unwiredappeal.tivo.streambaby.host;
 //////////////////////////////////////////////////////////////////////
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.BindException;
@@ -155,6 +156,8 @@ public class Main implements ILogger
 	            for (int i = 0; i < interfaces.length; ++i) {
 	                //rv[i] = new JmDNS(InetAddress.getByName(interfaces[i]));
 	            	rv[i] = JmDNS.create(InetAddress.getByName(interfaces[i]));
+	            	// and hack away to remove the shutdown hook
+	            	removeBadJmdnsShutdownHook(rv[i]);
 	            }
             }
             
@@ -173,6 +176,21 @@ public class Main implements ILogger
             usage();
         }
     }
+
+	private void removeBadJmdnsShutdownHook(JmDNS mdns) {
+		try {
+			Field[] fields = mdns.getClass().getDeclaredFields();
+			for (Field f : fields) {
+				if (f.getName().equals("shutdown")) {
+					f.setAccessible(true);
+					Thread s = (Thread)f.get(mdns);
+					Runtime.getRuntime().removeShutdownHook(s);
+					break;
+				}
+			}
+		}
+		catch(Exception e) { }
+	}
 
     private void usage()
     {
@@ -223,6 +241,18 @@ public class Main implements ILogger
         }
     }
 
+    protected static class UnregisterThread extends Thread {
+    	JmDNS mdns;
+    	ServiceInfo info;
+    	public UnregisterThread(JmDNS mdns, ServiceInfo info) {
+    		this.mdns = mdns;
+    		this.info = info;
+    	}
+    	@Override
+    	public void run() {
+    		mdns.unregisterService(info);
+    	}
+    }
     /**
      * Register a factory if MDNS is turned on.
      */
@@ -247,7 +277,12 @@ public class Main implements ILogger
                 //
                 // register using jmdns
                 //
-                rv[j].registerService(getServiceInfo(IHmeConstants.MDNS_TYPE, factory, ports[j]));
+                ServiceInfo info = getServiceInfo(IHmeConstants.MDNS_TYPE, factory, ports[j]);
+                rv[j].registerService(info);
+                // Don't do this, or we'll have same problem jmdns shutdown has
+                //UnregisterThread t = new UnregisterThread(rv[j], info);
+
+                //Runtime.getRuntime().addShutdownHook(t);
             }
         }
     }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -21,6 +22,7 @@ import javax.imageio.ImageIO;
 
 import org.w3c.tidy.Tidy;
 
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.utils.Log;
 
 public class MetaData {
@@ -49,7 +51,7 @@ public class MetaData {
 		return urlStr;
 	}
 	public void setUrl(String urlStr) {
-		data = urlStr;
+		this.urlStr = urlStr;
 		dataType = METADATA_URL;
 	}
 	
@@ -143,23 +145,44 @@ public class MetaData {
 		}
 	}
 	
+	public class TidyLogger extends Writer {
+
+		@Override
+		public void close() throws IOException {
+		}
+
+		@Override
+		public void flush() throws IOException {
+		}
+
+		@Override
+		public void write(char[] cbuf, int off, int len) throws IOException {
+		}
+		
+	}
 	public void setHtml(String html) {
-		Tidy t = new Tidy();
-		t.setXHTML(true);
-		StringReader sr = new StringReader(html);
-		StringWriter sw = new StringWriter();
-		InputStream is = new ReaderInputStream(sr);
-		OutputStream os = new WriterOutputStream(sw);
-		t.parse(is, os);
-		try {
-			os.close();
-		} catch (IOException e) {
+		if (StreamBabyConfig.cfgForceTidy.getBool()) {
+			Tidy t = new Tidy();
+			t.setQuiet(true);
+			t.setErrout(new PrintWriter(new TidyLogger()));
+			t.setXHTML(true);
+			StringReader sr = new StringReader(html);
+			StringWriter sw = new StringWriter();
+			InputStream is = new ReaderInputStream(sr);
+			OutputStream os = new WriterOutputStream(sw);
+			t.parse(is, os);
+			try {
+				os.close();
+			} catch (IOException e) {
+			}
+			try {
+				is.close();
+			} catch (IOException e) {
+			}
+			data = sw.toString();
 		}
-		try {
-			is.close();
-		} catch (IOException e) {
-		}
-		data = sw.toString();
+		else
+			data = html;
 		dataType = METADATA_HTML;
 	}
 	

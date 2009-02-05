@@ -31,10 +31,12 @@
         <pathelement location="../lib/bsh-2.0b4.jar"/>
         <pathelement location="../lib/tarbz.jar"/>
         <pathelement location="../lib/Tidy.jar"/>
-        <pathelement location="../lib/core-renderer.jar"/>
         <pathelement location="../lib/jmdns.jar"/>
         <pathelement location="../lib/hme-host-sb.jar"/>
         <pathelement location="../dlib/simulator.jar"/>
+        <pathelement location="../dlib/core-renderer.jar"/>
+        <pathelement location="../dlib/cobra.jar"/>
+        <pathelement location="../dlib/js.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -86,7 +88,7 @@
     </target>
     <target name="Streambaby - standalone">
         <java classname="com.unwiredappeal.tivo.streambaby.StreamBabyMain" dir="../" failonerror="true" fork="yes">
-            <jvmarg line="-Dstreambaby.debug=1"/>
+            <jvmarg line="-Dstreambaby.debug=1 -Djava.awt.headless=true"/>
             <classpath refid="main.classpath"/>
         </java>
     </target>

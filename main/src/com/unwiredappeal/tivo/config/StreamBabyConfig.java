@@ -12,6 +12,7 @@ import com.unwiredappeal.mediastreams.MpegStreamingModule;
 import com.unwiredappeal.mediastreams.RawStreamingModule;
 import com.unwiredappeal.mediastreams.TivoStreamingModule;
 import com.unwiredappeal.tivo.dir.DirEntry;
+import com.unwiredappeal.tivo.html.SBHtmlRendererFactory;
 import com.unwiredappeal.tivo.streambaby.PreviewWindow;
 import com.unwiredappeal.tivo.streambaby.host.Listener;
 import com.unwiredappeal.tivo.utils.AvailableSocket;
@@ -338,11 +339,16 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"Preserve aspect ratio when generating info boxes (mostly for graphics)"
 			);
 	public static ConfigEntry cfgForceTidy = new ConfigEntry(
-			"info.forcetidy",
+			"info.tidy",
 			"true",
-			"Read html at beginning of processing and tidy into xhtml.  Only absolute references will be allowed in the html"
+			"run tidy on html input"
 			);
-
+	
+	public static ConfigEntry cfgHtmlRenderer = new ConfigEntry(
+			"html.renderer",
+			SBHtmlRendererFactory.defaultRenderer,
+			"class of html renderer"
+			);
 	
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
