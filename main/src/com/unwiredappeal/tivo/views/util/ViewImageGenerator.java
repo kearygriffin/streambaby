@@ -15,18 +15,19 @@ import com.tivo.hme.bananas.BTilesPlus;import com.tivo.hme.sdk.ImageResource;
 
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BViewPlus;
+import com.unwiredappeal.tivo.streambaby.StreamBabyStream;
 
 public class ViewImageGenerator {
 
-	private static Map<String, ImageResource> resourceMap = Collections.synchronizedMap(new HashMap<String, ImageResource>());
-	private static Map<String, Rectangle> rectangleMap = Collections.synchronizedMap(new HashMap<String, Rectangle>());
+	//private static Map<String, ImageResource> resourceMap = Collections.synchronizedMap(new HashMap<String, ImageResource>());
+	//private static Map<String, Rectangle> rectangleMap = Collections.synchronizedMap(new HashMap<String, Rectangle>());
 
 	private String imgId;
 	Rectangle boundingRectangle;
 
-	BApplication app;
+	StreamBabyStream app;
 	
-	public ViewImageGenerator(BApplication bapp) { app = bapp; }
+	public ViewImageGenerator(BApplication bapp) { app = (StreamBabyStream)bapp; }
 	public void createRoundedCorners(int width, int height, int arc,
 			float strokeWidth, Color borderColor) {
 		reset();
@@ -56,7 +57,7 @@ public class ViewImageGenerator {
         while(!roundedRectangle.contains(bx, by))
         	by++;
         boundingRectangle = new Rectangle(bx, by, width-2*bx, height-2*by);
-        rectangleMap.put(imgId + "rect", boundingRectangle);
+        getRectangleMap().put(imgId + "rect", boundingRectangle);
         
         g2d.draw(roundedRectangle);
         /*
@@ -68,22 +69,23 @@ public class ViewImageGenerator {
         bi = ff.getImage();
         */
         g2d.dispose();
-        resourceMap.put(imgId + "tl", app.createImage(bi.getSubimage(0, 0, xarc, yarc)));
-        resourceMap.put(imgId + "tr", app.createImage(bi.getSubimage(bi.getWidth()-xarc, 0, xarc, yarc)));
-        resourceMap.put(imgId + "bl", app.createImage(bi.getSubimage(0, bi.getHeight()-yarc, xarc, yarc)));
-        resourceMap.put(imgId + "br", app.createImage(bi.getSubimage(bi.getWidth()-xarc, bi.getHeight()-yarc, xarc, yarc)));
-        resourceMap.put(imgId + "top", app.createImage(bi.getSubimage(xarc, 0, xarc/2, (int)strokeWidth)));
-        resourceMap.put(imgId + "bottom", app.createImage(bi.getSubimage(xarc, bi.getHeight()-(int)strokeWidth, (xarc/2), (int)strokeWidth)));
-        resourceMap.put(imgId + "left", app.createImage(bi.getSubimage(0, yarc, (int)strokeWidth, yarc/2)));
-        resourceMap.put(imgId + "right", app.createImage(bi.getSubimage(bi.getWidth()-(int)strokeWidth, yarc, (int)strokeWidth, yarc/2)));
+        Map<String, ImageResource> rmap = getResourceMap();
+        rmap.put(imgId + "tl", app.createImage(bi.getSubimage(0, 0, xarc, yarc)));
+        rmap.put(imgId + "tr", app.createImage(bi.getSubimage(bi.getWidth()-xarc, 0, xarc, yarc)));
+        rmap.put(imgId + "bl", app.createImage(bi.getSubimage(0, bi.getHeight()-yarc, xarc, yarc)));
+        rmap.put(imgId + "br", app.createImage(bi.getSubimage(bi.getWidth()-xarc, bi.getHeight()-yarc, xarc, yarc)));
+        rmap.put(imgId + "top", app.createImage(bi.getSubimage(xarc, 0, xarc/2, (int)strokeWidth)));
+        rmap.put(imgId + "bottom", app.createImage(bi.getSubimage(xarc, bi.getHeight()-(int)strokeWidth, (xarc/2), (int)strokeWidth)));
+        rmap.put(imgId + "left", app.createImage(bi.getSubimage(0, yarc, (int)strokeWidth, yarc/2)));
+        rmap.put(imgId + "right", app.createImage(bi.getSubimage(bi.getWidth()-(int)strokeWidth, yarc, (int)strokeWidth, yarc/2)));
 	}
 	
 	public ImageResource getImageResource(String t) {
-		return resourceMap.get(imgId + t);
+		return getResourceMap().get(imgId + t);
 	}
 	
 	public boolean isResourceCached() {
-		boundingRectangle =rectangleMap.get(imgId + "rect"); 
+		boundingRectangle = getRectangleMap().get(imgId + "rect"); 
 		return boundingRectangle != null;
 	}
 	
@@ -127,6 +129,35 @@ public class ViewImageGenerator {
 		Rectangle r = new Rectangle(boundingRectangle);
 		r.grow(-xoff, -yoff);
 		return r;
+	}
+	
+	//private static Map<String, ImageResource> resourceMap = Collections.synchronizedMap(new HashMap<String, ImageResource>());
+	//private static Map<String, Rectangle> rectangleMap = Collections.synchronizedMap(new HashMap<String, Rectangle>());
+
+	@SuppressWarnings("unchecked")
+	public synchronized Map<String, Rectangle> getRectangleMap() {
+		Map<String, Rectangle> rmap = (Map<String, Rectangle>)(app.getApplicationObject(ViewImageGenerator.class.getCanonicalName()+ ".rectangleMap"));
+		if (rmap != null)
+			return rmap;
+		else {
+			rmap = Collections.synchronizedMap(new HashMap<String, Rectangle>());
+			app.setApplicationObject(ViewImageGenerator.class.getCanonicalName() + ".rectangleMap", rmap);
+			return rmap;
+		}
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public synchronized Map<String, ImageResource> getResourceMap() {
+		Map<String, ImageResource> rmap = (Map<String, ImageResource>)(app.getApplicationObject(ViewImageGenerator.class.getCanonicalName() + ".imageMap"));
+		if (rmap != null)
+			return rmap;
+		else {
+			rmap = Collections.synchronizedMap(new HashMap<String, ImageResource>());
+			app.setApplicationObject(ViewImageGenerator.class.getCanonicalName() + ".imageMap", rmap);
+			return rmap;
+		}
+		
 	}
 
 }

@@ -323,7 +323,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public static ConfigEntry cfgQualitySelection = new ConfigEntry(
 			"quality.select",
-			"false",
+			"true",
 			"Enable user to select quality from 'play' screen"
 			);
 
@@ -344,12 +344,42 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"run tidy on html input"
 			);
 	
+	public static ConfigEntry cfgTidtXhtml = new ConfigEntry(
+			"info.tidy.xhtml",
+			"false",
+			"set tidy to generate xhtml output"
+			);
+
 	public static ConfigEntry cfgHtmlRenderer = new ConfigEntry(
 			"html.renderer",
 			SBHtmlRendererFactory.defaultRenderer,
 			"class of html renderer"
 			);
 	
+	public static ConfigEntry cfgDefaultCss = new ConfigEntry(
+			"html.css",
+			"streambaby.css",
+			"Default stylesheet to use for html rendering"
+			);
+
+	public static ConfigEntry cfgPyTivoXsl = new ConfigEntry(
+			"xsl.pytivo",
+			"pytivo.xsl",
+			"xslt to use for transforming pytivo metadata.  Relative to stylesheets or abs"
+			);
+	
+	public static ConfigEntry cfgTxtXsl = new ConfigEntry(
+			"xsl.txt",
+			"txt.xsl",
+			"xslt to use for transforming txt metadata.  Relative to stylesheets or abs"
+			);
+	
+	public static ConfigEntry cfgTivoXmlXsl = new ConfigEntry(
+			"xsl.tvbusenvelope",
+			"tivo-pyxml.xsl,pytivo.xsl",
+			"xslt to use for transforming tivo XML metadata.  Relative to stylesheets or abs"
+			);
+
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
@@ -376,7 +406,8 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public final String[] defaultVideoModules = new String[] {
 			"com.unwiredappeal.tivo.vm.ffjava.FFmpegJavaVideoModule",
 			"com.unwiredappeal.tivo.vm.ffexe.FFmpegExeVideoModule",
-			"com.unwiredappeal.tivo.metadata.StandardMetadataModule"
+			"com.unwiredappeal.tivo.metadata.StandardMetadataModule",
+			"com.unwiredappeal.tivo.metadata.TaggerMetadataModule"
 	};
 	
 	public Boolean _DEBUG = false;

@@ -37,6 +37,8 @@
         <pathelement location="../dlib/core-renderer.jar"/>
         <pathelement location="../dlib/cobra.jar"/>
         <pathelement location="../dlib/js.jar"/>
+        <pathelement location="../lib/saxon9.jar"/>
+        <pathelement location="../lib/saxon9-dom.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>

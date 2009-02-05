@@ -100,6 +100,7 @@
 	<copy todir="dist/${dist}-src">
 		<fileset dir=".">
 			<include name="assets/**"/>
+			<include name="stylesheets/**"/>
 			<include name="main/**"/>
 			<include name="native/**"/>
 			<include name="ffmpeg-java/**"/>
@@ -146,6 +147,9 @@
 	</copy>
 	<copy todir="dist/${dist}/assets">
 		<fileset dir="assets"/>
+	</copy>
+	<copy todir="dist/${dist}/stylesheets">
+		<fileset dir="stylesheets"/>
 	</copy>
 
 	<copy todir="dist/${dist}/lib">

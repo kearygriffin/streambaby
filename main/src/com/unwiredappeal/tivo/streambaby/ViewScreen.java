@@ -116,7 +116,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	public PreviewWindow preview = null;
 
 	public static int INFO_VIEW_HEIGHT = 300;
-	public static float INFO_VIEW_TRANSPARENCY = 0.40f;
+	public static float INFO_VIEW_TRANSPARENCY = 0.20f;
 	public static int INFO_VIEW_ARC = 50;
 	public static float INFO_VIEW_STROKE = 12.0f;
 	public static Color INFO_VIEW_COLOR = Color.blue;
@@ -698,7 +698,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			// + ", pos: " + position + ", dur: " + duration);
 			if (status == RSRC_EOB) {
 				if (position == 0 && duration == 0) {
-					error();
+					//error();
 				} else {
 					boolean rebuffered = possibleRebuffer(date);
 					if (!rebuffered

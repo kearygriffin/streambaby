@@ -38,6 +38,8 @@
         <pathelement location="${main.location}/../dlib/core-renderer.jar"/>
         <pathelement location="${main.location}/../dlib/cobra.jar"/>
         <pathelement location="${main.location}/../dlib/js.jar"/>
+        <pathelement location="${main.location}/../lib/saxon9.jar"/>
+        <pathelement location="${main.location}/../lib/saxon9-dom.jar"/>
     </path>
     <path id="ffmpegJavaModule.classpath">
         <pathelement location="bin"/>

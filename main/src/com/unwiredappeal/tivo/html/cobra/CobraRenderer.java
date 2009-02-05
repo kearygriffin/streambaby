@@ -1,21 +1,16 @@
 package com.unwiredappeal.tivo.html.cobra;
 
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 
 import org.lobobrowser.html.HtmlRendererContext;
-import org.lobobrowser.html.gui.HtmlPanel;
 import org.lobobrowser.html.parser.DocumentBuilderImpl;
-import org.lobobrowser.html.parser.InputSourceImpl;
 import org.lobobrowser.html.style.RenderState;
 import org.lobobrowser.html.test.SimpleHtmlRendererContext;
 import org.lobobrowser.html.test.SimpleUserAgentContext;

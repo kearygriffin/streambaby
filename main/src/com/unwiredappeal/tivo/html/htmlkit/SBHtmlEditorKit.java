@@ -10,8 +10,6 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
-import javax.swing.text.html.HTMLEditorKit.Parser;
-import javax.swing.text.html.HTMLEditorKit.ParserCallback;
 
 @SuppressWarnings("serial")
 public class SBHtmlEditorKit extends HTMLEditorKit {

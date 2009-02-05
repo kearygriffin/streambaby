@@ -9,10 +9,27 @@
    * Metadata supported:
    * .txt files-  Either a pyTivo metadata file or a standard txt file (autodetected)
    * .html
-   * .xml- Currently assumed to be a .tivo format XML file
+   * .xml- Currently assumed to be a .tivo format XML file (NOT YET IMPLEMENTED)
    * .gif, .png, .jpg:  Use as straight images.  New config property info.preserveaspect=true to control if img is allowed to be stretched
+   * Metadata is transformed using XSL into either straight txt or html (either is OK)
+   * new INI options: xsl.pytivo= and xsl.txt=
+    * Points to the xslt file to use to transform the respective formats.  Can be chained (so xsl.pytivo=pytivo.xsl,pretty.xsl would apply both xsl stylesheets)
+    * For pytivo the xml fed in is each "key" (value before the colon) is an element, and the text for that key is the text for the element (as cdata).
+     * Whole file is wrapped in <pytivo>  </pytivo>
+    * For txt the xml is the whole text file wrapped in <txt> </txt> (as cdata) 
  * Switch to current jmdns from sourceforge
    * Required changes to build process, removal of simulator.jar from main dist, addition of hme-host-sb.jar
+   * JmDNS shutdown hook is broken (always hangs).  Hack to remove the shutdown hook
+ * Added HTML rendering code for Cobra (from lobo project), flyingsaucer xhtmlrenderer, and HTMLEditKit (built-in to java)
+  * Compile requires libraries for cobra and flyingsaucer, but dist does not include, and always uses HTMLEditorKit, included with java
+  * Can set the render by setting html.renderer= in the INI file
+   * com.unwiredappeal.tivo.html.cobra.CobraRenderer for cobra
+   * com.unwiredappeal.tivo.html.fs.FlyingSaucerRenderer for flyingsaucer
+   * com.unwiredappeal.tivo.html.htmlkit.HtmlKitRenderer (default)
+ * New INI option, info.tidy (default: true) which runs jtidy on all HTML input before passing to renderer
+ * New INI option, info.tidy.xhtml (default: false) which tells tidy to generate xhtml output (htmleditorkit not really happy with xhtml)
+ * New INI option html.css to set default css for html rendering.  relative to stylesheets directory (or abs)
+  * default=streambaby.css, which doesn't exist by default (and so won't be loaded)
 
  
  ===V0.20===

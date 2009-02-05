@@ -3,7 +3,6 @@ package com.unwiredappeal.tivo.html.fs;
 import java.awt.image.BufferedImage;
 
 import org.xhtmlrenderer.swing.Java2DRenderer;
-import org.xhtmlrenderer.util.ImageUtil;
 
 public class SBFSJava2DRenderer extends Java2DRenderer {
 

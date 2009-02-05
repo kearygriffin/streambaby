@@ -69,9 +69,9 @@ public class VText extends BTextPlus<String> {
 	   
    }
    
-   public void setVisible(Boolean visible) {
+   public void setVisible(boolean visible) {
       this.visible = visible;
-      this.setVisible(visible);
+      super.setVisible(visible);
    }
    
    public boolean isVisibile() {

@@ -46,6 +46,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	public ImageResource filmResource;
 	public List<Cleanupable> cleanupRequired = Collections.synchronizedList(new LinkedList<Cleanupable>());
  
+	private Map<String, Object >appObjectMap = Collections.synchronizedMap(new HashMap<String, Object>());
 	/*
 	public void init(IContext context) throws Exception {
 		
@@ -386,6 +387,15 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 		
 		flushPersistentCache();
 
+	}
+
+
+	public Object getApplicationObject(String str) {
+		return appObjectMap.get(str);
+	}
+	
+	public void setApplicationObject(String str, Object o) {
+		appObjectMap.put(str, o);
 	}
 	
 }

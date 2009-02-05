@@ -4,7 +4,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BViewPlus;

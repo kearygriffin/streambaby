@@ -6,11 +6,14 @@ import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 
 
+
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.html.BaseHtmlRenderer;
 
 
@@ -40,8 +43,15 @@ public class HtmlKitRenderer extends BaseHtmlRenderer {
 			final JEditorPane pane = new JEditorPane();
 	        pane.setEditable(false);
 	        pane.setMargin(new Insets(0,0,0,0));
-
-			pane.setEditorKit(new SBHtmlEditorKit(baseUrl));
+	        SBHtmlEditorKit kit = new SBHtmlEditorKit(baseUrl);
+			pane.setEditorKit(kit);
+			File css = new File(StreamBabyConfig.convertRelativePath(StreamBabyConfig.cfgDefaultCss.getValue(), StreamBabyConfig.streamBabyDir + File.separator));
+			if (css.exists()) {
+				try {
+					kit.getStyleSheet().importStyleSheet(css.toURL());
+				} catch (MalformedURLException e) {
+				}
+			}
 			pane.setBounds(0, 0, width, height);
 			pane.setOpaque(false);
 			pane.setDoubleBuffered(false);

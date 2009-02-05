@@ -54,6 +54,11 @@ public class MetaData {
 		this.urlStr = urlStr;
 		dataType = METADATA_URL;
 	}
+
+	public void setBaseUrl(String urlStr) {
+		// just set the url to use for relative references.
+		this.urlStr = urlStr;
+	}
 	
 	public void convertUrl() {
 		if (isConverted)
@@ -161,11 +166,12 @@ public class MetaData {
 		
 	}
 	public void setHtml(String html) {
+		//Log.verbose("PreTidy: " + html);
 		if (StreamBabyConfig.cfgForceTidy.getBool()) {
 			Tidy t = new Tidy();
 			t.setQuiet(true);
 			t.setErrout(new PrintWriter(new TidyLogger()));
-			t.setXHTML(true);
+			t.setXHTML(StreamBabyConfig.cfgTidtXhtml.getBool());
 			StringReader sr = new StringReader(html);
 			StringWriter sw = new StringWriter();
 			InputStream is = new ReaderInputStream(sr);
@@ -180,6 +186,7 @@ public class MetaData {
 			} catch (IOException e) {
 			}
 			data = sw.toString();
+			//Log.verbose("PostTidy: " + data);
 		}
 		else
 			data = html;
