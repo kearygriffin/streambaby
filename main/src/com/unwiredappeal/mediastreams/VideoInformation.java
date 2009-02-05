@@ -6,8 +6,8 @@ import java.net.URI;
 
 import com.unwiredappeal.tivo.utils.InfoCache;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class VideoInformation extends InfoCache.Cacheable {
 	

@@ -3,6 +3,7 @@ package com.unwiredappeal.tivo.streambaby;
 import static com.tivo.hme.bananas.IBananasPlus.H_BAR_FONT;
 import static com.tivo.hme.bananas.IBananasPlus.H_BAR_TEXT_COLOR;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +21,9 @@ import com.tivo.hme.sdk.Resource;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.Log;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.metadata.MetaData;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class PlayScreen extends ScreenTemplate {
 
@@ -60,6 +62,25 @@ public class PlayScreen extends ScreenTemplate {
 		super(app);
 		this.de = de;
 		qual = StreamBabyConfig.inst.getDefaultQuality();
+		MetaDataViewer mv = new MetaDataViewer();
+		MetaData meta = new MetaData();
+		boolean hasMeta = de.getMetadata(meta);
+		if (hasMeta) {
+			LayoutManager lm = new LayoutManager(getNormal());
+			Layout safeTitle = lm.safeTitle(this);
+			Layout layout = safeTitle;
+
+			layout = lm.relativeY(layout, false);		
+			
+			layout = lm.safeAction(layout, this, 0, 25);
+			layout = lm.indentX(layout, -20);
+			layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
+			layout = lm.indentY(layout, 55);
+
+			int bottom = calcListLayout(4).getBounds().y;
+			int height = bottom - layout.getBounds().y;
+			BView v = mv.getView(meta, this.getNormal(), layout.getBounds().x, layout.getBounds().y, layout.getBounds().width+50, height);
+		}
 
 		/*
 		 * LayoutManager lm = new LayoutManager(getNormal()); Layout safeTitle =
@@ -80,10 +101,11 @@ public class PlayScreen extends ScreenTemplate {
 		Layout safeTitle = lm.safeTitle(this);
 		Layout layout = safeTitle;
 
-		layout = lm.relativeY(layout, true);
+		layout = lm.relativeY(layout, false);
 		// layout = lm.stretchWidth(layout, 0.9f);
 		layout = lm.safeAction(layout, this, 0, 25);
 		layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
+		layout = lm.indentY(layout, 65);
 		int height = ViewUtils.getHeight(this, H_BAR);
 		layout = lm.valign(layout, 295 - (rows * height));
 		return layout;
@@ -382,8 +404,8 @@ public class PlayScreen extends ScreenTemplate {
 
 
 		if (pos != 0) {
-			addSimpleTextButton("Resume playing "
-					+ de.getName(), new ButtonHandler() {
+			addSimpleTextButton("Resume playing"
+					, new ButtonHandler() {
 				public boolean left() {
 					popBack();
 					return true;
@@ -395,7 +417,7 @@ public class PlayScreen extends ScreenTemplate {
 					return beginPlay(false);
 				}
 			}, false);
-			addSimpleTextButton("Play " + de.getName() + " from beginning", new ButtonHandler() { 
+			addSimpleTextButton("Play from beginning", new ButtonHandler() { 
 				public boolean left() {
 					popBack();
 					return true;
@@ -409,7 +431,7 @@ public class PlayScreen extends ScreenTemplate {
 				
 			}, false);
 		} else {
-			addSimpleTextButton("Play " + de.getName(), new ButtonHandler() { 
+			addSimpleTextButton("Play", new ButtonHandler() { 
 				public boolean left() {
 					popBack();
 					return true;

@@ -10,7 +10,8 @@ import java.util.List;
 import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.metadata.MetaData;
+import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class DirEntry implements Comparable<DirEntry> {
 	//public String userPassword;
@@ -25,7 +26,9 @@ public class DirEntry implements Comparable<DirEntry> {
 	public String mimeType;
 	public List<String> passwords = new ArrayList<String>();
 	private  VideoInformation vinfo = null;
-	
+	private boolean hasMeta = false;
+	private boolean cachedMeta = false;
+	private MetaData meta = new MetaData();
 	public List<DirEntry> entryList = new ArrayList<DirEntry>();
 	
 	public DirEntry() { }
@@ -186,6 +189,17 @@ public class DirEntry implements Comparable<DirEntry> {
 		if (VideoModuleHelper.inst.canStreamOrTranscodeVideo(getUri(), vinfo))
 			return true;
 		return false;
+	}
+	
+	public boolean getMetadata(MetaData meta) {
+		if (cachedMeta) {
+			this.meta.copy(meta);
+			return hasMeta;
+		}
+		this.hasMeta = VideoModuleHelper.inst.setMetadata(meta, this, getVideoInformation());
+		meta.copy(this.meta);
+		cachedMeta = true;
+		return hasMeta;
 	}
 	
 	public VideoInformation getVideoInformation() {

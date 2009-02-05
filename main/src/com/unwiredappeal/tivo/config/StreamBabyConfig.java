@@ -18,8 +18,8 @@ import com.unwiredappeal.tivo.utils.AvailableSocket;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 import com.unwiredappeal.tivo.utils.TempFileManager;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 import com.unwiredappeal.virtmem.MappedFileMemoryManager;
 
 public class StreamBabyConfig extends ConfigurableObject {
@@ -38,7 +38,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static String DEFAULT_VIDEO_DIR = "videos";
 	public static String DEFAULT_TITLE = "Stream, Baby, Stream";
 	public static String CONFIG_FILE = "streambaby.ini";
-	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,m4a,raw";
+	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,m4a,raw,3gp,mov";
 
 	
 	public static ConfigEntry cfgSocketStart = new ConfigEntry(
@@ -331,6 +331,17 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"false",
 			"Set to true to skip top-level folders if there is only one"
 			);
+	
+	public static ConfigEntry cfgInfoPreserveAspect = new ConfigEntry(
+			"info.preserveaspect",
+			"true",
+			"Preserve aspect ratio when generating info boxes (mostly for graphics)"
+			);
+	public static ConfigEntry cfgForceTidy = new ConfigEntry(
+			"info.forcetidy",
+			"true",
+			"Read html at beginning of processing and tidy into xhtml.  Only absolute references will be allowed in the html"
+			);
 
 	
 	// This always be last
@@ -358,7 +369,8 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public final String[] defaultVideoModules = new String[] {
 			"com.unwiredappeal.tivo.vm.ffjava.FFmpegJavaVideoModule",
-			"com.unwiredappeal.tivo.vm.ffexe.FFmpegExeVideoModule"
+			"com.unwiredappeal.tivo.vm.ffexe.FFmpegExeVideoModule",
+			"com.unwiredappeal.tivo.metadata.StandardMetadataModule"
 	};
 	
 	public Boolean _DEBUG = false;

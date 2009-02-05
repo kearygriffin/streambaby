@@ -153,7 +153,8 @@ public class Main implements ILogger
             if (!disableMdns) {
 	            rv = new JmDNS[interfaces.length];
 	            for (int i = 0; i < interfaces.length; ++i) {
-	                rv[i] = new JmDNS(InetAddress.getByName(interfaces[i]));
+	                //rv[i] = new JmDNS(InetAddress.getByName(interfaces[i]));
+	            	rv[i] = JmDNS.create(InetAddress.getByName(interfaces[i]));
 	            }
             }
             
@@ -257,7 +258,8 @@ public class Main implements ILogger
         Hashtable atts = new Hashtable();
         atts.put("path", factory.getAppName());
         atts.put("version", (String)factory.getFactoryData().get(IFactory.HME_VERSION_TAG));
-        return new ServiceInfo(mdns_type, factory.getAppTitle() + "." + mdns_type, port, 0, 0, atts);
+        //return new ServiceInfo(mdns_type, factory.getAppTitle() + "." + mdns_type, port, 0, 0, atts);
+        return ServiceInfo.create(mdns_type, factory.getAppTitle() + "." + mdns_type, port, 0, 0, atts);
     }
 
     //
@@ -276,4 +278,10 @@ public class Main implements ILogger
         System.err.println("STARTING...");
         new Main(new ArgumentList(argv));
     }
+	public Listener getListener() {
+		return listener;
+	}
+	public List getFactories() {
+		return factories;
+	}
 }

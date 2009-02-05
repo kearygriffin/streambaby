@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/bananas-plus-0.1.1-streambabyr1.jar" sourcepath="/home/keary/tools/bananas-plus-read-only/src/java"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/hme.jar" sourcepath="/home/keary/tools/hme_sdk_1.4/src.zip"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/jna.jar" sourcepath="/home/keary/tools/jna/src.zip"/>
-	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/simulator.jar"/>
 	<classpathentry kind="lib" path="/ffmpegJavaModule/bin" sourcepath="/home/keary/twork/streambaby/ffmpegJavaModule/src"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/bcel-5.2.jar"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/simple-log.jar" sourcepath="/home/keary/tools/simple-log-2.0.1/simple-log-src.zip"/>
@@ -14,5 +13,10 @@
 	<classpathentry kind="lib" path="/ffmpeg-java/build/classes"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/bsh-2.0b4.jar"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/tarbz.jar" sourcepath="/home/keary/twork/tarbz/src"/>
+	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/Tidy.jar"/>
+	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/core-renderer.jar"/>
+	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/jmdns.jar" sourcepath="/home/keary/tools/jmdns-2.1/src"/>
+	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/hme-host-sb.jar" sourcepath="/home/keary/tools/hme_sdk_1.4/src"/>
+	<classpathentry kind="lib" path="/home/keary/twork/streambaby/dlib/simulator.jar" sourcepath="/home/keary/tools/hme_sdk_1.4/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

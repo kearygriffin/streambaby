@@ -9,17 +9,17 @@ import java.net.URI;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.videomodule.BaseVideoHandlerModule;
-import com.unwiredappeal.tivo.videomodule.StreamBabyModule;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
+import com.unwiredappeal.tivo.modules.BaseVideoHandlerModule;
+import com.unwiredappeal.tivo.modules.StreamBabyModule;
+import com.unwiredappeal.tivo.modules.VideoFormats;
 
 public class RawStreamingModule extends BaseVideoHandlerModule implements StreamBabyModule {
 
 
 
 	public final static int STREAM_PRI = 10;
-	public boolean initialize() {
-		super.initialize();
+	public boolean initialize(StreamBabyModule parentMod) {
+		super.initialize(parentMod);
 		this.getPriorities().streamPriority = STREAM_PRI;
 		return true;
 	}

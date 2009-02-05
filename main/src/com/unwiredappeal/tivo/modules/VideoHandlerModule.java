@@ -1,4 +1,4 @@
-package com.unwiredappeal.tivo.videomodule;
+package com.unwiredappeal.tivo.modules;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,12 +9,7 @@ import com.unwiredappeal.mediastreams.VideoInputStream;
 
 
 public interface VideoHandlerModule {
-	public static final String CONTAINER_MP4 = "mp4";
-	public static int MAX_PRIORITY = 100;
-	public static int MIN_PRIORITY = 0;
-	public static int DEFAULT_PRIORITY = 50;
-	
-	public boolean initialize();
+	public boolean initialize(StreamBabyModule parentMod);
 	public VideoInputStream openStreamableVideo(URI uri, VideoInformation vi, long startPosition) throws IOException;
 	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition, int qual) throws IOException;
 	public PreviewGenerator getPreviewHandler(URI uri, VideoInformation vi, boolean realtime);
@@ -26,9 +21,18 @@ public interface VideoHandlerModule {
 	public VideoHandlerPriorities getPriorities();
 
 	public static class VideoHandlerPriorities {
-			public int previewPriority = DEFAULT_PRIORITY;
-			public int fillVideoPriority = DEFAULT_PRIORITY;
-			public int streamPriority = DEFAULT_PRIORITY;
-			public int transcodePriority = DEFAULT_PRIORITY;
+			public int previewPriority = StreamBabyModule.DEFAULT_PRIORITY;
+			public int fillVideoPriority = StreamBabyModule.DEFAULT_PRIORITY;
+			public int streamPriority = StreamBabyModule.DEFAULT_PRIORITY;
+			public int transcodePriority = StreamBabyModule.DEFAULT_PRIORITY;
+			public VideoHandlerPriorities() { }
+			public VideoHandlerPriorities(final int p) {
+			}
+			public void setPriority(int p) {
+				previewPriority = p;
+				fillVideoPriority = p;
+				streamPriority = p;
+				transcodePriority = p;				
+			}
 		}
 	}

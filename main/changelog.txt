@@ -1,6 +1,17 @@
  ===SVN===
  * Changed default for quality.2channel to zero, effectively disabling it.  Newer ffmpeg doesn't like to do this for 5.1 aac -> 2 channel ac3
  * Added support for new ffmpeg, AVStream->sample_aspect_ratio 
+ * Added 3gp, mov to supported extension
+ * Undid previous mp4 changes to skip reinterleave under certain circumstances.
+ * Added metadata parsing.  Metadata is displayed on "Play" screen and when pressing the info button while playing
+   * Metadata is looked for in the form "filename.mpg.xxx" where xxx the metadata extension.
+   * Metadata is looked for in the same directory of the video file, or in a subdirectory of the directory where the main file is called .meta
+   * Metadata supported:
+   * .txt files-  Either a pyTivo metadata file or a standard txt file (autodetected)
+   * .html
+   * .xml- Currently assumed to be a .tivo format XML file
+   * .gif, .png, .jpg:  Use as straight images.  New config property info.preserveaspect=true to control if img is allowed to be stretched
+
  
  ===V0.20===
  * Added initial support for .tivo files

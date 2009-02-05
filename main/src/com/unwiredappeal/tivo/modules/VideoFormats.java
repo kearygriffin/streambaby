@@ -1,4 +1,4 @@
-package com.unwiredappeal.tivo.videomodule;
+package com.unwiredappeal.tivo.modules;
 
 import java.util.ArrayList;
 import java.util.Arrays;

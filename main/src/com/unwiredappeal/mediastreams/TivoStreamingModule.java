@@ -8,11 +8,11 @@ import java.util.Arrays;
 
 import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.videomodule.BaseVideoHandlerModule;
-import com.unwiredappeal.tivo.videomodule.StreamBabyModule;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoFormats.AllowableFormats;
-import com.unwiredappeal.tivo.videomodule.VideoFormats.Format;
+import com.unwiredappeal.tivo.modules.BaseVideoHandlerModule;
+import com.unwiredappeal.tivo.modules.StreamBabyModule;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoFormats.AllowableFormats;
+import com.unwiredappeal.tivo.modules.VideoFormats.Format;
 
 public class TivoStreamingModule extends BaseVideoHandlerModule implements StreamBabyModule {
 
@@ -30,8 +30,8 @@ public class TivoStreamingModule extends BaseVideoHandlerModule implements Strea
 	
 
 	public final static int STREAM_PRI = 10;
-	public boolean initialize() {
-		super.initialize();
+	public boolean initialize(StreamBabyModule parentMod) {
+		super.initialize(parentMod);
 		this.getPriorities().streamPriority = STREAM_PRI;
 		return true;
 	}

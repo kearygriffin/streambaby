@@ -23,7 +23,6 @@
         <pathelement location="../lib/bananas-plus-0.1.1-streambabyr1.jar"/>
         <pathelement location="../lib/hme.jar"/>
         <pathelement location="../lib/jna.jar"/>
-        <pathelement location="../lib/simulator.jar"/>
         <pathelement location="${ffmpegJavaModule.location}/bin"/>
         <pathelement location="../lib/bcel-5.2.jar"/>
         <pathelement location="../lib/simple-log.jar"/>
@@ -31,6 +30,11 @@
         <pathelement location="${ffmpeg-java.location}/build/classes"/>
         <pathelement location="../lib/bsh-2.0b4.jar"/>
         <pathelement location="../lib/tarbz.jar"/>
+        <pathelement location="../lib/Tidy.jar"/>
+        <pathelement location="../lib/core-renderer.jar"/>
+        <pathelement location="../lib/jmdns.jar"/>
+        <pathelement location="../lib/hme-host-sb.jar"/>
+        <pathelement location="../dlib/simulator.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -92,9 +96,9 @@
             <classpath refid="main.classpath"/>
         </java>
     </target>
-    <target name="Streambaby - help">
+    <target name="Streambaby - beanshell">
         <java classname="com.unwiredappeal.tivo.streambaby.StreamBabyMain" dir="../" failonerror="true" fork="yes">
-            <arg line="--help"/>
+            <arg line="--bsc test.bsh"/>
             <classpath refid="main.classpath"/>
         </java>
     </target>
@@ -119,6 +123,7 @@
     </target>
     <target name="Streambaby - Simulator">
         <java classname="com.unwiredappeal.tivo.streambaby.StreamBabyMain" dir="../" failonerror="true" fork="yes">
+            <env key="LD_LIBRARY_PATH" value="/home/keary/twork/streambaby/native"/>
             <jvmarg line="-Dstreambaby.debug=1"/>
             <arg line="--simulator"/>
             <classpath refid="main.classpath"/>

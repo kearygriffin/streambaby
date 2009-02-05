@@ -31,7 +31,7 @@ import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.InfoCache;
 import com.unwiredappeal.tivo.utils.NamedStream;
 import com.unwiredappeal.tivo.utils.Log;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoFormats;
 
 public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	
@@ -319,6 +319,10 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
            break;
        }
        return super.handleEvent(event);
+   }
+   
+   public boolean isSimulator() {
+	   return simulator;
    }
    
 	      

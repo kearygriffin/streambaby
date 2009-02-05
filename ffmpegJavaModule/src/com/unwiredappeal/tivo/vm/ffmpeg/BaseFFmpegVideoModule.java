@@ -9,8 +9,8 @@ import java.util.Map;
 import net.sf.ffmpeg_java.FFMPEGLibrary;
 
 import com.unwiredappeal.mediastreams.VideoInformation;
-import com.unwiredappeal.tivo.videomodule.BaseVideoHandlerModule;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
+import com.unwiredappeal.tivo.modules.BaseVideoHandlerModule;
+import com.unwiredappeal.tivo.modules.VideoFormats;
 
 public class BaseFFmpegVideoModule extends BaseVideoHandlerModule {
 

@@ -18,7 +18,7 @@ import com.unwiredappeal.mediastreams.AutoPreviewGenerationManager;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.Log;
-import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class PreviewWindow extends BViewPlus {
 

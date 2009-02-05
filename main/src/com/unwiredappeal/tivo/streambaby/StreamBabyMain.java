@@ -8,6 +8,7 @@ import bsh.Interpreter;
 
 import com.tivo.hme.host.util.ArgumentList;
 import com.tivo.hme.host.util.Config;
+import com.tivo.hme.sim.StreamBabySimulator;
 import com.unwiredappeal.tivo.config.ConfigurationManager;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.streambaby.host.Main;
@@ -131,7 +132,7 @@ public class StreamBabyMain  {
 		   for (int i=0;i<rem.length;i++)
 			   newArgs[i] = rem[i];
 		   newArgs[newArgs.length-1] = DEFAULT_CLASSNAME;
-		   com.tivo.hme.sim.Simulator.main(newArgs);
+		   StreamBabySimulator.main(newArgs);
 	   }
 	   else
 		   new Main(al, config, true);

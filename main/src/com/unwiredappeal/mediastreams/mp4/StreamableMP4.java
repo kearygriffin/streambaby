@@ -49,7 +49,7 @@ public class StreamableMP4 extends InputStream {
 	public static float INTERLEAVE_DURATION = 0.4f;
 	public static Logger logger;
 	public List<String> formats = new ArrayList<String>();
-	private static final long MAX_CHUNK_DELTA_BEFORE_INTERLEAVE = 4 * 1024 * 1024;
+	private static final long MAX_CHUNK_DELTA_BEFORE_INTERLEAVE = -1; // (causes issues, leave disabled) 4 * 1024 * 1024;
 
 	public static BArrayFactory bfact = new BArrayFactory() {
 		public BArray getBArray(int size) {

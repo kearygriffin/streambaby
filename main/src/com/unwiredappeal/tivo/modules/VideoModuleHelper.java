@@ -1,4 +1,4 @@
-package com.unwiredappeal.tivo.videomodule;
+package com.unwiredappeal.tivo.modules;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,17 +12,22 @@ import com.unwiredappeal.mediastreams.PreviewGenerator;
 import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.mediastreams.VideoInputStream;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
+import com.unwiredappeal.tivo.dir.DirEntry;
+import com.unwiredappeal.tivo.metadata.MetaData;
+import com.unwiredappeal.tivo.metadata.MetadataModule;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
 
 public class VideoModuleHelper {
 	public static VideoModuleHelper inst = new VideoModuleHelper();
-	public List<VideoHandlerModule> modules = new ArrayList<VideoHandlerModule>();
+	public List<VideoHandlerModule> videoModules = new ArrayList<VideoHandlerModule>();
+	public List<MetadataModule> metadataModules = new ArrayList<MetadataModule>();
+	public List<StreamBabyModule> streamBabyModules= new ArrayList<StreamBabyModule>();
 	
-	public boolean hasModule(String className) {
-		Iterator<VideoHandlerModule> it = modules.iterator();
+	private boolean hasModule(String className) {
+		Iterator<StreamBabyModule> it = streamBabyModules.iterator();
 		while(it.hasNext()) {
-			VideoHandlerModule m = it.next();
+			StreamBabyModule m = it.next();
 			if (m.getClass().getCanonicalName().compareTo(className) == 0)
 				return true;
 			
@@ -37,14 +42,18 @@ public class VideoModuleHelper {
 			StreamBabyModule sm = null;
 			if (cl != null)
 				sm = (StreamBabyModule)cl.newInstance();
-			
-			VideoHandlerModule m = null;
-			if (sm != null)
+			if (sm != null) {
+				streamBabyModules.add(sm);
+				VideoHandlerModule m = null;
 				m  = (VideoHandlerModule)sm.getModule(StreamBabyModule.STREAMBABY_MODULE_VIDEO);
-			if (m != null && m.initialize()) {
-				modules.add(m);
+				if (m != null && m.initialize(sm))
+					videoModules.add(m);
+				MetadataModule meta = null;
+				meta = (MetadataModule)sm.getModule(StreamBabyModule.STREAMBABY_MODULE_METADATA);
+				if (meta != null)
+					metadataModules.add(meta);
 				return true;
-			} else 
+			} else
 				return false;
 		} catch (InstantiationException e) {
 			Log.error("Unable to load videoModule: " + className + ", (InstExcept)Err: " + e.getMessage());
@@ -59,7 +68,7 @@ public class VideoModuleHelper {
 	}
 	
 	public boolean canStreamVideo(URI uri, VideoInformation vinfo) {
-		Iterator<VideoHandlerModule> it = modules.iterator();
+		Iterator<VideoHandlerModule> it = videoModules.iterator();
 		while(it.hasNext()) {
 			VideoHandlerModule m = it.next();
 			if (m.canStream(uri, vinfo)) {
@@ -73,7 +82,7 @@ public class VideoModuleHelper {
 	
 	public boolean canStreamOrTranscodeVideo(URI uri, VideoInformation vinfo) {
 		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
-		Iterator<VideoHandlerModule> it = modules.iterator();
+		Iterator<VideoHandlerModule> it = videoModules.iterator();
 		while(it.hasNext()) {
 			VideoHandlerModule m = it.next();
 			if (m.canStream(uri, vinfo)) {
@@ -91,7 +100,7 @@ public class VideoModuleHelper {
 		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
 		if (disableTranscode)
 			return false;
-		Iterator<VideoHandlerModule> it = modules.iterator();
+		Iterator<VideoHandlerModule> it = videoModules.iterator();
 		while(it.hasNext()) {
 			VideoHandlerModule m = it.next();
 			if (m.canTranscode(uri, vinfo))
@@ -102,9 +111,21 @@ public class VideoModuleHelper {
 		
 	}
 
+	public boolean setMetadata(MetaData m, DirEntry de, VideoInformation vinfo) {
+		URI uri = de.getUri();
+		Iterator<MetadataModule> it = getMetadataModulesIterator();
+		while(it.hasNext()) {
+			MetadataModule meta = it.next();
+			if (meta.setMetadata(m, uri, vinfo) && m.hasMetaData())
+				return true;				
+		}
+		m.setString(de.getName());
+		return false;
+		
+	}
 	
 	public boolean canStream(URI uri, VideoInformation vinfo) {
-		Iterator<VideoHandlerModule> it = modules.iterator();
+		Iterator<VideoHandlerModule> it = videoModules.iterator();
 		while(it.hasNext()) {
 			VideoHandlerModule m = it.next();
 			if (m.canStream(uri, vinfo)) {
@@ -118,8 +139,8 @@ public class VideoModuleHelper {
 	public static interface GetPriority {
 		int getPriority(VideoHandlerModule m);
 	}
-	private Iterator<VideoHandlerModule> getModulesIterator(final GetPriority p) {
-		List<VideoHandlerModule> sortedList = new ArrayList<VideoHandlerModule>(modules);
+	private Iterator<VideoHandlerModule> getVideoModulesIterator(final GetPriority p) {
+		List<VideoHandlerModule> sortedList = new ArrayList<VideoHandlerModule>(videoModules);
 		Collections.sort(sortedList, new Comparator<VideoHandlerModule>() {
 
 			public int compare(VideoHandlerModule o1, VideoHandlerModule o2) {
@@ -129,9 +150,24 @@ public class VideoModuleHelper {
 		});
 		return sortedList.iterator();
 	}
+
+	private Iterator<MetadataModule> getMetadataModulesIterator() {
+		List<MetadataModule> sortedList = new ArrayList<MetadataModule>(metadataModules);
+		Collections.sort(sortedList, new Comparator<MetadataModule>() {
+
+			public int compare(MetadataModule o1, MetadataModule o2) {
+				return o2.getMetadataPriority() - o1.getMetadataPriority();
+			}
+			
+		});
+		return sortedList.iterator();
+	}
+	
+
+	
 	public VideoInputStream openStreamableVideo(URI uri, VideoInformation vinfo, long startPosition) {
 		VideoInputStream st = null;
-		Iterator<VideoHandlerModule> it = getModulesIterator(new GetPriority() { 
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(new GetPriority() { 
 				public int getPriority(VideoHandlerModule m) 
 				{ return m.getPriorities().streamPriority; }
 			}
@@ -155,7 +191,7 @@ public class VideoModuleHelper {
 		if (disableTranscode)
 			return null;
 		VideoInputStream st = null;
-		Iterator<VideoHandlerModule> it = getModulesIterator(new GetPriority() { 
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(new GetPriority() { 
 			public int getPriority(VideoHandlerModule m) 
 			{ return m.getPriorities().transcodePriority; }
 		}
@@ -176,7 +212,7 @@ public class VideoModuleHelper {
 	}
 	public PreviewGenerator getPreviewHandler(URI uri, VideoInformation vinfo, boolean realtime) {
 		PreviewGenerator st = null;
-		Iterator<VideoHandlerModule> it = getModulesIterator(new GetPriority() { 
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(new GetPriority() { 
 			public int getPriority(VideoHandlerModule m) 
 			{ return m.getPriorities().previewPriority; }
 		}
@@ -207,7 +243,7 @@ public class VideoModuleHelper {
 	}
 	public boolean fillVideoInformation(URI uri, VideoInformation vidinfo) {
 		Log.debug("GetVidInfo: " + uri);
-		Iterator<VideoHandlerModule> it = getModulesIterator(new GetPriority() { 
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(new GetPriority() { 
 			public int getPriority(VideoHandlerModule m) 
 			{ return m.getPriorities().fillVideoPriority; }
 		}
@@ -224,7 +260,7 @@ public class VideoModuleHelper {
 	}
 	
 	public boolean canPreview(URI uri, VideoInformation vi, boolean realtime) {
-		Iterator<VideoHandlerModule> it = modules.iterator();
+		Iterator<VideoHandlerModule> it = videoModules.iterator();
 		boolean b = false;
 		while(!b && it.hasNext()) {
 			VideoHandlerModule m = it.next();
@@ -235,7 +271,7 @@ public class VideoModuleHelper {
 	}
 	
 	public boolean hasRealtimePreview() {
-		Iterator<VideoHandlerModule> it = modules.iterator();
+		Iterator<VideoHandlerModule> it = videoModules.iterator();
 		boolean b = false;
 		while(!b && it.hasNext()) {
 			VideoHandlerModule m = it.next();
@@ -245,7 +281,7 @@ public class VideoModuleHelper {
 		
 	}
 	public int getModuleCount() {
-		return modules.size();
+		return videoModules.size();
 	}
 	public int getBitRateForQual(int qual) {
 		int br = StreamBabyConfig.inst.getVideoBr(qual) + StreamBabyConfig.inst.getAudioBr(qual);

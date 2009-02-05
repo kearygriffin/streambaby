@@ -24,7 +24,6 @@
         <pathelement location="${main.location}/../lib/bananas-plus-0.1.1-streambabyr1.jar"/>
         <pathelement location="${main.location}/../lib/hme.jar"/>
         <pathelement location="${main.location}/../lib/jna.jar"/>
-        <pathelement location="${main.location}/../lib/simulator.jar"/>
         <pathelement location="${ffmpegJavaModule.location}/bin"/>
         <pathelement location="${main.location}/../lib/bcel-5.2.jar"/>
         <pathelement location="${main.location}/../lib/simple-log.jar"/>
@@ -32,6 +31,11 @@
         <pathelement location="${ffmpeg-java.location}/build/classes"/>
         <pathelement location="${main.location}/../lib/bsh-2.0b4.jar"/>
         <pathelement location="${main.location}/../lib/tarbz.jar"/>
+        <pathelement location="${main.location}/../lib/Tidy.jar"/>
+        <pathelement location="${main.location}/../lib/core-renderer.jar"/>
+        <pathelement location="${main.location}/../lib/jmdns.jar"/>
+        <pathelement location="${main.location}/../lib/hme-host-sb.jar"/>
+        <pathelement location="${main.location}/../dlib/simulator.jar"/>
     </path>
     <path id="ffmpegJavaModule.classpath">
         <pathelement location="bin"/>

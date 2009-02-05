@@ -1,4 +1,4 @@
-package com.unwiredappeal.tivo.videomodule;
+package com.unwiredappeal.tivo.modules;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,9 +9,9 @@ import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.mediastreams.VideoInputStream;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.ConfigurableObject;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoFormats.AllowableFormats;
-import com.unwiredappeal.tivo.videomodule.VideoFormats.Format;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoFormats.AllowableFormats;
+import com.unwiredappeal.tivo.modules.VideoFormats.Format;
 
 public class BaseVideoHandlerModule extends ConfigurableObject implements VideoHandlerModule {
 	
@@ -20,7 +20,8 @@ public class BaseVideoHandlerModule extends ConfigurableObject implements VideoH
 	public BaseVideoHandlerModule() {
 		this.populateConfig();
 	}
-	public boolean initialize() {
+	public boolean initialize(StreamBabyModule parentMod) {
+		setPriorities(parentMod.getSimplePriority());
 		return true;
 	}
 	public VideoInputStream openStreamableVideo(URI uri, VideoInformation vi, long startPosition) throws IOException {
@@ -114,6 +115,10 @@ public class BaseVideoHandlerModule extends ConfigurableObject implements VideoH
 		return nullFormats;
 	}
 	*/
+	
+	public int getSimplePriority() {
+		return StreamBabyModule.DEFAULT_PRIORITY;
+	}
 	
 
 	

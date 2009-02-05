@@ -52,10 +52,10 @@ import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.utils.Utils;
 import com.unwiredappeal.tivo.utils.Log;
-import com.unwiredappeal.tivo.videomodule.StreamBabyModule;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoHandlerModule;
-import com.unwiredappeal.tivo.videomodule.VideoFormats.AllowableFormats;
+import com.unwiredappeal.tivo.modules.StreamBabyModule;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoHandlerModule;
+import com.unwiredappeal.tivo.modules.VideoFormats.AllowableFormats;
 import com.unwiredappeal.tivo.vm.ffjava.FFmpegJavaConfig;
 import com.unwiredappeal.tivo.vm.ffmpeg.BaseFFmpegVideoModule;
 
@@ -110,7 +110,8 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 	}
 	
 	@Override
-	public boolean initialize() {
+	public boolean initialize(StreamBabyModule parentMod) {
+		super.initialize(parentMod);
 		boolean b = FFmpegJavaConfig.inst.useFFmpegLibrary();
 		if (b) {
 			avFormat = AVFormatLibrary.INSTANCE;

@@ -26,9 +26,9 @@ import com.unwiredappeal.tivo.utils.SocketProcessInputStream;
 import com.unwiredappeal.tivo.utils.Utils;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.AvailableSocket.SocketNotAvailable;
-import com.unwiredappeal.tivo.videomodule.StreamBabyModule;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoFormats.AllowableFormats;
+import com.unwiredappeal.tivo.modules.StreamBabyModule;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoFormats.AllowableFormats;
 import com.unwiredappeal.tivo.vm.ffmpeg.BaseFFmpegVideoModule;
 
 public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements StreamBabyModule {
@@ -198,7 +198,8 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 	
 	public static int VIDEO_PRIORITIES = 40;
 	@Override
-	public boolean initialize() {
+	public boolean initialize(StreamBabyModule parentMod) {
+		super.initialize(parentMod);
 		setPriorities(VIDEO_PRIORITIES);
 		
 		ffmpegPath = cfgFFmpegPath.getValue();

@@ -39,11 +39,14 @@ import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.NamedStream;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.metadata.MetaData;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoModuleHelper;
+import com.unwiredappeal.tivo.views.BRoundedPanel;
 import com.unwiredappeal.tivo.views.VText;
 
-public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanupable, IdleHandler {
+public class ViewScreen extends ScreenTemplate implements Ticker.Client,
+		Cleanupable, IdleHandler {
 
 	/* Guesses at constants */
 	public static final int RSRC_STATUS_END = 11;
@@ -52,10 +55,10 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	private static final long BEGIN_PREVIEW_WINDOW = 3;
 	private static final long END_SEEK_PROTECTION = 10 * 1000L;
 	private static final long BEGIN_RWD_WINDOW = 1500L;
-	private static final long MAX_DUR_TIME =  1500L;
+	private static final long MAX_DUR_TIME = 1500L;
 
 	public boolean ignoreCutList = false;
-	
+
 	IntervalTree cutPosTree = null;
 	private BViewPlus pleaseWait;
 	BView waitView = null;
@@ -65,7 +68,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	private boolean readyHandled = false;
 	long lastPreviewMillis;
 	boolean played;
-	long  lastPosition;
+	long lastPosition;
 	long gotoPos = -1;
 	private boolean isClosed = true;
 	private String startMimeType = null;
@@ -76,8 +79,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	public SelectionScreen initialScreen;
 	public float _lastSpeed = 0;
 	public boolean _isPreviewing = false;
-	VText _infoText;
-	BView infoView;
+	BRoundedPanel infoView;
 	VText errorText;
 	VText keypadText;
 	VText waitText;
@@ -113,7 +115,16 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	int quality;
 	public PreviewWindow preview = null;
 
-	public ViewScreen(BApplicationPlus app, List<DirEntry> elist, String name, int quality) {
+	public static int INFO_VIEW_HEIGHT = 300;
+	public static float INFO_VIEW_TRANSPARENCY = 0.40f;
+	public static int INFO_VIEW_ARC = 50;
+	public static float INFO_VIEW_STROKE = 12.0f;
+	public static Color INFO_VIEW_COLOR = Color.blue;
+	public static String INFO_FONT_SIZE_STANDALONE = "small";
+	public static String INFO_FONT_SIZE = "tiny";
+	public static int INFO_SPACE = 0;
+	public ViewScreen(BApplicationPlus app, List<DirEntry> elist, String name,
+			int quality) {
 		super(app);
 		this.quality = quality;
 		this.folderName = name;
@@ -121,21 +132,54 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		if (elist.size() > 1)
 			playingMultiple = true;
 		curVideoNum = 0;
-		sapp = (StreamBabyStream)app;
-		//this.de = videoList.get(0);
-		//ImageResource r = this.createImage(GLOBAL.film_background);
+		sapp = (StreamBabyStream) app;
+		// this.de = videoList.get(0);
+		// ImageResource r = this.createImage(GLOBAL.film_background);
 		filmResource = sapp.filmResource;
 		setDefaultBackground();
 		/*
-		if (StreamBabyConfig.inst.DEBUG)
-			tivoCmd = new TivoCmd(app);
-			*/
+		 * if (StreamBabyConfig.inst.DEBUG) tivoCmd = new TivoCmd(app);
+		 */
 		sapp.addCleanupRequired(this);
 	}
 
-	//TivoCmd tivoCmd;
+	public void updateInfoView() {
+		String desc = de.getName();
+		if (videoList.size() > 1) {
+			desc = desc + " - " + (curVideoNum + 1) + "/" + videoList.size();
+			if (folderName != null)
+				desc = folderName + ": " + desc;
+		}
+		infoView.clearInnerView();
+		MetaData meta = new MetaData();
+		boolean hasMeta = de.getMetadata(meta);
+		String siz = INFO_FONT_SIZE_STANDALONE;
+		int rows = 4;
+		if (hasMeta) {
+			rows = 1;
+			siz = INFO_FONT_SIZE;
+		}
+		
+		Log.debug("Desc: " + desc);
+		VText _infoText = new VText(infoView, infoView.getInnerBounds().x, infoView.getInnerBounds().y, 
+				rows, siz);		
+		_infoText.setFlags(RSRC_HALIGN_CENTER | RSRC_VALIGN_TOP
+				| RSRC_TEXT_WRAP);
+		_infoText.setValue(desc);
+		infoView.addInner(_infoText);
+		if (hasMeta) {
+			int y = infoView.getInnerBounds().y + _infoText.getHeight() + INFO_SPACE;
+			int h = infoView.getInnerBounds().height - (_infoText.getHeight() + INFO_SPACE);
+			MetaDataViewer viewer = new MetaDataViewer();
+			BView v = viewer.getView(meta, infoView, infoView.getInnerBounds().x, y, infoView.getInnerBounds().width, h);
+			if (v != null)
+				infoView.addInner(v);
+		}
+	}
+
+	// TivoCmd tivoCmd;
 	public ViewScreen(BApplicationPlus app, DirEntry e, int kbps) {
-		this(app, Arrays.asList(new DirEntry[] { e  }), null, kbps);
+		this(app, Arrays.asList(new DirEntry[] { e }), null, kbps);
 	}
 
 	public void setDefaultBackground() {
@@ -145,15 +189,16 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			getBelow().setResource(Color.darkGray);
 	}
 
-
 	public void startStream() {
 
-		//getBelow().setResource(Color.black);
-		
-		_infoText = new VText(getNormal(), SAFE_ACTION_H, SAFE_ACTION_V, 3,
-				"small");
-		_infoText.setFlags(RSRC_HALIGN_CENTER | RSRC_VALIGN_TOP | RSRC_TEXT_WRAP);
-		infoView = _infoText;
+		// getBelow().setResource(Color.black);
+
+		infoView = new BRoundedPanel(getNormal(), sapp
+				.getSafeActionHorizontal(), sapp.getSafeActionVertical(), this
+				.getWidth()
+				- (sapp.getSafeActionHorizontal() * 2), INFO_VIEW_HEIGHT,
+				INFO_VIEW_ARC, INFO_VIEW_STROKE, INFO_VIEW_COLOR,
+				INFO_VIEW_TRANSPARENCY);
 		infoView.setVisible(false);
 
 		// keypad text (when numbers pressed)
@@ -172,91 +217,92 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		waitText = new VText(getBelow(), SAFE_ACTION_H, getHeight() / 2, 2,
 				"small");
 		waitText.setFlags(RSRC_HALIGN_CENTER | RSRC_TEXT_WRAP);
-		
-	    LayoutManager lm = new LayoutManager(getNormal());
-	    Layout safeTitle = lm.safeTitle(this);
-	    Layout layout = safeTitle;
-	      Element e = getBApp().getSkin().get(IBananasPlus.H_PLEASE_WAIT);
-	      layout = lm.size(layout, e.getWidth(), e.getHeight());
-	      layout = lm.align(layout, A_CENTER, A_CENTER);
 
-	    pleaseWait = new BViewPlus(this, layout, false);
-	    pleaseWait.setResource(e.getResource());
-	    pleaseWait.setVisible(false);
-	    
-	    playNextVideo(1);
+		LayoutManager lm = new LayoutManager(getNormal());
+		Layout safeTitle = lm.safeTitle(this);
+		Layout layout = safeTitle;
+		Element e = getBApp().getSkin().get(IBananasPlus.H_PLEASE_WAIT);
+		layout = lm.size(layout, e.getWidth(), e.getHeight());
+		layout = lm.align(layout, A_CENTER, A_CENTER);
+
+		pleaseWait = new BViewPlus(this, layout, false);
+		pleaseWait.setResource(e.getResource());
+		pleaseWait.setVisible(false);
+
+		playNextVideo(1);
 
 	}
-	
+
 	public void playNextVideo(int dir) {
 		startPosition = 0;
 		duration = 0;
 
 		errorText.setVisible(false);
 		boolean ok = false;
-		while(curVideoNum >= 0 && curVideoNum < videoList.size() && !ok) {
+		while (curVideoNum >= 0 && curVideoNum < videoList.size() && !ok) {
 			this.de = videoList.get(curVideoNum);
 			this.vinfo = de.getVideoInformation();
 			deUri = de.getUri();
 
-			if (this.vinfo == null || !VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri, de.getVideoInformation())) {
+			if (this.vinfo == null
+					|| !VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri,
+							de.getVideoInformation())) {
 				curVideoNum += dir;
 			} else
 				ok = true;
 		}
 
-		String desc = de.getName();
-		if (videoList.size() > 1) {
-			desc = desc + " - " + (curVideoNum+1) + "/" + videoList.size();
-			if (folderName != null)
-				desc = folderName + ": " + desc;
-		}
-		_infoText.setValue(desc);
+		updateInfoView();
 		if (preview != null) {
 			preview.remove();
 			preview = null;
 		}
-		preview = PreviewWindow.getPreviewWindow(getBelow(), de);  // new PreviewWindow(getBelow(), de);
-		
-	    long gotoPos = 0;
-	    if (!playingMultiple)
-	    	gotoPos = getResetSavedPosition(sapp, deUri, de.getVideoInformation().getDuration());
+		preview = PreviewWindow.getPreviewWindow(getBelow(), de); // new
+																	// PreviewWindow(getBelow(),
+																	// de);
+
+		long gotoPos = 0;
+		if (!playingMultiple)
+			gotoPos = getResetSavedPosition(sapp, deUri, de
+					.getVideoInformation().getDuration());
 		_isPreviewing = false;
 		_lastSpeed = 1;
 		stream_speed = 3;
 
 		// force a reload
 		duration = -1;
-		
-	    if (playingMultiple) {
-            timeout_info = new Date().getTime() + 1000*GLOBAL.timeout_info;
-            infoView.setVisible(true);
-	    }
 
+		if (playingMultiple) {
+			timeout_info = new Date().getTime() + 1000 * GLOBAL.timeout_info;
+			infoView.setVisible(true);
+		}
 
 		VideoInformation vinfo = de.getVideoInformation();
-		if (vinfo == null || !VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri, de.getVideoInformation())) {
+		if (vinfo == null
+				|| !VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri, de
+						.getVideoInformation())) {
 			displayError("Incompatible video stream");
 		} else {
 			loadCutList();
 			gotoPosition(gotoPos, null);
 		}
-		//gotoPosition(gotoPos, "Starting");
+		// gotoPosition(gotoPos, "Starting");
 
 	}
-	
+
 	private void loadCutList() {
 		cutPosTree = null;
 		if (Utils.isFile(de.getUri())) {
 			File f = new File(de.getUri().getPath() + ".edl");
 			if (f.exists() && f.isFile()) {
-				BufferedReader br  = null;
+				BufferedReader br = null;
 				try {
-					br = new BufferedReader(new InputStreamReader(f.toURL().openStream()));
+					br = new BufferedReader(new InputStreamReader(f.toURL()
+							.openStream()));
 					if (br != null) {
 						cutPosTree = new IntervalTree();
 						String str;
-						while((str =br.readLine()) != null) {
+						while ((str = br.readLine()) != null) {
 							StringTokenizer st = new StringTokenizer(str);
 							if (st.countTokens() < 3)
 								continue;
@@ -266,29 +312,35 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 							try {
 								double startd = Double.parseDouble(start);
 								double endd = Double.parseDouble(end);
-								startd += (StreamBabyConfig.cfgCutStartOffset.getInt()/1000.0);
-								endd -= (StreamBabyConfig.cfgCutEndOffset.getInt()/1000.0);
+								startd += (StreamBabyConfig.cfgCutStartOffset
+										.getInt() / 1000.0);
+								endd -= (StreamBabyConfig.cfgCutEndOffset
+										.getInt() / 1000.0);
 								int rem = Integer.parseInt(remove);
-								if (rem == 0 && startd > 0 && endd > 0 && endd > startd) {
+								if (rem == 0 && startd > 0 && endd > 0
+										&& endd > startd) {
 									Interval i = new Interval(startd, endd);
 									cutPosTree.insert(i);
 								}
-								
-							} catch(NumberFormatException ne) { }
+
+							} catch (NumberFormatException ne) {
+							}
 						}
 					}
-				} catch(IOException e) {
+				} catch (IOException e) {
 					cutPosTree = null;
 				} finally {
 					if (br != null)
 						try {
-						br.close();
-						} catch(IOException e) { }
+							br.close();
+						} catch (IOException e) {
+						}
 				}
 			}
 		}
-		
+
 	}
+
 	private static long getSavedPosition(IContext context, URI uri) {
 		long pos = 0;
 		String stringPos = context.getPersistentData(persistKey(uri));
@@ -300,26 +352,25 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		}
 		return pos;
 	}
-	
-	public static long getResetSavedPosition(StreamBabyStream app, URI uri, long dur) {
+
+	public static long getResetSavedPosition(StreamBabyStream app, URI uri,
+			long dur) {
 		long saved = getSavedPosition(app.getContext(), uri);
 		if (saved < 0)
 			saved = 0;
-		long left = dur-saved;
+		long left = dur - saved;
 		if (left < CLOSE_TO_END_RESTART) {
 			saved = 0;
-			app.cachePersistentData(persistKey(uri),
-					"0", true);			
+			app.cachePersistentData(persistKey(uri), "0", true);
 		}
 		return saved;
 	}
-	
-	   public boolean handleEnter(Object arg, boolean isReturn) {
-		   sapp.setCurrentScreen(this);
-			startStream();
-		   return true;
-	   }
 
+	public boolean handleEnter(Object arg, boolean isReturn) {
+		sapp.setCurrentScreen(this);
+		startStream();
+		return true;
+	}
 
 	private void gotoPosition(long pos) {
 		if (isPreviewing())
@@ -327,19 +378,18 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		else
 			gotoPosition(pos, null);
 	}
-	
+
 	public long getVideoLength() {
-		if (vinfo != null) { 
+		if (vinfo != null) {
 			long len = vinfo.getVideoLength();
 			if (len <= 0)
 				return duration;
 			else
 				return len;
-		}
-		else
+		} else
 			return duration;
 	}
-	
+
 	public long getRealVideoLength() {
 		if (vinfo != null)
 			return vinfo.getVideoLength();
@@ -347,17 +397,15 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	}
 
 	private void gotoPosition(long pos, String ssString) {
-		Log.debug("goto position: " + pos + ", vidlen: "
-				+ getVideoLength());
+		Log.debug("goto position: " + pos + ", vidlen: " + getVideoLength());
 		if (getVideoLength() > 0 && pos >= getVideoLength()) {
 			pos = getVideoLength();
 			return;
 		}
 		if (pos < 0)
 			pos = 0;
-		
 
-		//String fileName = de.getFilename();
+		// String fileName = de.getFilename();
 		// Let's make sure we can open the stream...
 		// Start the stream
 		if (stream != null && pos >= startPosition
@@ -394,10 +442,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		if (waitView != null)
 			waitView.setVisible(false);
 		waitView = null;
-		if (ssString == null && StreamBabyConfig.cfgUsePleaseWait.getBool() == false)
+		if (ssString == null
+				&& StreamBabyConfig.cfgUsePleaseWait.getBool() == false)
 			ssString = "Seeking...";
 		if (ssString != null) {
-			//ssString = "Seeking";
+			// ssString = "Seeking";
 			waitText.setValue(ssString);
 			waitView = waitText;
 		} else {
@@ -415,40 +464,44 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 				stream.pause();
 		}
 		closeStream();
-		Ticker.master.add(this, System.currentTimeMillis()+250, null);
-		//finishGoto(gotoPos);
+		Ticker.master.add(this, System.currentTimeMillis() + 250, null);
+		// finishGoto(gotoPos);
 	}
+
 	public void finishGoto(long pos) {
 		gotoPos = -1;
 		long startSec = (pos / 1000);
 		startPosition = (startSec * 1000);
 		maxDuration = 0;
-		if (!VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri, de.getVideoInformation()))
+		if (!VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri, de
+				.getVideoInformation()))
 			displayError("Incompatible video stream");
 		else {
 			VideoInputStream is = null;
-			Log.debug("Openening stream at position: " + startPosition + "(" + startPosition/1000 + " secs)");
+			Log.debug("Openening stream at position: " + startPosition + "("
+					+ startPosition / 1000 + " secs)");
 			if (quality == VideoFormats.QUALITY_AUTO)
 				quality = sapp.getAutoQuality();
-			is = VideoModuleHelper.inst.openVideo(deUri, de.getVideoInformation(), startPosition, quality);
+			is = VideoModuleHelper.inst.openVideo(deUri, de
+					.getVideoInformation(), startPosition, quality);
 			canSeek = is.canPosition();
 			if (!canSeek)
 				startPosition = 0;
-			//URL streamUrl = new URL(fileName + "?start=" + startSec);
-			//debug.print("Creating name stream: " + streamUrl.toString());
-			
+			// URL streamUrl = new URL(fileName + "?start=" + startSec);
+			// debug.print("Creating name stream: " + streamUrl.toString());
+
 			if (is == null) {
 				displayError("Failed to open stream");
-				//getBelow().clearResource();
-				//getBelow().setResource(Color.black);
-				//getBelow().setResource(filmResource);
+				// getBelow().clearResource();
+				// getBelow().setResource(Color.black);
+				// getBelow().setResource(filmResource);
 				setDefaultBackground();
-				
+
 			} else {
 				this.vinfo = is.getVideoInformation();
 				subDuration = is.getSubDuration();
 				if (startPosition != 0)
-					startPosition = getVideoLength() - subDuration;				
+					startPosition = getVideoLength() - subDuration;
 				startMimeType = is.getMimeType();
 				namedStream = new NamedStream(is.getInputStream(), subDuration);
 				namedStream.setContentType(is.getContentType());
@@ -461,20 +514,25 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 
 	public void possiblyStartNext() {
 		if (queuedToPlay && isClosed) {
-			stream = createVideoStream(getContext().getBaseURI().toString() + namedStream.getStreamName(),
-					startMimeType, true);
+			stream = createVideoStream(getContext().getBaseURI().toString()
+					+ namedStream.getStreamName(), startMimeType, true);
 			if (startMimeType.compareTo("audio/mp3") == 0)
 				isMp3 = true;
-			else 
+			else
 				isMp3 = false;
 			readyHandled = false;
 			isComplete = false;
 			stream.addHandler(this);
-			getBelow().setResource(stream);
+			Resource r = stream;
+			if (StreamBabyConfig.inst._DEBUG && sapp.isSimulator()) {
+				r = createImage(StreamBabyConfig.cfgBackgroundImage.getValue());
+			}
+			getBelow().setResource(r);
 			queuedToPlay = false;
 		}
 
 	}
+
 	public void changeSpeed(float speed) {
 		Log.debug("speed=" + speed);
 		if (isPreviewing() && speed == 1) {
@@ -531,12 +589,12 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			_statusBar.makeVisible(false);
 		}
 	}
-	
+
 	public void handleReady() {
 		if (readyHandled)
 			return;
 		// Clear out Starting text and display status bar
-		//waitText.setVisible(false);
+		// waitText.setVisible(false);
 		if (waitView != null) {
 			waitView.setVisible(false);
 			waitView = null;
@@ -555,11 +613,12 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		closeStream();
 		displayStatusBar(false);
 		displayError("Failed to open stream");
-		if (waitView != null) 
+		if (waitView != null)
 			waitView.setVisible(false);
 		waitView = null;
 
 	}
+
 	public synchronized boolean isStatusBarVisible() {
 		return _statusBar.visible;
 	}
@@ -571,6 +630,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	public synchronized void updateStatusBar(long p) {
 		_statusBar.Update(p);
 	}
+
 	public synchronized void setStatusBarMode(String mode) {
 		_statusBar.setMode(mode);
 	}
@@ -590,7 +650,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		if (stream == null) {
 			return super.handleEvent(event);
 		}
-		//Log.verbose("event=" + event);
+		// Log.verbose("event=" + event);
 		// Clear text if timeouts reached
 		long date = new Date().getTime();
 		if (timeout_info > 0 && date >= timeout_info) {
@@ -609,14 +669,14 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			keypad.removeAllElements();
 		}
 
-
-
 		// Update stream position and duration information
 		if (event instanceof HmeEvent.ResourceInfo) {
 			HmeEvent.ResourceInfo info = (HmeEvent.ResourceInfo) event;
 			if (info != null && info.getMap().get("position") != null) {
-				position = Long.parseLong(info.getMap().get("position").toString());
-				duration = Long.parseLong(info.getMap().get("duration").toString());
+				position = Long.parseLong(info.getMap().get("position")
+						.toString());
+				duration = Long.parseLong(info.getMap().get("duration")
+						.toString());
 			}
 			if (isMp3)
 				duration = getVideoLength();
@@ -634,22 +694,25 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 				maxDurationTime = date;
 			}
 			// int status = stream.getStatus();
-			//debug.print("ResourceStatus(" + r.toString() + "): " + status
-				//	+ ", pos: " + position + ", dur: " + duration);
+			// debug.print("ResourceStatus(" + r.toString() + "): " + status
+			// + ", pos: " + position + ", dur: " + duration);
 			if (status == RSRC_EOB) {
 				if (position == 0 && duration == 0) {
 					error();
 				} else {
 					boolean rebuffered = possibleRebuffer(date);
-					if (!rebuffered && getRealVideoLength() > 0 && getRealVideoLength() - (startPosition+duration) < 20000L)
+					if (!rebuffered
+							&& getRealVideoLength() > 0
+							&& getRealVideoLength()
+									- (startPosition + duration) < 20000L)
 						endOfVideo();
-					else if (!rebuffered){
-						//if (stream_speed != 3) {
+					else if (!rebuffered) {
+						// if (stream_speed != 3) {
 						stream.pause();
 						changeSpeed(0);
 						displayStatusBar(true); // keep status bar displayed
 						timeout_status = -1;
-						//}
+						// }
 					}
 				}
 
@@ -660,15 +723,16 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			} else if (status == RSRC_STATUS_END) {
 				Log.debug("END: ");
 				boolean rebuffered = possibleRebuffer(date);
-				if (!rebuffered && getRealVideoLength() > 0 && getRealVideoLength() - (startPosition+duration) < 20000L)
-					endOfVideo();				
-			}
-			else if (status == RSRC_STATUS_COMPLETE) {
+				if (!rebuffered
+						&& getRealVideoLength() > 0
+						&& getRealVideoLength() - (startPosition + duration) < 20000L)
+					endOfVideo();
+			} else if (status == RSRC_STATUS_COMPLETE) {
 				Log.debug("COMPLETE: ");
 				isComplete = true;
-				//boolean rebuffered = possibleRebuffer(date);
-				//if (!rebuffered)
-					//endOfVideo();
+				// boolean rebuffered = possibleRebuffer(date);
+				// if (!rebuffered)
+				// endOfVideo();
 			} else if (status == RSRC_STATUS_READY) {
 				Log.verbose("RSSRC_STATUS_READY");
 				handleReady();
@@ -685,12 +749,14 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 				handleReady();
 				played = true;
 				if (stream_speed > 3
-						&& (duration - position) < BEGIN_PREVIEW_WINDOW * SPEEDS[stream_speed] * 1000L) {
+						&& (duration - position) < BEGIN_PREVIEW_WINDOW
+								* SPEEDS[stream_speed] * 1000L) {
 					beginPreviewMode();
 				} else {
-					if (!ignoreCutList && stream_speed == 3 ) {
+					if (!ignoreCutList && stream_speed == 3) {
 						long cutpos = getEndCutPos(position + startPosition);
-						if (cutpos > 0 && cutpos < ((startPosition + duration)-8000)) {
+						if (cutpos > 0
+								&& cutpos < ((startPosition + duration) - 8000)) {
 							Log.debug("Jumping to cutpos: " + cutpos);
 							gotoPosition(cutpos);
 						}
@@ -701,24 +767,27 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			// statusBar.visible) {
 			if (status >= RSRC_STATUS_PLAYING && _statusBar != null) {
 				if (isPreviewing()) {
-					//previewTick();
+					// previewTick();
 				}
 				lastPosition = position;
 				// Update status bar even when not being displayed
 				// statusBar.Update(position, duration);
 				if (!isPreviewing())
-					updateStatusBar(startPosition + position, getVideoLength(), startPosition, startPosition+duration);
+					updateStatusBar(startPosition + position, getVideoLength(),
+							startPosition, startPosition + duration);
 				else
-					updateStatusBar(-1, getVideoLength(), startPosition, startPosition+duration);
+					updateStatusBar(-1, getVideoLength(), startPosition,
+							startPosition + duration);
 				// statusBar.Update();
-				if (startPosition > BEGIN_RWD_WINDOW && stream_speed !=3 && position < BEGIN_RWD_WINDOW)
+				if (startPosition > BEGIN_RWD_WINDOW && stream_speed != 3
+						&& position < BEGIN_RWD_WINDOW)
 					beginPreviewMode();
 				else if (position == 0 && stream_speed != 3) {
 					// stream_speed = 3;
 					// changeSpeed(0);
 					beginPreviewMode();
 
-				} 
+				}
 				if (stream_speed == 3)
 					savePosition(false);
 			}
@@ -728,23 +797,23 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		return super.handleEvent(event);
 	}
 
-
 	@SuppressWarnings("unchecked")
 	private long getEndCutPos(long pos) {
 		double secs = pos / 1000.0;
 		if (cutPosTree == null)
 			return -1;
-		List<Interval> cutList = (List<Interval>)cutPosTree.searchAll(new Interval(secs, secs));
+		List<Interval> cutList = (List<Interval>) cutPosTree
+				.searchAll(new Interval(secs, secs));
 		if (cutList != null && !cutList.isEmpty()) {
 			double maxsecs = Double.MIN_VALUE;
 			Iterator<Interval> it = cutList.iterator();
-			while(it.hasNext()) {
+			while (it.hasNext()) {
 				Interval i = it.next();
 				if (i.getHigh() > maxsecs)
 					maxsecs = i.getHigh();
 			}
-			long retpos = (long)(maxsecs * 1000);
-			if (Math.abs(retpos-pos) < 1000)
+			long retpos = (long) (maxsecs * 1000);
+			if (Math.abs(retpos - pos) < 1000)
 				return -1;
 			return retpos;
 		} else
@@ -759,9 +828,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		if (vidlen == 0)
 			return false;
 		long endDelta = vidlen - (startPosition + duration);
-		if (maxDurationTime > 0 && maxDelta > MAX_DUR_TIME
-				&& stream_speed == 3
-				&& endDelta  > 5000 && (duration) > 300000L) {
+		if (maxDurationTime > 0 && maxDelta > MAX_DUR_TIME && stream_speed == 3
+				&& endDelta > 5000 && (duration) > 300000L) {
 			// We are at the end of the 1.1G buffer, reload
 			// pretend we are a closed stream
 			gotoPosition(startPosition + duration + 1,
@@ -780,7 +848,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 
 	public boolean handleKeyPress(int code, long rawcode) {
 		Log.debug("code=" + code + " rawcode=" + rawcode);
-		if ((stream == null || _statusBar == null) && code != KEY_LEFT && code != KEY_CHANNELUP && code != KEY_CHANNELDOWN) {
+		if ((stream == null || _statusBar == null) && code != KEY_LEFT
+				&& code != KEY_CHANNELUP && code != KEY_CHANNELDOWN) {
 			return false;
 		}
 		/*
@@ -892,7 +961,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 					if (getLastSpeed() != 0 && stream_speed < 3) {
 						skip = (15 * 60) * 1000L;
 					} else if (getLastSpeed() != 0 && stream_speed > 3) {
-						skip = (-15*60) * 1000L;
+						skip = (-15 * 60) * 1000L;
 					}
 					movePosition(-1 * skip);
 				}
@@ -917,7 +986,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 					if (getLastSpeed() != 0 && stream_speed < 3) {
 						skip = (-15 * 60) * 1000L;
 					} else if (getLastSpeed() != 0 && stream_speed > 3) {
-						skip = (15*60) * 1000L;
+						skip = (15 * 60) * 1000L;
 					}
 					movePosition(skip);
 				}
@@ -931,32 +1000,21 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			case KEY_THUMBSDOWN:
 				ignoreCutList = !ignoreCutList;
 				/*
-				if (tivoCmd != null) {
-					mins = getMinutes();
-					int cmd = mins;
-					int arg = -1;
-					if (mins >= 0) {
-						if (mins > 100) {
-							arg = mins / 100;
-							cmd = mins = 100;
-						}
-						Log.debug("Sending cmd: " + cmd + ", arg: " + arg);
-						tivoCmd.sendCmd(stream.getID(), cmd, arg);
-						keypadText.setVisible(false);
-						timeout_keypad = -1;
-						keypad.removeAllElements();						
-					} 
-				} else {
-					
-				}
-				*/
+				 * if (tivoCmd != null) { mins = getMinutes(); int cmd = mins;
+				 * int arg = -1; if (mins >= 0) { if (mins > 100) { arg = mins /
+				 * 100; cmd = mins = 100; } Log.debug("Sending cmd: " + cmd + ",
+				 * arg: " + arg); tivoCmd.sendCmd(stream.getID(), cmd, arg);
+				 * keypadText.setVisible(false); timeout_keypad = -1;
+				 * keypad.removeAllElements(); } } else {
+				 *  }
+				 */
 				break;
 			case KEY_ENTER:
 				play("right.snd");
 				mins = getMinutes();
 				Log.debug("enter: goto position: " + mins + " mins");
 				if (mins >= 0) {
-					//play("select.snd");
+					// play("select.snd");
 					gotoPosition(mins * 60000);
 				}
 				keypadText.setVisible(false);
@@ -970,7 +1028,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 				return true;
 			case KEY_CLEAR:
 				// Clear text and status bar
-				// Really want to leave error on screen if we are not playing multiple files
+				// Really want to leave error on screen if we are not playing
+				// multiple files
 				if (playingMultiple)
 					errorText.setVisible(false);
 				infoView.setVisible(false);
@@ -987,18 +1046,19 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 				 * infoText.setVisible(false); timeout_info = -1; }
 				 * play("select.snd"); return true;
 				 */
-	         case KEY_INFO:
-	             // KJM added
-	             // Display file name temporarily
-	             if (timeout_info == -1) {
-	                timeout_info = new Date().getTime() + 1000*GLOBAL.timeout_info;
-	                infoView.setVisible(true);
-	             } else {
-	                infoView.setVisible(false);
-	                timeout_info = -1;
-	             }
-	             //play("select.snd");
-	             return true;
+			case KEY_INFO:
+				// KJM added
+				// Display file name temporarily
+				if (timeout_info == -1) {
+					timeout_info = new Date().getTime() + 1000
+							* GLOBAL.timeout_info;
+					infoView.setVisible(true);
+				} else {
+					infoView.setVisible(false);
+					timeout_info = -1;
+				}
+				// play("select.snd");
+				return true;
 			case KEY_NUM0:
 				addKey(0);
 				play("updown.snd");
@@ -1050,7 +1110,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 				curVideoNum = newVidNum;
 				playNextVideo(dir);
 				return true;
-				
+
 			} // switch
 		}
 		return super.handleKeyPress(code, rawcode);
@@ -1059,7 +1119,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	private void movePosition(long l) {
 		if (!isPreviewing()) {
 			long np = position + l;
-			if (Math.abs(l) > (60*1000L)) {
+			if (Math.abs(l) > (60 * 1000L)) {
 				if (np < 0 || np > duration) {
 					beginPreviewMode(l);
 					return;
@@ -1071,9 +1131,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		}
 
 	}
-    private void beginPreviewMode() {
-    	beginPreviewMode(0L);
-    }
+
+	private void beginPreviewMode() {
+		beginPreviewMode(0L);
+	}
+
 	private void beginPreviewMode(long offset) {
 		if (isPreviewing())
 			return;
@@ -1114,7 +1176,6 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		_lastSpeed = sp;
 	}
 
-	
 	public synchronized long tick(long tm, Object arg) {
 		// Check to see if the application has closed down
 		// and return -1 so the ticker doesn't re-register us.
@@ -1129,7 +1190,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 
 		return ret;
 	}
-	
+
 	public long previewTick() {
 		if (!isPreviewing() || getBApp().isApplicationClosing()) {
 			return -1;
@@ -1141,15 +1202,15 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		long p = preview.getNextFrame();
 		preview.setPosition(p);
 		updateStatusBar(p);
-		
+
 		p = preview.getPosition();
-		//long delta = curTime  - lastPreviewMillis;
+		// long delta = curTime - lastPreviewMillis;
 		long delta = PREVIEW_INTERVAL;
-		//if (delta < PREVIEW_INTERVAL)
-			//return 0;
+		// if (delta < PREVIEW_INTERVAL)
+		// return 0;
 		lastPreviewMillis = curTime;
-		int secDelta = (int) ((float) delta  * getLastSpeed());
-		p = p + (long) ((float) delta  * getLastSpeed());
+		int secDelta = (int) ((float) delta * getLastSpeed());
+		p = p + (long) ((float) delta * getLastSpeed());
 		long vidlen = getVideoLength();
 		if (p < 0) {
 			p = 0;
@@ -1166,7 +1227,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 
 	private void movePreviewPosition(long l) {
 		long np = preview.getPosition() + l;
-		if (np < 0) 
+		if (np < 0)
 			np = 0;
 		else if (np > getVideoLength())
 			np = getVideoLength();
@@ -1206,8 +1267,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	public void startFromPreview() {
 		exitPreview();
 		play("right.snd");
-		//stream_speed = 3;
-		//changeSpeed(1);
+		// stream_speed = 3;
+		// changeSpeed(1);
 		long pos = preview.getPosition();
 		gotoPosition(pos);
 	}
@@ -1215,7 +1276,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 	public void exitPreview() {
 		setIsPreviewing(false);
 		preview.makeVisible(false);
-		updateStatusBar(lastPosition+startPosition);
+		updateStatusBar(lastPosition + startPosition);
 	}
 
 	public void addKey(int num) {
@@ -1262,14 +1323,13 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		} else {
 			// debug.print("Resetting start time, at end");
 		}
-		sapp.cachePersistentData(persistKey(deUri),
-				stringPos, saveCache);
+		sapp.cachePersistentData(persistKey(deUri), stringPos, saveCache);
 	}
-	
+
 	public static String persistKey(URI uri) {
 		return "mpos:" + uri.toString();
 	}
-	
+
 	private void endOfVideo() {
 		startPosition = 0;
 		position = 0;
@@ -1293,21 +1353,21 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 		// Pop back to file browser mode
 		getBApp().pop();
 		this.remove();
-		//play("left.snd");
+		// play("left.snd");
 
 		// Re-refresh directory listing (re-build ViewScreen list)
-		//initialScreen.updateFileList(de.getParent());
-		//initialScreen.focusOn(de.getName());
-		//initialScreen.resetBackground();
+		// initialScreen.updateFileList(de.getParent());
+		// initialScreen.focusOn(de.getName());
+		// initialScreen.resetBackground();
 	}
 
 	private void closeStream() {
 		if (stream != null) {
-//			if (stream.getStatus() >= RSRC_STATUS_PLAYING) {
-				if (!stream.isPaused())
-					stream.pause();
-				stream.close();
-	//		}
+			// if (stream.getStatus() >= RSRC_STATUS_PLAYING) {
+			if (!stream.isPaused())
+				stream.pause();
+			stream.close();
+			// }
 			stream.remove();
 		}
 		stream = null;
@@ -1329,16 +1389,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 			pleaseWait.remove();
 			pleaseWait = null;
 		}
-		if (_infoText != null) {
-			_infoText.setValue(null);
-			_infoText.clearResource();
-			_infoText.remove(null);
-		}
-		if (infoView != null && _infoText != infoView) {
+		if (infoView != null) {
+			infoView.clearInnerView();
 			infoView.clearResource();
 			infoView.remove(null);
 		}
-		_infoText = null;
 		infoView = null;
 		if (errorText != null) {
 			errorText.setValue(null);
@@ -1360,7 +1415,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client, Cleanup
 
 		super.remove();
 	}
-	
+
 	public void cleanup() {
 		remove();
 	}

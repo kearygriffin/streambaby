@@ -22,7 +22,7 @@ import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class PreviewCacheUtils {
 

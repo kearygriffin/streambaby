@@ -11,11 +11,11 @@ import com.unwiredappeal.mediastreams.mpeg.StreamableMpeg;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.videomodule.BaseVideoHandlerModule;
-import com.unwiredappeal.tivo.videomodule.StreamBabyModule;
-import com.unwiredappeal.tivo.videomodule.VideoFormats;
-import com.unwiredappeal.tivo.videomodule.VideoFormats.AllowableFormats;
-import com.unwiredappeal.tivo.videomodule.VideoFormats.Format;
+import com.unwiredappeal.tivo.modules.BaseVideoHandlerModule;
+import com.unwiredappeal.tivo.modules.StreamBabyModule;
+import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.modules.VideoFormats.AllowableFormats;
+import com.unwiredappeal.tivo.modules.VideoFormats.Format;
 
 public class MpegStreamingModule extends BaseVideoHandlerModule implements StreamBabyModule {
 	
@@ -58,7 +58,8 @@ public class MpegStreamingModule extends BaseVideoHandlerModule implements Strea
 	public static final int STREAM_VIDEO_PRIORITY = 60;
 
 	@Override
-	public boolean initialize() {
+	public boolean initialize(StreamBabyModule parentMod) {
+		super.initialize(parentMod);
 		getPriorities().fillVideoPriority = FILL_VIDEO_PRIORITY;
 		getPriorities().streamPriority = STREAM_VIDEO_PRIORITY;
 		StreamableMpeg.logger = new StreamableMpeg.Logger() {

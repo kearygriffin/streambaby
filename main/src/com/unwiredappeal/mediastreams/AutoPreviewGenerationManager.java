@@ -17,7 +17,7 @@ import com.unwiredappeal.tivo.streambaby.ShutdownHook;
 import com.unwiredappeal.tivo.streambaby.PreviewCacheUtils.UriCallback;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.videomodule.VideoModuleHelper;
+import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class AutoPreviewGenerationManager implements Cleanupable {
 
