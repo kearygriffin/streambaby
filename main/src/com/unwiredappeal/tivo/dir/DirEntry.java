@@ -18,7 +18,8 @@ public class DirEntry implements Comparable<DirEntry> {
 	public boolean entriesLoaded = false;
 	public boolean isFolder;
 	public boolean isRoot = false;
-	public String name;
+	public String fileName;
+	public String name = null;
 	public DirEntry parent;
 	public URI uri;
 	//public long videoLength;
@@ -38,11 +39,11 @@ public class DirEntry implements Comparable<DirEntry> {
 
 		this.uri = uri;
 		this.isFolder = false;
-		this.name = uri.toString();
+		this.fileName = uri.toString();
 		if (Utils.isFile(uri)) {
 			File f = new File(uri);
 			this.isFolder = f.isDirectory() || !f.exists();
-			this.name = f.getName();
+			this.fileName = f.getName();
 		}
 		//this.parent = parent;
 	}
@@ -58,11 +59,36 @@ public class DirEntry implements Comparable<DirEntry> {
 	public void setFolder(boolean isFolder) {
 		this.isFolder = isFolder;
 	}
-	public String getName() {
-		return name;
+	
+	public String getStrippedFilename() {
+		   String name = getFilename();
+		  	  if (isFile && StreamBabyConfig.cfgTrimExtensions.getBool())
+				  name = trimExtension(name);
+			  return name;
 	}
-	public void setName(String name) {
-		this.name = name;
+	
+	public void setName(String n) {
+		this.name = n;
+	}
+	
+	public String getName() {
+		if (name != null)
+			return name;
+		if (!StreamBabyConfig.cfgUseTitle.getBool())
+			return getStrippedFilename();
+		if (!cachedMeta) {
+			MetaData m = new MetaData();
+			getMetadata(m);
+		}
+		if (hasMeta && meta.hasTitle() && meta.getTitle().length() > 0) {
+			return meta.getTitle();
+		} else {
+			return getStrippedFilename();
+		}
+	}
+	
+	public String getFilename() {
+		return fileName;
 	}
 	public DirEntry getParent() {
 		return parent;
@@ -144,8 +170,10 @@ public class DirEntry implements Comparable<DirEntry> {
 			      for (int i=0;i<files.length;i++) {
 			    	  File f = files[i];
 			    	  DirEntry newDirEntry = new DirEntry(f.toURI());
+			    	  /*
 			    	  if (newDirEntry.isFile && StreamBabyConfig.cfgTrimExtensions.getBool())
 			    		  newDirEntry.setName(trimExtension(newDirEntry.getName()));
+			    	  */
 			    	  if (true || forceAll || newDirEntry.isFolder || newDirEntry.isStreamableVideo()) {
 				    	  thisEntry.addEntry(newDirEntry);
 			    	  }

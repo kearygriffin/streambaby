@@ -9,9 +9,12 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -28,6 +31,8 @@ import com.unwiredappeal.tivo.utils.Log;
 
 public abstract class BaseMetadataModule implements StreamBabyModule, MetadataModule{
 	private static String DEFAULT_XSL = "system/echo.xsl";
+	
+	public static Map<String, Templates> cachedTransformers = new HashMap<String, Templates>();
 	public Object getModule(int moduleType) {
 		if (moduleType == StreamBabyModule.STREAMBABY_MODULE_METADATA)
 			return this;
@@ -45,6 +50,18 @@ public abstract class BaseMetadataModule implements StreamBabyModule, MetadataMo
 
 	public boolean initialize(StreamBabyModule parent) {
 		return true;
+	}
+	
+	public static synchronized Templates getXsltTransformer(String xsl) throws TransformerConfigurationException {
+		Templates tp = cachedTransformers.get(xsl);
+		if (tp != null)
+			return tp;
+		// construct a transformer using the echo stylesheet
+		StreamSource xslSource = new StreamSource(xsl);
+		TransformerFactory factory = TransformerFactory.newInstance();		
+		tp = factory.newTemplates(xslSource);
+		return tp;
+
 	}
 	
 	protected  boolean transform(MetaData m, SAXSource source, String xsl, String defaultXsl) {
@@ -69,18 +86,17 @@ public abstract class BaseMetadataModule implements StreamBabyModule, MetadataMo
 			xslFiles.add(xslFileName);
 		}
 		
-		// construct a transformer using the echo stylesheet
-		TransformerFactory factory = TransformerFactory.newInstance();
 		
 
 		String resultStr = null;
 		for (String xslFile : xslFiles) {
 			if (resultStr != null)
 				source = new SAXSource(new InputSource(new StringReader(resultStr)));
-			StreamSource xslSource = new StreamSource(xslFile);
 			Transformer transformer;
 			try {
-				transformer = factory.newTransformer(xslSource);
+				Templates cachedXsl = getXsltTransformer(xslFile);
+				transformer = cachedXsl.newTransformer();
+				//transformer = factory.newTransformer(xslSource);
 			} catch (TransformerConfigurationException e) {
 				Log.error("Unable to load xslt transformer:" + e);
 				continue;

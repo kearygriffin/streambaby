@@ -144,7 +144,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	}
 
 	public void updateInfoView() {
-		String desc = de.getName();
+		String desc = de.getStrippedFilename();
 		if (videoList.size() > 1) {
 			desc = desc + " - " + (curVideoNum + 1) + "/" + videoList.size();
 			if (folderName != null)
@@ -719,7 +719,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			} else if (status == RSRC_STATUS_ERROR) {
 				// Display error associated with starting a stream
 				displayError("ERROR: " + info.getMap().get("error.text") + "\n"
-						+ de.getName());
+						+ de.getFilename());
 			} else if (status == RSRC_STATUS_END) {
 				Log.debug("END: ");
 				boolean rebuffered = possibleRebuffer(date);
@@ -1431,7 +1431,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 
 	public String toString() {
 		if (de != null)
-			return de.getName();
+			return de.getStrippedFilename();
 		return null;
 	}
 

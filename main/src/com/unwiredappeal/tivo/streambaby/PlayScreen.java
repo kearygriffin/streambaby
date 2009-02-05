@@ -539,7 +539,7 @@ public class PlayScreen extends ScreenTemplate {
 
 	public String toString() {
 		if (de != null)
-			return de.getName();
+			return de.getStrippedFilename();
 		else
 			return "Play";
 	}

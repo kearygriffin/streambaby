@@ -12,7 +12,7 @@
     <br/><xsl:value-of select="pytivo/description"/>
     <font size="4">
     <br/><xsl:apply-templates select="pytivo/vActor[position() &lt; 4]"/>
-    <br/><i><xsl:apply-templates select="pytivo/vSeriesGenre"/></i>
+    <br/><i><xsl:apply-templates select="pytivo/vProgramGenre"/></i>
     </font></font>
 </body>
 </html>
@@ -26,7 +26,7 @@
     </xsl:for-each>
       <xsl:if test="position() != last()"><xsl:text>, </xsl:text></xsl:if>
 </xsl:template>
-<xsl:template match="pytivo/vSeriesGenre">
+<xsl:template match="pytivo/vProgramGenre">
 	<xsl:value-of select="."/>
 	<xsl:if test="position() != last()">, </xsl:if> 
 </xsl:template>

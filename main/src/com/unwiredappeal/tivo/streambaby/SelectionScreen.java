@@ -4,6 +4,7 @@ package com.unwiredappeal.tivo.streambaby;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import com.tivo.hme.bananas.BApplicationPlus;
 import com.tivo.hme.bananas.BHighlights;
@@ -85,7 +86,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
       pleaseWait = new BViewPlus(this, layout);
       pleaseWait.setResource(e.getResource());
       */
-	  title = de.getName();
+	  title = de.getStrippedFilename();
 	  resetTitle();
       //Ticker.master.add(this, System.currentTimeMillis()+200, null);
       
@@ -124,8 +125,21 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
    public void updateFileList(DirEntry de) {
 	   
 	   List<DirEntry> dirEntries = de.getEntryList(((StreamBabyStream)getBApp()).getPassword());
-	   if (!de.isRoot())
-		   Collections.sort(dirEntries);
+	   if (!de.isRoot()) {
+		   if (StreamBabyConfig.cfgSortByFilename.getBool()) {
+			   Comparator<DirEntry> cmp = new Comparator<DirEntry>() {
+				public int compare(DirEntry o1, DirEntry o2) {
+					if (o2.isFolder() != o1.isFolder()) {
+						return o2.isFolder() ? 1 : -1;
+					}
+					return o1.getFilename().compareToIgnoreCase(o2.getFilename());
+				}  
+			   };
+			   Collections.sort(dirEntries, cmp);
+		   }
+		   else
+			   Collections.sort(dirEntries);
+	   }
       // Update directory text
       //dirText.setValue(de.getName());
        

@@ -9,7 +9,7 @@
    * Metadata supported:
    * .txt files-  Either a pyTivo metadata file or a standard txt file (autodetected)
    * .html
-   * .xml- Currently assumed to be a .tivo format XML file (NOT YET IMPLEMENTED)
+   * .xml
    * .gif, .png, .jpg:  Use as straight images.  New config property info.preserveaspect=true to control if img is allowed to be stretched
    * Metadata is transformed using XSL into either straight txt or html (either is OK)
    * new INI options: xsl.pytivo= and xsl.txt=
@@ -17,6 +17,18 @@
     * For pytivo the xml fed in is each "key" (value before the colon) is an element, and the text for that key is the text for the element (as cdata).
      * Whole file is wrapped in <pytivo>  </pytivo>
     * For txt the xml is the whole text file wrapped in <txt> </txt> (as cdata) 
+   * For XML metadata, a config entry is looked for in the form xsl.xxxx where xxx is the name of root element of the xml file
+    * this is the config entry to determine the XSLT chain to use for this type of XML
+    * For tivo this is tvbusenvelope, so the config entry is xsl.tvbusenvelope, and the default is tivo-pyxml.xsl,pytivo-text.xsl (so convert to pytivo xml format, then use pytivo XSL to convert to streambaby format)
+    * If the above config entry is not found, stylesheets/xxxx.xsl is looked for to use (where xxxxx is the name of the root element)
+   * There are two supplied default stylesheets for pytivo (and thus for tivo xml format als)
+    * pytivo-text.xsl:  Transforms the metadata into pure text for display.  Text looks nice.
+    * pytivo-html.xsl:  Transforms the metadata into HTML for display.  Font's can look a bit rough, but more flexible.
+    * the default is pytivo-text.xsl
+ * INI entry use.title= (default true) to use the title from the metadata instead of filename for listings
+ * INI entry sort.filename= (default false).  If true, streambaby will sort entries in the selection screen by filename instead of metadata title
+  * If set to false, tivo use metadata title for sort.
+  * Sorting by metadata title causes a longer delay (could be very long if there are alot of movies in the directory) before rendering the selection screen if set to false
  * Switch to current jmdns from sourceforge
    * Required changes to build process, removal of simulator.jar from main dist, addition of hme-host-sb.jar
    * JmDNS shutdown hook is broken (always hangs).  Hack to remove the shutdown hook

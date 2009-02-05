@@ -119,7 +119,8 @@ public class VideoModuleHelper {
 			if (meta.setMetadata(m, uri, vinfo) && m.hasMetaData())
 				return true;				
 		}
-		m.setString(de.getName());
+		m.setString(de.getStrippedFilename());
+		m.setTitle(de.getStrippedFilename());
 		return false;
 		
 	}

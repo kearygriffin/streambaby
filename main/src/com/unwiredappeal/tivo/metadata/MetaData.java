@@ -38,6 +38,7 @@ public class MetaData {
 	BufferedImage bufferedImage = null;
 	int dataType = -1;
 	String urlStr = null;
+	String title = null;
 	
 	public void copy(MetaData copy) {
 		copy.data = data;
@@ -45,6 +46,7 @@ public class MetaData {
 		copy.dataType = dataType;
 		copy.urlStr = urlStr;
 		copy.isConverted = isConverted;
+		copy.title = title;
 	}
 	
 	public String getUrl() {
@@ -246,5 +248,17 @@ public class MetaData {
 
 	public BufferedImage getImage() {
 		return bufferedImage;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String t) {
+		title = t;
+	}
+	
+	public boolean hasTitle() {
+		return title != null;
 	}
 }

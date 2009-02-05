@@ -364,7 +364,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public static ConfigEntry cfgPyTivoXsl = new ConfigEntry(
 			"xsl.pytivo",
-			"pytivo.xsl",
+			"pytivo-text.xsl",
 			"xslt to use for transforming pytivo metadata.  Relative to stylesheets or abs"
 			);
 	
@@ -376,8 +376,20 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgTivoXmlXsl = new ConfigEntry(
 			"xsl.tvbusenvelope",
-			"tivo-pyxml.xsl,pytivo.xsl",
+			"tivo-pyxml.xsl,pytivo-text.xsl",
 			"xslt to use for transforming tivo XML metadata.  Relative to stylesheets or abs"
+			);
+
+	public static ConfigEntry cfgUseTitle = new ConfigEntry(
+			"use.title",
+			"true",
+			"Use metadata title instead of filename when available"
+			);
+
+	public static ConfigEntry cfgSortByFilename= new ConfigEntry(
+			"sort.filename",
+			"true",
+			"Sort by filename instead of title"
 			);
 
 	// This always be last
