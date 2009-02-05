@@ -138,8 +138,7 @@
 	<delete dir="dist/${dist}-src"/>
   </target>
 
-   <target name="dist-both" depends="clean,create-dist,dist-src">
-	<!--  Create src dist -->
+   <target name="dist-both" depends="clean,create-dist">
 	<antcall target="build"/>
 	<copy file="native/placeholder.txt" todir="dist/${dist}/native"/>
 	<copy todir="dist/${dist}/jbin">
