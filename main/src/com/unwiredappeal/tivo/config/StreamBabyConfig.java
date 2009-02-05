@@ -388,7 +388,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public static ConfigEntry cfgSortByFilename= new ConfigEntry(
 			"sort.filename",
-			"true",
+			"false",
 			"Sort by filename instead of title"
 			);
 
