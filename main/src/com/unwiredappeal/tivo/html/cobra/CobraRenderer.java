@@ -1,16 +1,26 @@
 package com.unwiredappeal.tivo.html.cobra;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.lobobrowser.html.HtmlRendererContext;
+import org.lobobrowser.html.domimpl.HTMLDocumentImpl;
 import org.lobobrowser.html.parser.DocumentBuilderImpl;
+import org.lobobrowser.html.parser.InputSourceImpl;
 import org.lobobrowser.html.style.RenderState;
 import org.lobobrowser.html.test.SimpleHtmlRendererContext;
 import org.lobobrowser.html.test.SimpleUserAgentContext;
@@ -18,18 +28,19 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.unwiredappeal.tivo.html.BaseHtmlRenderer;
+import com.unwiredappeal.tivo.utils.Log;
 
 public class CobraRenderer extends BaseHtmlRenderer {
 
-	public BufferedImage[] getImages(int width, int height) {
+	@SuppressWarnings({ "serial", "deprecation" })
+	public BufferedImage[] getImages(final int width, final int height) {
 		if (!isModified() && this.width == width && this.height == height)
 			return bis;
-		BufferedImage bi = null;
 		File fileToDelete = null;
 		Graphics graphics = null;
 		
 		try {
-			if (bi != null) {
+			if (bis != null) {
 				setModified(false);
 				this.width = width;
 				this.height = height;
@@ -51,6 +62,16 @@ public class CobraRenderer extends BaseHtmlRenderer {
 	
 			// Set up the HTML renderer
 			final SBHtmlPanel panel = new SBHtmlPanel();
+			// Since no layout manager is used setBounds() must be called.
+			panel.setOpaque(false);
+	        panel.setDefaultMarginInsets(new Insets(0,0,0,0));
+			panel.setDefaultOverflowX(RenderState.OVERFLOW_HIDDEN);
+			panel.setDefaultOverflowY(RenderState.OVERFLOW_HIDDEN);
+			panel.setPreferredWidth(width);
+			//panel.setBounds(0, 0, width, height);
+			panel.setBorder(null);
+			panel.addNotify(); 
+			panel.setDoubleBuffered(false);			
 	
 			// HTML component support
 			SimpleUserAgentContext uContext = new SimpleUserAgentContext();
@@ -65,40 +86,58 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			    rContext.getUserAgentContext(),
 			    rContext);
 			Document doc;
+			
 			try {
-				doc = builder.parse(rurl);
+				doc = builder.createDocument(new InputSourceImpl(new FileReader(new File(new URI(rurl))), baseUrl));
+				//((HTMLDocumentImpl)doc).setBaseURI(baseUrl);
+				((HTMLDocumentImpl)doc).load();
+				//doc = builder.parse(rurl);
 			} catch (SAXException e1) {
 				return null;
 			} catch (IOException e1) {
 				return null;
+			} catch (URISyntaxException e) {
+				return null;
 			}
 	
-			// Since no layout manager is used setBounds() must be called.
-			panel.setOpaque(false);
-	        panel.setDefaultMarginInsets(new Insets(0,0,0,0));
-			panel.setDefaultOverflowX(RenderState.OVERFLOW_HIDDEN);
-			panel.setDefaultOverflowY(RenderState.OVERFLOW_HIDDEN);
-			panel.setPreferredWidth(width);
-			panel.setBounds(0, 0, width, height);
-			panel.setBorder(null);
-			panel.addNotify(); 
-			panel.setDoubleBuffered(false);
+
+			
+			final JPanel parentPanel = new JPanel( new BorderLayout() )
+	        {
+	            private int CUSTOM_WIDTH = width;
+	            public Dimension getPreferredSize()
+	            {
+	                Dimension d = super.getPreferredSize();
+	                d.width = CUSTOM_WIDTH;
+	                return d;
+	            }
+	            public Dimension getMinimumSize()
+	            {
+	                Dimension d = super.getMinimumSize();
+	                d.width = CUSTOM_WIDTH;
+	                return d;
+	            }
+	            public Dimension getMaximumSize()
+	            {
+	                Dimension d = super.getMaximumSize();
+	                d.width = CUSTOM_WIDTH;
+	                return d;
+	            }
+	        };
+
+	        parentPanel.add(panel);			
 			panel.setDocument(doc, rContext);
 	
-			doc.setDocumentURI(baseUrl);
-			bi = 
-			    new BufferedImage(width, 
-			                      height, 
-			                      BufferedImage.TYPE_4BYTE_ABGR);
-			graphics = bi.getGraphics();
-			final Graphics fgraphics = graphics;
-	
-			// Cobra insists that the rendering is 
-			// done in the Swing UI thread
+			
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 				        public void run() {
-				            panel.print(fgraphics);
+					        parentPanel.setSize( parentPanel.getPreferredSize() );
+					        parentPanel.doLayout();
+					        panel.doLayout();
+					        parentPanel.setSize( parentPanel.getPreferredSize());
+					        panel.setSize(panel.getPreferredSize());
+							Log.debug("ParentPanelPref:" + panel.getSize());
 				        }
 				});
 			} catch (InterruptedException e) {
@@ -106,6 +145,57 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			} catch (InvocationTargetException e) {
 				return null;
 			}
+			int images = ((int)parentPanel.getSize().getHeight() + (height-1))/height;
+			int totalHeight = (int)parentPanel.getSize().getHeight();
+			if (totalHeight < height)
+				totalHeight = height;
+			final int iheight = totalHeight;
+
+			// Set up the HTML renderer
+			final SBHtmlPanel npanel = new SBHtmlPanel();
+			// Since no layout manager is used setBounds() must be called.
+			npanel.setOpaque(false);
+	        npanel.setDefaultMarginInsets(new Insets(0,0,0,0));
+			npanel.setDefaultOverflowX(RenderState.OVERFLOW_HIDDEN);
+			npanel.setDefaultOverflowY(RenderState.OVERFLOW_HIDDEN);
+			npanel.setPreferredWidth(width);
+			npanel.setBounds(0, 0, width, iheight);
+			npanel.setBorder(null);
+			npanel.addNotify(); 
+			npanel.setDoubleBuffered(false);		
+			npanel.setDocument(doc, rContext);
+
+		
+
+			BufferedImage bi = 
+			    new BufferedImage(width, 
+			                      iheight, 
+			                      BufferedImage.TYPE_4BYTE_ABGR);
+			graphics = bi.getGraphics();
+			final Graphics fgraphics = graphics;
+
+			// Cobra insists that the rendering is 
+			// done in the Swing UI thread
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+				        public void run() {
+							Container c = new Container();
+					        SwingUtilities.paintComponent(fgraphics, npanel, c, 0, 0, width, iheight);
+				        }
+				});
+			} catch (InterruptedException e) {
+				return null;
+			} catch (InvocationTargetException e) {
+				return null;
+			}
+			int heightLeft = iheight;
+			bis = new BufferedImage[images];
+			for (int i=0;i<images;i++) {
+				bis[i] = bi.getSubimage(0, height*i, width, Math.min(height, heightLeft));
+				heightLeft -= height;
+			}
+
+	
 		} finally {
 			if (graphics != null)
 				graphics.dispose();
@@ -114,7 +204,6 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			
 		}
 	
-		bis = new BufferedImage[] { bi } ;
 		return bis;
 
 	}

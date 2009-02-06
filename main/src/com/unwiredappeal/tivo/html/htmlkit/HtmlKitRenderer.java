@@ -119,7 +119,9 @@ public class HtmlKitRenderer extends BaseHtmlRenderer {
 	        parentPanel.setSize( parentPanel.getPreferredSize() );
 			Log.debug("ParentPanelPref:" + parentPanel.getSize());
 			int images = ((int)parentPanel.getSize().getHeight() + (height-1))/height;
-			int iheight = height * images;
+			int iheight = (int)parentPanel.getSize().getHeight();
+			if (iheight < height)
+				iheight = height;
 			bi = 
 			    new BufferedImage(width, 
 			                      iheight, 
@@ -129,8 +131,10 @@ public class HtmlKitRenderer extends BaseHtmlRenderer {
 			Container c = new Container();
 	        SwingUtilities.paintComponent(fgraphics, pane, c, 0, 0, width, iheight);
 			bis = new BufferedImage[images];
+			int heightLeft = iheight;
 			for (int i=0;i<images;i++) {
-				bis[i] = bi.getSubimage(0, height*i, width, height);
+				bis[i] = bi.getSubimage(0, height*i, width, Math.min(height, heightLeft));
+				heightLeft -= height;
 			}
 
 	      } finally {

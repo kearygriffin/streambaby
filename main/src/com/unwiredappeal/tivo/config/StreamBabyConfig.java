@@ -346,7 +346,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgTidtXhtml = new ConfigEntry(
 			"info.tidy.xhtml",
-			"false",
+			"true",
 			"set tidy to generate xhtml output"
 			);
 

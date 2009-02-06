@@ -33,13 +33,11 @@
    * Required changes to build process, removal of simulator.jar from main dist, addition of hme-host-sb.jar
    * JmDNS shutdown hook is broken (always hangs).  Hack to remove the shutdown hook
  * Added HTML rendering code for Cobra (from lobo project), flyingsaucer xhtmlrenderer, and HTMLEditKit (built-in to java)
-  * Compile requires libraries for cobra and flyingsaucer, but dist does not include, and always uses HTMLEditorKit, included with java
   * Can set the render by setting html.renderer= in the INI file
-   * com.unwiredappeal.tivo.html.cobra.CobraRenderer for cobra
-   * com.unwiredappeal.tivo.html.fs.FlyingSaucerRenderer for flyingsaucer
-   * com.unwiredappeal.tivo.html.htmlkit.HtmlKitRenderer (default)
+   * com.unwiredappeal.tivo.html.cobra.CobraRenderer for cobra (default)
+   * com.unwiredappeal.tivo.html.htmlkit.HtmlKitRenderer 
  * New INI option, info.tidy (default: true) which runs jtidy on all HTML input before passing to renderer
- * New INI option, info.tidy.xhtml (default: false) which tells tidy to generate xhtml output (htmleditorkit not really happy with xhtml)
+ * New INI option, info.tidy.xhtml (default: true) which tells tidy to generate xhtml output.
  * New INI option html.css to set default css for html rendering.  relative to stylesheets directory (or abs)
   * default=streambaby.css, which doesn't exist by default (and so won't be loaded)
  * Added new location to look for streambaby.ini.   ${user.home}/.streambaby/streambaby.ini

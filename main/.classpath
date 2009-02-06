@@ -17,10 +17,9 @@
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/jmdns.jar" sourcepath="/home/keary/tools/jmdns-2.1/src"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/hme-host-sb.jar" sourcepath="/home/keary/tools/hme_sdk_1.4/src"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/dlib/simulator.jar" sourcepath="/home/keary/tools/hme_sdk_1.4/src"/>
-	<classpathentry kind="lib" path="/home/keary/twork/streambaby/dlib/core-renderer.jar" sourcepath="/home/keary/tools/flying/src"/>
-	<classpathentry kind="lib" path="/home/keary/twork/streambaby/dlib/cobra.jar" sourcepath="/home/keary/tools/cobra-0.98.4/src"/>
-	<classpathentry kind="lib" path="/home/keary/twork/streambaby/dlib/js.jar"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/saxon9.jar"/>
 	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/saxon9-dom.jar"/>
+	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/cobra.jar"/>
+	<classpathentry kind="lib" path="/home/keary/twork/streambaby/lib/js.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

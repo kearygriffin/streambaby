@@ -61,7 +61,7 @@ public class DirEntry implements Comparable<DirEntry> {
 	
 	public String getStrippedFilename() {
 		   String name = getFilename();
-		  	  if (isFile() && StreamBabyConfig.cfgTrimExtensions.getBool())
+		  	  if (name != null && isFile() && StreamBabyConfig.cfgTrimExtensions.getBool())
 				  name = trimExtension(name);
 			  return name;
 	}

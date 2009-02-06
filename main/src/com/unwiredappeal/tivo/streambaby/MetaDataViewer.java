@@ -86,7 +86,7 @@ public class MetaDataViewer {
 					v = sp;
 					int offy = 0;
 					for (BufferedImage bi : bis) {
-						setImage(sp, 0, offy, width, height, bi, false);
+						setImage(sp, 0, offy, bi.getWidth(), bi.getHeight(), bi, false);
 						offy+= height;
 					}
 					sp.refresh();

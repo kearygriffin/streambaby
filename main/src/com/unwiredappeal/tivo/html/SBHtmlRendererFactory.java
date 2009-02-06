@@ -7,10 +7,10 @@ public class SBHtmlRendererFactory {
 	
 	public static String currentRenderer = null; 
 	//public static final String defaultRenderer = "com.unwiredappeal.tivo.html.fs.FlyingSaucerRenderer";
-	//public static final String defaultRenderer = "com.unwiredappeal.tivo.html.cobra.CobraRenderer";
-	public static final String defaultRenderer = "com.unwiredappeal.tivo.html.htmlkit.HtmlKitRenderer";
+	public static final String defaultRenderer = "com.unwiredappeal.tivo.html.cobra.CobraRenderer";
+	//public static final String defaultRenderer = "com.unwiredappeal.tivo.html.htmlkit.HtmlKitRenderer";
 	public static String[] renderClasses = new String[] {
-			"com.unwiredappeal.tivo.html.fs.FlyingSaucerRenderer",
+			//"com.unwiredappeal.tivo.html.fs.FlyingSaucerRenderer",
 			"com.unwiredappeal.tivo.html.cobra.CobraRenderer",
 			"com.unwiredappeal.tivo.html.htmlkit.HtmlKitRenderer"
 			

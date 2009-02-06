@@ -11,7 +11,10 @@ import com.tivo.hme.bananas.BHighlights;
 import com.tivo.hme.bananas.BListPlus;
 import com.tivo.hme.bananas.BText;
 import com.tivo.hme.bananas.BView;
+import com.tivo.hme.bananas.BViewPlus;
+import com.tivo.hme.bananas.IBananasPlus;
 import com.tivo.hme.bananas.PlusSupport;
+import com.tivo.hme.bananas.BSkin.Element;
 import com.tivo.hme.bananas.layout.Layout;
 import com.tivo.hme.bananas.layout.LayoutManager;
 import com.tivo.hme.sdk.util.Ticker;
@@ -29,7 +32,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 	public int level = 0;
 	StreamBabyStream sapp;
 	DirEntry de;
-	//private BViewPlus pleaseWait;
+	private BViewPlus pleaseWait;
 	//private Stack<String> lastEntry = new Stack<String>();
 //	private DirEntry curDir;
     //private SelectionScreen screen;
@@ -70,7 +73,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
       
       list = new StandardList(getNormal(), layout);   
 
-      updateFileList(de);
+      //updateFileList(de);
 
       setFocusDefault(list);
 	
@@ -78,17 +81,18 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
       safeTitle = lm.safeTitle(this);
       layout = safeTitle;
 
-      /*
+      
       Element e = getBApp().getSkin().get(IBananasPlus.H_PLEASE_WAIT);
       layout = lm.size(layout, e.getWidth(), e.getHeight());
       layout = lm.align(layout, A_CENTER, A_CENTER);
-
+		
       pleaseWait = new BViewPlus(this, layout);
       pleaseWait.setResource(e.getResource());
-      */
+      pleaseWait.setVisible(true);
+      
 	  title = de.getStrippedFilename();
 	  resetTitle();
-      //Ticker.master.add(this, System.currentTimeMillis()+200, null);
+      Ticker.master.add(this, System.currentTimeMillis()+200, null);
       
    }
    
@@ -100,15 +104,15 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 
 	   resetTitle();
 	   
-       if (!isReturn)
-       	focusOnDefault();
+       //if (!isReturn)
+       	//focusOnDefault();
        
        return true;
        //return super.handleEnter(arg, isReturn);
    }
 
-	public long tick(long tm, Object arg) {
-		/*
+	public synchronized long tick(long tm, Object arg) {
+		
 		updateFileList(de);
 		setFocusDefault(list);
 		focusOnDefault();
@@ -116,7 +120,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 		pleaseWait.remove();
 
 		flush();
-		*/
+		
 		return 0;
 		
 	}   
@@ -253,7 +257,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
       PlusSupport.viewRemoveNotify(this);
    }
    
-   public boolean handleKeyPress(int code, long rawcode) {
+   public synchronized boolean handleKeyPress(int code, long rawcode) {
 	   Log.debug("code=" + code + " rawcode=" + rawcode);
 	   
 	   DirEntry entry ;
