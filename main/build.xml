@@ -6,39 +6,38 @@
               as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="main">
     <property environment="env"/>
+    <property name="STREAMBABY" value="../"/>
     <property name="ffmpegJavaModule.location" value="../ffmpegJavaModule"/>
-    <property name="ffmpeg-java.location" value="../ffmpeg-java"/>
     <property name="ECLIPSE_HOME" value="../../../opt/eclipse"/>
+    <property name="ffmpeg-java.location" value="../ffmpeg-java"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.5"/>
     <property name="source" value="1.5"/>
     <path id="ffmpeg-java.classpath">
         <pathelement location="${ffmpeg-java.location}/build/classes"/>
         <pathelement location="${ffmpeg-java.location}/lib/jna.jar"/>
-        <pathelement location="${ffmpeg-java.location}/../lib/bcel-5.2.jar"/>
+        <pathelement location="${STREAMBABY}/lib/bcel-5.2.jar"/>
     </path>
     <path id="main.classpath">
         <pathelement location="bin"/>
-        <pathelement location="../lib/bananas.jar"/>
-        <pathelement location="../lib/bananas-plus-0.1.1-streambabyr1.jar"/>
-        <pathelement location="../lib/hme.jar"/>
-        <pathelement location="../lib/jna.jar"/>
-        <pathelement location="${ffmpegJavaModule.location}/bin"/>
-        <pathelement location="../lib/bcel-5.2.jar"/>
-        <pathelement location="../lib/simple-log.jar"/>
         <path refid="ffmpeg-java.classpath"/>
-        <pathelement location="${ffmpeg-java.location}/build/classes"/>
-        <pathelement location="../lib/bsh-2.0b4.jar"/>
-        <pathelement location="../lib/tarbz.jar"/>
-        <pathelement location="../lib/Tidy.jar"/>
-        <pathelement location="../lib/jmdns.jar"/>
-        <pathelement location="../lib/hme-host-sb.jar"/>
-        <pathelement location="../dlib/simulator.jar"/>
-        <pathelement location="../dlib/core-renderer.jar"/>
-        <pathelement location="../dlib/cobra.jar"/>
-        <pathelement location="../dlib/js.jar"/>
-        <pathelement location="../lib/saxon9.jar"/>
-        <pathelement location="../lib/saxon9-dom.jar"/>
+        <pathelement location="${STREAMBABY}/lib/bananas.jar"/>
+        <pathelement location="${STREAMBABY}/lib/bananas-plus-0.1.1-streambabyr1.jar"/>
+        <pathelement location="${STREAMBABY}/lib/bcel-5.2.jar"/>
+        <pathelement location="${STREAMBABY}/lib/bsh-2.0b4.jar"/>
+        <pathelement location="${STREAMBABY}/lib/cobra.jar"/>
+        <pathelement location="${STREAMBABY}/lib/hme.jar"/>
+        <pathelement location="${STREAMBABY}/lib/hme-host-sb.jar"/>
+        <pathelement location="${STREAMBABY}/lib/jmdns.jar"/>
+        <pathelement location="${STREAMBABY}/lib/jna.jar"/>
+        <pathelement location="${STREAMBABY}/lib/js.jar"/>
+        <pathelement location="${STREAMBABY}/lib/saxon9.jar"/>
+        <pathelement location="${STREAMBABY}/lib/saxon9-dom.jar"/>
+        <pathelement location="${STREAMBABY}/lib/simple-log.jar"/>
+        <pathelement location="${STREAMBABY}/lib/tarbz.jar"/>
+        <pathelement location="${STREAMBABY}/lib/Tidy.jar"/>
+        <pathelement location="${STREAMBABY}/dlib/core-renderer.jar"/>
+        <pathelement location="${STREAMBABY}/dlib/simulator.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>

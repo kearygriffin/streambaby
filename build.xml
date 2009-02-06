@@ -91,7 +91,7 @@
 	<property name="dist" value="streambaby-${version}"/>
 
 	</target>
-   <target name="all" depends="init,clean,dist-both,build"/>
+   <target name="all" depends="init,clean,dist-both"/>
   <target name="release">
 	<property name="version" value="${rversion}"/>
 	<antcall target="all"/>
