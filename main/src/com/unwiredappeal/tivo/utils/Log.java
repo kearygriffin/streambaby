@@ -28,6 +28,9 @@ public class Log {
    
    public Log() {
 	   File f = new File(StreamBabyConfig.streamBabyDir, "simplelog.properties");
+	   if (!f.exists()) {
+		   f = new File(StreamBabyConfig.streamBabyDir, "simplelog.properties.default");		   
+	   }
 	   if (!f.exists())
 		   simpleLog = SimpleLog.defaultInstance(); 
 	   else {
