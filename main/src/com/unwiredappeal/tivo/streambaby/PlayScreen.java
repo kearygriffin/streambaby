@@ -36,6 +36,7 @@ public class PlayScreen extends ScreenTemplate {
 	boolean canStream;
 	boolean canTranscode;
 
+	BView mview = null;
 	public abstract class ButtonHandler {
 
 		@SuppressWarnings("unchecked")
@@ -78,7 +79,7 @@ public class PlayScreen extends ScreenTemplate {
 
 			int bottom = calcListLayout(4).getBounds().y;
 			int height = bottom - layout.getBounds().y;
-			/* BView v = */ mv.getView(meta, this.getNormal(), layout.getBounds().x, layout.getBounds().y, layout.getBounds().width+50, height);
+			mview = mv.getView(meta, this.getNormal(), layout.getBounds().x, layout.getBounds().y, layout.getBounds().width+50, height);
 		}
 
 		/*
@@ -520,7 +521,9 @@ public class PlayScreen extends ScreenTemplate {
 	public boolean handleKeyPress(int code, long rawcode) {
 		Log.debug("code=" + code + " rawcode=" + rawcode);
 		switch (code) {
-
+		case KEY_CHANNELUP:
+		case KEY_CHANNELDOWN:
+			return mview.handleKeyPress(code, rawcode);
 		case KEY_SELECT:
 			BButtonPlus<ButtonHandler> b = buttonsList.get(curButton);
 			return b.getValue().select();

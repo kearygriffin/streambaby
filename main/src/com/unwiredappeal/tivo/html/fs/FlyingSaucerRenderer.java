@@ -12,9 +12,9 @@ public class FlyingSaucerRenderer extends BaseHtmlRenderer {
 	public FlyingSaucerRenderer() {		
 	}
 
-	public BufferedImage getImage(int width, int height) {
+	public BufferedImage[] getImages(int width, int height) {
 		if (!isModified() && this.width == width && this.height == height)
-			return bi;
+			return bis;
 		String rurl = this.url;
 		File fileToDelete = null;
 		if (!urlBased) {
@@ -24,7 +24,7 @@ public class FlyingSaucerRenderer extends BaseHtmlRenderer {
 			fileToDelete = new File(rurl);
 		}
 		SBFSJava2DRenderer r = new SBFSJava2DRenderer(rurl, baseUrl, width, height);
-		bi = r.getImage();
+		BufferedImage bi = r.getImage();
 		if (bi != null) {
 			setModified(false);
 			this.width = width;
@@ -33,7 +33,8 @@ public class FlyingSaucerRenderer extends BaseHtmlRenderer {
 		if (fileToDelete != null)
 			fileToDelete.delete();
 		
-		return bi;
+		bis = new BufferedImage[] { bi };
+		return bis;
 	}
 	
 }

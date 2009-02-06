@@ -23,7 +23,6 @@ public class DirEntry implements Comparable<DirEntry> {
 	public DirEntry parent;
 	public URI uri;
 	//public long videoLength;
-	public boolean isFile = true;
 	public String mimeType;
 	public List<String> passwords = new ArrayList<String>();
 	private  VideoInformation vinfo = null;
@@ -53,7 +52,7 @@ public class DirEntry implements Comparable<DirEntry> {
 	}
 	
 	public boolean isFile() {
-		return !isFolder() && isFile;
+		return !isFolder();
 	}
 	
 	public void setFolder(boolean isFolder) {
@@ -62,7 +61,7 @@ public class DirEntry implements Comparable<DirEntry> {
 	
 	public String getStrippedFilename() {
 		   String name = getFilename();
-		  	  if (isFile && StreamBabyConfig.cfgTrimExtensions.getBool())
+		  	  if (isFile() && StreamBabyConfig.cfgTrimExtensions.getBool())
 				  name = trimExtension(name);
 			  return name;
 	}

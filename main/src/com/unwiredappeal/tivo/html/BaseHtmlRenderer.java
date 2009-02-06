@@ -9,7 +9,7 @@ import com.unwiredappeal.tivo.utils.TempFileManager;
 
 public abstract class BaseHtmlRenderer implements SBHtmlRenderer {
 	public boolean isModified = false;
-	protected BufferedImage bi = null;
+	protected BufferedImage[] bis = null;
 	protected String baseUrl = null;
 	protected String url = null;
 	protected String html = null;
@@ -59,7 +59,7 @@ public abstract class BaseHtmlRenderer implements SBHtmlRenderer {
 	
 	public void setModified() {
 		isModified = true;
-		bi = null;
+		bis = null;
 	}
 
 	public void setModified(boolean b) {

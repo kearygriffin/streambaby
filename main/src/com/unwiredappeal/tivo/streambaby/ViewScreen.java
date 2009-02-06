@@ -92,6 +92,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	int stream_speed = 3;
 
 	public static long CLOSE_TO_END_RESTART = 5000;
+	long lastPositionUpdate = 0;
 	long position = 0;
 	long duration = 0;
 	long startPosition = 0;
@@ -114,6 +115,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	boolean playingMultiple = false;
 	int quality;
 	public PreviewWindow preview = null;
+	BView metaview;
 
 	public static int INFO_VIEW_HEIGHT = 300;
 	public static float INFO_VIEW_TRANSPARENCY = 0.20f;
@@ -123,6 +125,10 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	public static String INFO_FONT_SIZE_STANDALONE = "small";
 	public static String INFO_FONT_SIZE = "tiny";
 	public static int INFO_SPACE = 0;
+	
+	cctext cc;
+	boolean CC = true;
+	
 	public ViewScreen(BApplicationPlus app, List<DirEntry> elist, String name,
 			int quality) {
 		super(app);
@@ -171,9 +177,10 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			int y = infoView.getInnerBounds().y + _infoText.getHeight() + INFO_SPACE;
 			int h = infoView.getInnerBounds().height - (_infoText.getHeight() + INFO_SPACE);
 			MetaDataViewer viewer = new MetaDataViewer();
-			BView v = viewer.getView(meta, infoView, infoView.getInnerBounds().x, y, infoView.getInnerBounds().width, h);
-			if (v != null)
-				infoView.addInner(v);
+			metaview = viewer.getView(meta, infoView, infoView.getInnerBounds().x, y, infoView.getInnerBounds().width, h);
+			metaview.setVisible(infoView.getVisible());
+			if (metaview != null)
+				infoView.addInner(metaview);
 		}
 	}
 
@@ -203,7 +210,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 
 		// keypad text (when numbers pressed)
 		keypadText = new VText(getNormal(), SAFE_ACTION_H,
-				GLOBAL.statusBG_Y + 60, 1, "");
+				GLOBAL.statusBG_Y + 35, 1, "");
 		keypadText.setVisible(false);
 
 		// Error screen text (for error reporting)
@@ -273,7 +280,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		duration = -1;
 
 		if (playingMultiple) {
-			timeout_info = new Date().getTime() + 1000 * GLOBAL.timeout_info;
+			timeout_info = new Date().getTime() + 1000 * 5;
 			infoView.setVisible(true);
 		}
 
@@ -284,6 +291,10 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			displayError("Incompatible video stream");
 		} else {
 			loadCutList();
+			closeCC();
+			cc = new cctext(getNormal(), "medium", deUri.getPath());
+			if (cc == null || !cc.exists())
+				closeCC();
 			gotoPosition(gotoPos, null);
 		}
 		// gotoPosition(gotoPos, "Starting");
@@ -677,6 +688,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 						.toString());
 				duration = Long.parseLong(info.getMap().get("duration")
 						.toString());
+				lastPositionUpdate = System.currentTimeMillis();
 			}
 			if (isMp3)
 				duration = getVideoLength();
@@ -693,6 +705,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				maxDuration = duration;
 				maxDurationTime = date;
 			}
+			//if (ccEnabled())
+				//cc.display(position+startPosition);
 			// int status = stream.getStatus();
 			// debug.print("ResourceStatus(" + r.toString() + "): " + status
 			// + ", pos: " + position + ", dur: " + duration);
@@ -819,6 +833,27 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		} else
 			return -1;
 	}
+	
+   public Boolean ccEnabled() {
+	      boolean enabled = true;
+	      if (!CC) enabled = false;
+	      if (cc == null) enabled = false;
+	      if (stream == null) enabled = false;
+	      if (stream != null && stream.getSpeed() != 1) enabled = false;
+	      if (_statusBar != null && _statusBar.visible) enabled = false;
+
+	      if (cc != null ) {
+	         if (enabled)
+	            cc.on = true;
+	         else {
+	        	if (cc.on)
+	        		cc.setVisible(false);
+	            cc.on = false;
+	         }
+	      }
+	      return enabled;
+	   }
+
 
 	private boolean possibleRebuffer(long date) {
 		if (!canSeek)
@@ -1038,6 +1073,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				keypadText.setVisible(false);
 				timeout_keypad = -1;
 				keypad.removeAllElements();
+				timeout_info = -1;
 				return true;
 				/*
 				 * case KEY_INFO: // Display file name temporarily if
@@ -1059,6 +1095,13 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				}
 				// play("select.snd");
 				return true;
+			case KEY_OPT_ASPECT:
+				CC = !CC;
+				// make it hide/show immediately?
+				//if (ccEnabled())
+					//cc.display(position+startPosition);
+				handleCC();
+				break;
 			case KEY_NUM0:
 				addKey(0);
 				play("updown.snd");
@@ -1101,6 +1144,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				return true;
 			case KEY_CHANNELUP:
 			case KEY_CHANNELDOWN:
+				if (infoView != null && infoView.getVisible() && metaview != null) {
+					// reset timer
+					timeout_info = new Date().getTime() + 1000 * GLOBAL.timeout_info;
+					return metaview.handleKeyPress(code, rawcode);
+				}
 				int dir = (code == KEY_CHANNELUP ? 1 : -1);
 				int newVidNum = curVideoNum + dir;
 				if (newVidNum < 0 || newVidNum >= videoList.size()) {
@@ -1175,20 +1223,32 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	public synchronized void setLastSpeed(float sp) {
 		_lastSpeed = sp;
 	}
+	
+	public synchronized void handleCC() {
+		if (ccEnabled()) {
+			long delta = System.currentTimeMillis() - lastPositionUpdate;
+			cc.display(position+startPosition+delta);
+		}
+	}
 
 	public synchronized long tick(long tm, Object arg) {
+		
+		if (getBApp().isApplicationClosing())
+			return -1;
 		// Check to see if the application has closed down
 		// and return -1 so the ticker doesn't re-register us.
 		if (gotoPos != -1) {
 			finishGoto(gotoPos);
 			gotoPos = -1;
 			flush();
-			return -1;
+			//return -1;
 		}
 		long ret = previewTick();
+		handleCC();
 		flush();
 
-		return ret;
+		return System.currentTimeMillis() + 100;
+		//return ret;
 	}
 
 	public long previewTick() {
@@ -1373,7 +1433,13 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		stream = null;
 	}
 
+	public void closeCC() {
+		if (cc != null)
+			cc.remove();
+		cc = null;
+	}
 	public void remove() {
+		closeCC();
 		sapp.removeCleanupRequire(this);
 		closeStream();
 		if (_statusBar != null)

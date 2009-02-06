@@ -42,6 +42,14 @@ public class BRoundedPanel extends BViewPlus {
 		innerViews.clear();
 	}
 	
+	@Override
+	public void setVisible(boolean b) {
+		super.setVisible(b);
+		for (BView v : innerViews) {
+			v.setVisible(b);
+		}
+	}
+
 	public void addInner(BView v) {
 		innerViews.add(v);
 	}

@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import com.tivo.hme.bananas.BScrollPanePlus;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BViewPlus;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
@@ -13,6 +14,8 @@ import com.unwiredappeal.tivo.html.SBHtmlRendererFactory;
 import com.unwiredappeal.tivo.metadata.MetaData;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.TempFileManager;
+import com.unwiredappeal.tivo.views.BScrollableText;
+import com.unwiredappeal.tivo.views.SBScrollPanePlus;
 import com.unwiredappeal.tivo.views.VText;
 
 public class MetaDataViewer {
@@ -31,10 +34,10 @@ public class MetaDataViewer {
 			}
 		}
 		if (meta.getMetadataType() == MetaData.METADATA_STRING) {
-			VText vt = new VText(parent, x, y, width, height, "small");
-			vt.setFlags(VText.RSRC_HALIGN_LEFT|VText.RSRC_VALIGN_TOP|VText.RSRC_TEXT_WRAP);
-			vt.setValue(meta.getMetadata());
-			v = vt;
+			BScrollableText st = new BScrollableText(parent, x, y, width, height, "small");
+			//vt.setFlags(VText.RSRC_HALIGN_LEFT|VText.RSRC_VALIGN_TOP|VText.RSRC_TEXT_WRAP);
+			st.setValue(meta.getMetadata());
+			v = st;
 		} else if (meta.getMetadataType() == MetaData.METADATA_IMAGE){
 			BufferedImage bi = meta.getImage();
 			if (bi != null) {
@@ -77,9 +80,18 @@ public class MetaDataViewer {
 					r.setUrlDocument(url, baseUrl);
 				else
 					r.setHtmlDocument(meta.getMetadata(), baseUrl);
-				BufferedImage bi = r.getImage(width, height);
-				if (bi != null)
-					v = setImage(parent, x, y, width, height, bi, false);
+				BufferedImage [] bis = r.getImages(width, height);
+				if (bis != null) {
+					SBScrollPanePlus sp = new SBScrollPanePlus(parent, x, y, width, height);
+					v = sp;
+					int offy = 0;
+					for (BufferedImage bi : bis) {
+						setImage(sp, 0, offy, width, height, bi, false);
+						offy+= height;
+					}
+					sp.refresh();
+					//v = setImage(parent, x, y, width, height, bi, false);
+				}
 			} catch(Exception e) {
 				Log.error("Unable to render HTML: " + e.getMessage());
 			}

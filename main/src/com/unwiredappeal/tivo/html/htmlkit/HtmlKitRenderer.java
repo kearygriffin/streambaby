@@ -1,6 +1,9 @@
 package com.unwiredappeal.tivo.html.htmlkit;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
@@ -8,19 +11,23 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import javax.swing.CellRendererPane;
 import javax.swing.JEditorPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 
 
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.html.BaseHtmlRenderer;
+import com.unwiredappeal.tivo.utils.Log;
 
 
 public class HtmlKitRenderer extends BaseHtmlRenderer {
-	public BufferedImage getImage(int width, int height) {
+	@SuppressWarnings("serial")
+	public BufferedImage[] getImages(final int width, final int height) {
 		if (!isModified() && this.width == width && this.height == height)
-			return bi;
+			return bis;
 		BufferedImage bi = null;
 		File fileToDelete = null;
 		Graphics graphics = null;
@@ -41,10 +48,35 @@ public class HtmlKitRenderer extends BaseHtmlRenderer {
 			}
 
 			final JEditorPane pane = new JEditorPane();
+			JPanel parentPanel = new JPanel( new BorderLayout() )
+	        {
+	            private int CUSTOM_WIDTH = width;
+	            public Dimension getPreferredSize()
+	            {
+	                Dimension d = super.getPreferredSize();
+	                d.width = CUSTOM_WIDTH;
+	                return d;
+	            }
+	            public Dimension getMinimumSize()
+	            {
+	                Dimension d = super.getMinimumSize();
+	                d.width = CUSTOM_WIDTH;
+	                return d;
+	            }
+	            public Dimension getMaximumSize()
+	            {
+	                Dimension d = super.getMaximumSize();
+	                d.width = CUSTOM_WIDTH;
+	                return d;
+	            }
+	        };
+
+	        parentPanel.add(pane);			
 	        pane.setEditable(false);
 	        pane.setMargin(new Insets(0,0,0,0));
 	        SBHtmlEditorKit kit = new SBHtmlEditorKit(baseUrl);
 			pane.setEditorKit(kit);
+			//pane.setPreferredSize(new Dimension(width, 0));
 			File css = new File(StreamBabyConfig.convertRelativePath(StreamBabyConfig.cfgDefaultCss.getValue(), StreamBabyConfig.streamBabyDir + File.separator));
 			if (css.exists()) {
 				try {
@@ -52,7 +84,7 @@ public class HtmlKitRenderer extends BaseHtmlRenderer {
 				} catch (MalformedURLException e) {
 				}
 			}
-			pane.setBounds(0, 0, width, height);
+			//pane.setBounds(0, 0, width, height);
 			pane.setOpaque(false);
 			pane.setDoubleBuffered(false);
 			/*
@@ -81,14 +113,26 @@ public class HtmlKitRenderer extends BaseHtmlRenderer {
 	        	}
 	        }
 	        */
+
+	        parentPanel.setSize( parentPanel.getPreferredSize() );
+	        parentPanel.doLayout();
+	        parentPanel.setSize( parentPanel.getPreferredSize() );
+			Log.debug("ParentPanelPref:" + parentPanel.getSize());
+			int images = ((int)parentPanel.getSize().getHeight() + (height-1))/height;
+			int iheight = height * images;
 			bi = 
 			    new BufferedImage(width, 
-			                      height, 
+			                      iheight, 
 			                      BufferedImage.TYPE_4BYTE_ABGR);
 			graphics = bi.getGraphics();
 			final Graphics fgraphics = graphics;
 			Container c = new Container();
-	        SwingUtilities.paintComponent(fgraphics, pane, c, 0, 0, width, height);		
+	        SwingUtilities.paintComponent(fgraphics, pane, c, 0, 0, width, iheight);
+			bis = new BufferedImage[images];
+			for (int i=0;i<images;i++) {
+				bis[i] = bi.getSubimage(0, height*i, width, height);
+			}
+
 	      } finally {
 			if (graphics != null)
 				graphics.dispose();
@@ -97,9 +141,7 @@ public class HtmlKitRenderer extends BaseHtmlRenderer {
 			
 		}
 	
-		return bi;
+			return bis;
 	}
-
-	
 
 }

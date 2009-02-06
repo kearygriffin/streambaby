@@ -5,20 +5,22 @@ package com.unwiredappeal.tivo.views;
 import com.tivo.hme.bananas.BScreen;
 import com.tivo.hme.bananas.BTextPlus;
 import com.tivo.hme.bananas.BView;
+import com.tivo.hme.sdk.Resource.FontResource;
 import com.unwiredappeal.tivo.streambaby.GLOBAL;
+import com.unwiredappeal.tivo.streambaby.StreamBabyStream;
 
 public class VText extends BTextPlus<String> {
    public boolean visible = true;
    public VText(BView view, int x, int y, int width, int height, String type) {
 	   super(view, x, y, width, height, true);
 	   FontSizeInfo info = getFontSize(type);
-	   setupText(type, info.fontSize);
+	   setupText(this, type, info.fontSize);
 
    }
 
    public VText(BView view, int x, int y, int h_multiplier, String type) {
 	 super(view, x, y, view.getScreen().getWidth()-(BScreen.SAFE_TITLE_H*2), getFontSize(type).h*h_multiplier+(getFontSize(type).h), true);
-      setupText(type, getFontSize(type).fontSize);
+      setupText(this, type, getFontSize(type).fontSize);
    }
 
    public static class FontSizeInfo {
@@ -61,12 +63,19 @@ public class VText extends BTextPlus<String> {
 	   
 	      return new FontSizeInfo(fontSize, h);
    }
-   private void setupText(String type, int fontSize) {
-	      this.setColor(GLOBAL.text_COLOR);
-	      this.setShadow(GLOBAL.text_SHADOW,3);
-	      String font = String.format("default-%d.font", fontSize);
-	      this.setFont(font);
+   public static FontResource setupText(BTextPlus<String> t, String type, int fontSize) {
+	      t.setColor(GLOBAL.text_COLOR);
+	      t.setShadow(GLOBAL.text_SHADOW,3);
+	      //String font = String.format("default-%d.font", fontSize);
+	      FontResource font = getFontResource(t, "default.ttf", FONT_PLAIN, fontSize);
+	      t.setFont(font);
+	      return font;
 	   
+   }
+   
+   public static FontResource getFontResource(BView v, String fontName, int style, int size) {
+	      FontResource font = ((StreamBabyStream)v.getBApp()).getFont(fontName, style, size);
+	      return font;
    }
    
    public void setVisible(boolean visible) {

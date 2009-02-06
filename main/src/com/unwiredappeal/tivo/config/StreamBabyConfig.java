@@ -397,7 +397,18 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"meta.xsl",
 			"xslt to use for transforming standard tag metadata.  Relative to stylesheets or abs"
 			);
+	
+	public static ConfigEntry cfgCCMinTimePerChar = new ConfigEntry(
+			"cc.minchartime",
+			"50",
+			"Minimum time to leave a CC on the screen (per character) in ms"
+			);
 
+	public static ConfigEntry cfgCCMinTime = new ConfigEntry(
+			"cc.mintime",
+			"1500",
+			"Minimum time to leave a CC on the screen (absolute) in ms"
+			);
 	
 
 	// This always be last

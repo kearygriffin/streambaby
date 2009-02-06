@@ -25,6 +25,8 @@ import com.tivo.hme.sdk.HmeEvent;
 import com.tivo.hme.sdk.ImageResource;
 import com.tivo.hme.sdk.Resolution;
 import com.tivo.hme.sdk.ResolutionInfo;
+import com.tivo.hme.sdk.Resource;
+import com.tivo.hme.sdk.Resource.FontResource;
 import com.unwiredappeal.mediastreams.AutoPreviewGenerationManager;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
@@ -47,6 +49,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	public List<Cleanupable> cleanupRequired = Collections.synchronizedList(new LinkedList<Cleanupable>());
  
 	private Map<String, Object >appObjectMap = Collections.synchronizedMap(new HashMap<String, Object>());
+	private Map<String, FontResource > fontMap = new HashMap<String, FontResource>();
 	/*
 	public void init(IContext context) throws Exception {
 		
@@ -396,6 +399,17 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	
 	public void setApplicationObject(String str, Object o) {
 		appObjectMap.put(str, o);
+	}
+
+
+	public synchronized FontResource getFont(String fontName, int fontFace, int fontSize) {
+		String id = fontName + "-" + fontFace + "-" + fontSize;
+		FontResource r = fontMap.get(id);
+		if (r != null)
+			return r;
+		r = (FontResource)createFont(fontName, fontFace, fontSize, FONT_METRICS_BASIC|FONT_METRICS_GLYPH);
+		fontMap.put(id, r);
+		return r;
 	}
 	
 }

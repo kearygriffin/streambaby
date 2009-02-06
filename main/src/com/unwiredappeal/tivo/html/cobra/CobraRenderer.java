@@ -21,9 +21,9 @@ import com.unwiredappeal.tivo.html.BaseHtmlRenderer;
 
 public class CobraRenderer extends BaseHtmlRenderer {
 
-	public BufferedImage getImage(int width, int height) {
+	public BufferedImage[] getImages(int width, int height) {
 		if (!isModified() && this.width == width && this.height == height)
-			return bi;
+			return bis;
 		BufferedImage bi = null;
 		File fileToDelete = null;
 		Graphics graphics = null;
@@ -114,7 +114,8 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			
 		}
 	
-		return bi;
+		bis = new BufferedImage[] { bi } ;
+		return bis;
 
 	}
 	

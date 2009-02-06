@@ -7,8 +7,12 @@ import java.net.URL;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.ImageView;
 import javax.swing.text.html.StyleSheet;
 
 @SuppressWarnings("serial")
@@ -86,6 +90,23 @@ public class SBHtmlEditorKit extends HTMLEditorKit {
 				doc.setBase(new URL(baseUrl));
 			} catch (MalformedURLException e) {
 			}
+	}
+	
+	public ViewFactory getViewFactory()
+	{
+		return new HTMLFactory()
+		{
+			public View create(Element elem)
+			{
+				View view = super.create(elem);
+			
+				if (view instanceof ImageView)
+				{
+				((ImageView) view).setLoadsSynchronously(true);
+				}
+				return view;
+			}
+		};
 	}
 
 }
