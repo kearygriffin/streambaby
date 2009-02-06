@@ -42,6 +42,8 @@
  * New INI option, info.tidy.xhtml (default: false) which tells tidy to generate xhtml output (htmleditorkit not really happy with xhtml)
  * New INI option html.css to set default css for html rendering.  relative to stylesheets directory (or abs)
   * default=streambaby.css, which doesn't exist by default (and so won't be loaded)
+ * Added new location to look for streambaby.ini.   ${user.home}/.streambaby/streambaby.ini
+ * Fixed config loading to look for streambaby.ini in ${user.home} (was ${user.dir}, which was incorrect)
 
  
  ===V0.20===

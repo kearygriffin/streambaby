@@ -150,6 +150,20 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 		return realtime == true;
 	}
 	
+	private void setMetadataItem(VideoInformation vidinfo, String key, byte[] val) {
+		if (val == null)
+			return;
+		if (val[0] == 0)
+			return;
+		StringBuffer b = new StringBuffer();
+		String valStr = null;		
+		for (byte x : val) {
+			b.append(new String(new byte[] { x }));
+		}
+		valStr = b.toString().trim();
+		if (valStr != null && valStr.length() > 0)
+			vidinfo.setMetadataItem(key, valStr);
+	}
 	@Override
 	public boolean fillVideoInformation(URI uri, VideoInformation vidinfo) {
 		if (!Utils.isFile(uri))
@@ -172,7 +186,29 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 				avFormat.dump_format(formatCtx, 0, filename, 0);
 		
 			
-		    // Find the first video stream
+			/*
+			public byte[] title = new byte[512];
+			public byte[] author = new byte[512];
+			public byte[] copyright = new byte[512];
+			public byte[] comment = new byte[512];
+			public byte[] album = new byte[512];
+			public int year;  
+			public int track; 
+			public byte[] genre = new byte[32]; 
+			*/
+			
+			setMetadataItem(vidinfo, "title", formatCtx.title);
+			setMetadataItem(vidinfo, "author", formatCtx.author);
+			setMetadataItem(vidinfo, "copyright", formatCtx.copyright);
+			setMetadataItem(vidinfo, "comment", formatCtx.comment);
+			setMetadataItem(vidinfo, "album", formatCtx.album);
+			setMetadataItem(vidinfo, "genre", formatCtx.genre);
+			if (formatCtx.year > 0)
+				vidinfo.setMetadataItem("year", Integer.toString(formatCtx.year));
+			if (formatCtx.track > 0)
+				vidinfo.setMetadataItem("track", Integer.toString(formatCtx.track));
+			
+			// Find the first video stream
 		     AVStream audioStream = null;
 		     AVStream videoStream = null;
 		    for (int i=0; i<formatCtx.nb_streams; i++)

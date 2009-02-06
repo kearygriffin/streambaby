@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import com.tivo.hme.host.util.ArgumentList;
 import com.tivo.hme.sdk.Factory;
 import com.tivo.hme.sdk.util.HmeVersion;
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.streambaby.host.Main;
 
 public class StreamBabySimulator extends Simulator {
@@ -61,7 +62,7 @@ public class StreamBabySimulator extends Simulator {
             if (main.getFactories() != null && main.getListener() != null) {
                 Factory appFactory = (Factory)(main.getFactories().get(0));
                 String[] intfs = main.getListener().getInterfaces();
-                url = "http://" + intfs[0] + appFactory.getAppName();
+                url = "http://" + intfs[0] + ":" + StreamBabyConfig.cfgPort.getValue() + appFactory.getAppName();
             } else {
             	System.out.println("Unable to start specified application - running Simulator stand alone.");
             }

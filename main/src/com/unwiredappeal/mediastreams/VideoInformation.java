@@ -3,6 +3,8 @@ package com.unwiredappeal.mediastreams;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.unwiredappeal.tivo.utils.InfoCache;
 import com.unwiredappeal.tivo.utils.Utils;
@@ -11,6 +13,7 @@ import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class VideoInformation extends InfoCache.Cacheable {
 	
+	private Map<String, String> metadataMap = new HashMap<String, String>();
 	private static final String CACHE_NAME = VideoInformation.class.toString();
 	public long videoLength;
 	//String audioCodec;
@@ -221,5 +224,18 @@ public class VideoInformation extends InfoCache.Cacheable {
 		video = video + "\n  PixAspect: " + getPixelAspect() + ", Aspect: " + getAspect();
 		return beg + "\n" + video + "\n" + audio;
 	}
+	
 
+
+	public Map<String, String> getMetadataMap() {
+		return metadataMap;
+	}
+	
+	public void setMetadataItem(String key, String val) {
+		metadataMap.put(key, val);
+	}
+
+	public String getMetdataItem(String key) {
+		return metadataMap.get(key);
+	}
 }

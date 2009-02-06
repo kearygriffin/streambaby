@@ -39,7 +39,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static String DEFAULT_VIDEO_DIR = "videos";
 	public static String DEFAULT_TITLE = "Stream, Baby, Stream";
 	public static String CONFIG_FILE = "streambaby.ini";
-	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,m4a,raw,3gp,mov";
+	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,raw,3gp,mov";
 
 	
 	public static ConfigEntry cfgSocketStart = new ConfigEntry(
@@ -65,7 +65,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 			);
 	public static ConfigEntry cfgPort = new ConfigEntry(
 			"port",
-			"7288",
+			"7290",
 			"HME port to attach to"
 			);
 	
@@ -392,6 +392,14 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"Sort by filename instead of title"
 			);
 
+	public static ConfigEntry cfgMetaXsl = new ConfigEntry(
+			"xsl.meta",
+			"meta.xsl",
+			"xslt to use for transforming standard tag metadata.  Relative to stylesheets or abs"
+			);
+
+	
+
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
@@ -618,10 +626,14 @@ public class StreamBabyConfig extends ConfigurableObject {
 			return false;
 		}
 		// Next, try user dir
-		if (ConfigurationManager.inst.attemptLoadProps(System.getProperty("user.dir")
+		if (ConfigurationManager.inst.attemptLoadProps(System.getProperty("user.home")
 				+ File.separator + CONFIG_FILE))
 			return true;
 		
+		// Next, try user dir
+		if (ConfigurationManager.inst.attemptLoadProps(System.getProperty("user.home")
+				+ File.separator + ".streambaby" + File.separator + CONFIG_FILE))
+			return true;
 
 		// and the current directory
 		if (ConfigurationManager.inst.attemptLoadProps(CONFIG_FILE))
