@@ -49,6 +49,7 @@
   * If movie name is movie.mpg, subtitles should be in movie.srt
   * Added new config options cc.mintime, and cc.minchartime
    * both are in milliseconds and control the minimum time a CC is displayed on the screen (unless it needs to be erased to display another one)
+  * added new INI cc.fontsize to configure fontsize for CC.  default=20
   * Aspect button currently turns CC on/off.  It is ON by default if a SRT file exists.
   
 
