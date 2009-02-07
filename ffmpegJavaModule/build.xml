@@ -7,6 +7,7 @@
 <project basedir="." default="build" name="ffmpegJavaModule">
     <property environment="env"/>
     <property name="STREAMBABY" value="../"/>
+    <property name="ffmpegJavaModule.location" value="../ffmpegJavaModule"/>
     <property name="ECLIPSE_HOME" value="../../../opt/eclipse"/>
     <property name="ffmpeg-java.location" value="../ffmpeg-java"/>
     <property name="main.location" value="../main"/>
@@ -38,6 +39,8 @@
         <pathelement location="${STREAMBABY}/lib/Tidy.jar"/>
         <pathelement location="${STREAMBABY}/dlib/core-renderer.jar"/>
         <pathelement location="${STREAMBABY}/dlib/simulator.jar"/>
+        <pathelement location="${STREAMBABY}/lib/isoparser-137-SNAPSHOT.jar"/>
+        <pathelement location="${ffmpegJavaModule.location}/bin"/>
     </path>
     <path id="ffmpegJavaModule.classpath">
         <pathelement location="bin"/>

@@ -292,7 +292,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		} else {
 			loadCutList();
 			closeCC();
-			cc = new cctext(getNormal(), "medium", deUri.getPath());
+			cc = new cctext(getNormal(), StreamBabyConfig.cfgCCFontSize.getInt(), deUri.getPath());
 			if (cc == null || !cc.exists())
 				closeCC();
 			gotoPosition(gotoPos, null);

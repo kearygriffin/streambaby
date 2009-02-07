@@ -19,12 +19,17 @@ import javax.swing.SwingUtilities;
 
 import org.lobobrowser.html.HtmlRendererContext;
 import org.lobobrowser.html.domimpl.HTMLDocumentImpl;
+import org.lobobrowser.html.domimpl.HTMLImageElementImpl;
+import org.lobobrowser.html.domimpl.ImageEvent;
+import org.lobobrowser.html.domimpl.ImageListener;
 import org.lobobrowser.html.parser.DocumentBuilderImpl;
 import org.lobobrowser.html.parser.InputSourceImpl;
 import org.lobobrowser.html.style.RenderState;
 import org.lobobrowser.html.test.SimpleHtmlRendererContext;
 import org.lobobrowser.html.test.SimpleUserAgentContext;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.html2.HTMLCollection;
 import org.xml.sax.SAXException;
 
 import com.unwiredappeal.tivo.html.BaseHtmlRenderer;
@@ -164,9 +169,29 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			npanel.addNotify(); 
 			npanel.setDoubleBuffered(false);		
 			npanel.setDocument(doc, rContext);
-
 		
+			HTMLCollection col = ((HTMLDocumentImpl)doc).getImages();
+			
+			imageCount = 0;
+			int localImageCount = 0;
+			for (int i=0;i<col.getLength();i++) {
+				Node node = col.item(i);
+				deltaImages(1);
+				localImageCount++;
+				HTMLImageElementImpl imgNode = (HTMLImageElementImpl)node;
+				imgNode.addImageListener(new ImageListener() {
 
+					public void imageLoaded(ImageEvent event) {
+						deltaImages(-1);
+					} });
+				
+			}
+			while(deltaImages(0) > 0) {
+				sleep(50);
+			}
+			if (localImageCount > 0)
+				sleep(200);
+			
 			BufferedImage bi = 
 			    new BufferedImage(width, 
 			                      iheight, 
@@ -181,6 +206,7 @@ public class CobraRenderer extends BaseHtmlRenderer {
 				        public void run() {
 							Container c = new Container();
 					        SwingUtilities.paintComponent(fgraphics, npanel, c, 0, 0, width, iheight);
+				        	//panel.print(fgraphics);
 				        }
 				});
 			} catch (InterruptedException e) {
@@ -188,6 +214,7 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			} catch (InvocationTargetException e) {
 				return null;
 			}
+
 			int heightLeft = iheight;
 			bis = new BufferedImage[images];
 			for (int i=0;i<images;i++) {
@@ -208,5 +235,17 @@ public class CobraRenderer extends BaseHtmlRenderer {
 
 	}
 	
-
+	int imageCount = 0;
+	public synchronized int deltaImages(int delta) {
+		imageCount += delta;
+		return imageCount;
+	}
+	public void sleep(int n) {
+		try {
+			Thread.sleep(n);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

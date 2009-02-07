@@ -25,6 +25,9 @@
     * pytivo-text.xsl:  Transforms the metadata into pure text for display.  Text looks nice.
     * pytivo-html.xsl:  Transforms the metadata into HTML for display.  Font's can look a bit rough, but more flexible.
     * the default is pytivo-text.xsl
+  * metadata is also read from MP4 files into xml in the format <meta> <tag>xxx</tag>  <tag>xxx</tag>  </meta>
+   * xsl.meta determines the XSL to use.  Default=meta-html.xsl.  meta-text.xsl is also available
+    * Supports artwork, which is why meta-html is the default	
  * INI entry use.title= (default true) to use the title from the metadata instead of filename for listings
  * INI entry sort.filename= (default false).  If true, streambaby will sort entries in the selection screen by filename instead of metadata title
   * If set to false, tivo use metadata title for sort.

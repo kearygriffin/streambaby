@@ -23,7 +23,8 @@ public class cctext {
    double minCCTime = 0;
    double minCCTimePerChar = 0;
    BView view;
-   String fsize;
+   //String fsize;
+   int fontSize;
    Stack<bgtext> text = new Stack<bgtext>();
    //long start=-1, stop=-1, size=0, time;
    long time;
@@ -44,10 +45,10 @@ public class cctext {
    
    String lastCC = null;
    
-   public cctext(BView view, String fsize, String file) {
+   public cctext(BView view, int fontSize, String file) {
 	   minCCTime = StreamBabyConfig.cfgCCMinTime.getInt()/1000.0;
 	   minCCTimePerChar = StreamBabyConfig.cfgCCMinTimePerChar.getInt()/1000.0;
-      this.fsize = fsize;
+      this.fontSize = fontSize;
       this.view = view;
       if (! file.toLowerCase().endsWith(".srt")) {
          file = file.replaceFirst("^(.+)\\..+$", "$1.srt");
@@ -69,8 +70,8 @@ public class cctext {
    @SuppressWarnings("unchecked")
 public void display(long time) {
       if (on) {
-    	  Log.debug("CCTime: " + time/1000.0); //  + " (" + start + "," + stop + ")");
-    	 if (time < this.time)
+    	  //Log.debug("CCTime: " + time/1000.0); //  + " (" + start + "," + stop + ")");
+    	 if (time < this.time && (this.time-time) < 1000)
     		 return;
          this.time = time;
          String thisCC = null;
@@ -125,7 +126,7 @@ public void display(long time) {
 
       
       for (int i=0; i<lines.length; i++) {
-         bgtext t = new bgtext(view, fsize, lines[i]);
+         bgtext t = new bgtext(view, fontSize, lines[i]);
          text.push(t);
       }
       

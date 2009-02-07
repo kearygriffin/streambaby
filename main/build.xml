@@ -38,6 +38,8 @@
         <pathelement location="${STREAMBABY}/lib/Tidy.jar"/>
         <pathelement location="${STREAMBABY}/dlib/core-renderer.jar"/>
         <pathelement location="${STREAMBABY}/dlib/simulator.jar"/>
+        <pathelement location="${STREAMBABY}/lib/isoparser-137-SNAPSHOT.jar"/>
+        <pathelement location="${ffmpegJavaModule.location}/bin"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>

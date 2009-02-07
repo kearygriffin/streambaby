@@ -7,8 +7,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 </xsl:template>
 
 <xsl:template match="meta">
-	<xsl:apply-templates select="title"/>
-	<xsl:apply-templates select="author"/>
+	<xsl:apply-templates select="name"/>
+	<xsl:apply-templates select="tracktitle"/>
+	<xsl:apply-templates select="artist"/>
 	<xsl:apply-templates select="album"/>
 	<xsl:apply-templates select="comment"/>
 </xsl:template>
@@ -21,12 +22,18 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 </xsl:template>
 
-<xsl:template match="title">
+<xsl:template match="name">
 	<xsl:value-of select="."/>
 	<xsl:text>&#xD;&#xA;</xsl:text>
 </xsl:template>
 
-<xsl:template match="author">
+<xsl:template match="tracktitle">
+	<xsl:value-of select="."/>
+	<xsl:text>&#xD;&#xA;</xsl:text>
+</xsl:template>
+
+
+<xsl:template match="artist">
 <xsl:value-of select="."/>
 <xsl:text>&#xD;&#xA;</xsl:text>
 </xsl:template>

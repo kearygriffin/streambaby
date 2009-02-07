@@ -7,7 +7,7 @@
 	<classpathentry kind="var" path="STREAMBABY/lib/bananas-plus-0.1.1-streambabyr1.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/bcel-5.2.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/bsh-2.0b4.jar"/>
-	<classpathentry kind="var" path="STREAMBABY/lib/cobra.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/cobra.jar" sourcepath="/TOOLS/cobra-0.98.4/src"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/hme.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/hme-host-sb.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/jmdns.jar"/>
@@ -20,5 +20,7 @@
 	<classpathentry kind="var" path="STREAMBABY/lib/Tidy.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/dlib/core-renderer.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/dlib/simulator.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/isoparser-137-SNAPSHOT.jar" sourcepath="/TOOLS/isobox4j/isoparser/src/main"/>
+	<classpathentry kind="lib" path="/ffmpegJavaModule/bin"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

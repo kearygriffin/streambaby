@@ -394,7 +394,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public static ConfigEntry cfgMetaXsl = new ConfigEntry(
 			"xsl.meta",
-			"meta.xsl",
+			"meta-html.xsl",
 			"xslt to use for transforming standard tag metadata.  Relative to stylesheets or abs"
 			);
 	
@@ -407,6 +407,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static ConfigEntry cfgCCMinTime = new ConfigEntry(
 			"cc.mintime",
 			"1500",
+			"Minimum time to leave a CC on the screen (absolute) in ms"
+			);
+	
+	public static ConfigEntry cfgCCFontSize = new ConfigEntry(
+			"cc.fontsize",
+			"20",
 			"Minimum time to leave a CC on the screen (absolute) in ms"
 			);
 	
@@ -438,7 +444,8 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"com.unwiredappeal.tivo.vm.ffjava.FFmpegJavaVideoModule",
 			"com.unwiredappeal.tivo.vm.ffexe.FFmpegExeVideoModule",
 			"com.unwiredappeal.tivo.metadata.StandardMetadataModule",
-			"com.unwiredappeal.tivo.metadata.TaggerMetadataModule"
+			"com.unwiredappeal.tivo.metadata.TaggerMetadataModule",
+			"com.unwiredappeal.tivo.metadata.MP4MetadataModule"
 	};
 	
 	public Boolean _DEBUG = false;

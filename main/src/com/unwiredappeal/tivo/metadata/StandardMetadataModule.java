@@ -156,8 +156,8 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		metaMap = vi.getMetadataMap();
 		if (metaMap.size() == 0)
 			return false;
-		if (metaMap.get("title") != null)
-			m.setTitle(metaMap.get("title"));
+		if (metaMap.get("name") != null)
+			m.setTitle(metaMap.get("name"));
 		
 		StringBuffer data = new StringBuffer();
 		data.append("<meta>\n");

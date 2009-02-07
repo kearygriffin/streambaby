@@ -17,7 +17,10 @@ public class bgtext {
    BView bg;
    public int x, y, w, h, fontSize;
 
-   public bgtext(BView view, String size, String value) {
+   public bgtext(BView view, int fontSize, String value) {
+	   this.fontSize = fontSize;
+	   h = fontSize + 2;
+	   /*
       fontSize = 20;
       h = 22;
       if (size.equals("large") ) {
@@ -32,7 +35,7 @@ public class bgtext {
          fontSize = 15;
          h = 17;
       }
-      
+      */
 	   FontResource font = ((StreamBabyStream)view.getBApp()).getFont("default.ttf", BView.FONT_PLAIN, fontSize);
 	   fm = font.getFontInfo();
 	   if (fm != null)

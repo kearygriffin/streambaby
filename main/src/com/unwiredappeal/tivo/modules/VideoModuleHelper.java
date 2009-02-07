@@ -50,7 +50,7 @@ public class VideoModuleHelper {
 					videoModules.add(m);
 				MetadataModule meta = null;
 				meta = (MetadataModule)sm.getModule(StreamBabyModule.STREAMBABY_MODULE_METADATA);
-				if (meta != null)
+				if (meta != null && meta.initialize(sm))
 					metadataModules.add(meta);
 				return true;
 			} else

@@ -5,10 +5,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +30,7 @@ import org.xml.sax.InputSource;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.modules.StreamBabyModule;
 import com.unwiredappeal.tivo.utils.Log;
+import com.unwiredappeal.tivo.utils.TempFileManager;
 
 public abstract class BaseMetadataModule implements StreamBabyModule, MetadataModule{
 	private static String DEFAULT_XSL = "system/echo.xsl";
@@ -168,5 +171,24 @@ public abstract class BaseMetadataModule implements StreamBabyModule, MetadataMo
 	}
 
 	
-
+	protected static Map<String, String> artworkMap = new HashMap<String, String>();
+	protected String writeArtwork(URI uri, byte[] data, String ext) {
+		String id = uri.toString() + ext;
+		String filename = artworkMap.get(id);
+		if (filename!= null)
+			return filename;
+		File f;
+		try {
+			f = TempFileManager.createTempFile("art-", ext);
+			filename = f.getAbsolutePath();
+			f.deleteOnExit();
+			RandomAccessFile raf = new RandomAccessFile(f, "rw");
+			raf.write(data);
+			raf.close();
+			return filename;
+		} catch (IOException e) {
+			Log.error("Error creating artwork file");
+			return null;
+		}
+	}
 }

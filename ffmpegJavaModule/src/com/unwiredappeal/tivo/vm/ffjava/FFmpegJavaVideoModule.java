@@ -158,6 +158,8 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 		StringBuffer b = new StringBuffer();
 		String valStr = null;		
 		for (byte x : val) {
+			if (x == 0)
+				break;
 			b.append(new String(new byte[] { x }));
 		}
 		valStr = b.toString().trim();
@@ -197,8 +199,8 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 			public byte[] genre = new byte[32]; 
 			*/
 			
-			setMetadataItem(vidinfo, "title", formatCtx.title);
-			setMetadataItem(vidinfo, "author", formatCtx.author);
+			setMetadataItem(vidinfo, "name", formatCtx.title);
+			setMetadataItem(vidinfo, "artist", formatCtx.author);
 			setMetadataItem(vidinfo, "copyright", formatCtx.copyright);
 			setMetadataItem(vidinfo, "comment", formatCtx.comment);
 			setMetadataItem(vidinfo, "album", formatCtx.album);
@@ -206,7 +208,7 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 			if (formatCtx.year > 0)
 				vidinfo.setMetadataItem("year", Integer.toString(formatCtx.year));
 			if (formatCtx.track > 0)
-				vidinfo.setMetadataItem("track", Integer.toString(formatCtx.track));
+				vidinfo.setMetadataItem("tracknumber", Integer.toString(formatCtx.track));
 			
 			// Find the first video stream
 		     AVStream audioStream = null;

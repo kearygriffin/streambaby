@@ -39,11 +39,11 @@ public class RandomAccessFileInputStream extends RandomAccessInputStream {
 	}
 
 	public void fillBuffer() throws IOException {
-		if (bufp >= BUFFER_SIZE) {
+		if (bufp >= curBufSize) {
 			if (filePos != fp.getFilePointer())
 				fp.seek(filePos);
 			int len = fp.read(buf, 0, BUFFER_SIZE);
-			curBufSize = len;
+			curBufSize = Math.max(len, 0);
 			bufp = 0;
 		}
 	}
