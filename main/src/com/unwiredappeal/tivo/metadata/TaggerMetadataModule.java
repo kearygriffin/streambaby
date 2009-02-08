@@ -15,6 +15,7 @@ public class TaggerMetadataModule extends BaseMetadataModule {
 
 	@Override
 	public boolean initialize(StreamBabyModule m) {
+		super.initialize(m);
 		return false;
 	}
 	public boolean setMetadata(MetaData m, URI uri, VideoInformation vi) {

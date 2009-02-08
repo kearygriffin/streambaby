@@ -28,6 +28,8 @@ public class GLOBAL {
 
 	// Playback times
 	public static int timeout_status_bar = 5;
+	public static int timeout_icon = 5;
+
 	public static int timeout_info = 10;
 	public static int skip_back = 8;
 	public static int skip_forwards = 30;

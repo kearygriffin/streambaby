@@ -75,7 +75,7 @@ public class DirEntry implements Comparable<DirEntry> {
 			return name;
 		if (!StreamBabyConfig.cfgUseTitle.getBool())
 			return getStrippedFilename();
-		if (!cachedMeta) {
+		if (!cachedMeta && !StreamBabyConfig.cfgUseTitleCachedOnly.getBool()) {
 			MetaData m = new MetaData();
 			getMetadata(m);
 		}

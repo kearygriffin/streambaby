@@ -21,6 +21,6 @@
 	<classpathentry kind="var" path="STREAMBABY/dlib/core-renderer.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/dlib/simulator.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/isoparser-137-SNAPSHOT.jar" sourcepath="/TOOLS/isobox4j/isoparser/src/main"/>
-	<classpathentry kind="lib" path="/ffmpegJavaModule/bin"/>
+	<classpathentry kind="lib" path="/ffmpegJavaModule/bin" sourcepath="/ffmpegJavaModule/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

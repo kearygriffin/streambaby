@@ -27,12 +27,13 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.xml.sax.InputSource;
 
+import com.unwiredappeal.tivo.config.ConfigurableObject;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.modules.StreamBabyModule;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.TempFileManager;
 
-public abstract class BaseMetadataModule implements StreamBabyModule, MetadataModule{
+public abstract class BaseMetadataModule extends ConfigurableObject implements StreamBabyModule, MetadataModule{
 	private static String DEFAULT_XSL = "system/echo.xsl";
 	
 	public static Map<String, Templates> cachedTransformers = new HashMap<String, Templates>();
@@ -52,6 +53,7 @@ public abstract class BaseMetadataModule implements StreamBabyModule, MetadataMo
 	}
 
 	public boolean initialize(StreamBabyModule parent) {
+		this.populateConfig();
 		return true;
 	}
 	

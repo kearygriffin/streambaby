@@ -83,14 +83,14 @@ public class CobraRenderer extends BaseHtmlRenderer {
 	
 			// NoopHtmlRenderContext implements HtmlRendererContext 
 			// but does nothing.
-			HtmlRendererContext rContext = 
+			final HtmlRendererContext rContext = 
 			    new SimpleHtmlRendererContext(panel, uContext);
 	
 			// Parse the HTML
 			DocumentBuilderImpl builder = new DocumentBuilderImpl(
 			    rContext.getUserAgentContext(),
 			    rContext);
-			Document doc;
+			final Document doc;
 			
 			try {
 				doc = builder.createDocument(new InputSourceImpl(new FileReader(new File(new URI(rurl))), baseUrl));
@@ -105,7 +105,26 @@ public class CobraRenderer extends BaseHtmlRenderer {
 				return null;
 			}
 	
+			HTMLCollection col = ((HTMLDocumentImpl)doc).getImages();
+			
+			imageCount = 0;
+			int localImageCount = 0;
+			for (int i=0;i<col.getLength();i++) {
+				Node node = col.item(i);
+				deltaImages(1);
+				localImageCount++;
+				HTMLImageElementImpl imgNode = (HTMLImageElementImpl)node;
+				imgNode.addImageListener(new ImageListener() {
 
+					public void imageLoaded(ImageEvent event) {
+						deltaImages(-1);
+					} });
+				
+			}
+			while(deltaImages(0) > 0) {
+				sleep(50);
+			}
+			
 			
 			final JPanel parentPanel = new JPanel( new BorderLayout() )
 	        {
@@ -131,12 +150,13 @@ public class CobraRenderer extends BaseHtmlRenderer {
 	        };
 
 	        parentPanel.add(panel);			
-			panel.setDocument(doc, rContext);
 	
-			
+
+
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 				        public void run() {
+							panel.setDocument(doc, rContext);
 					        parentPanel.setSize( parentPanel.getPreferredSize() );
 					        parentPanel.doLayout();
 					        panel.doLayout();
@@ -149,6 +169,11 @@ public class CobraRenderer extends BaseHtmlRenderer {
 				return null;
 			} catch (InvocationTargetException e) {
 				return null;
+			}
+
+			// I can't figure out why I need to wait here
+			if (localImageCount > 0) {
+				sleep(200);
 			}
 			int images = ((int)parentPanel.getSize().getHeight() + (height-1))/height;
 			int totalHeight = (int)parentPanel.getSize().getHeight();
@@ -168,29 +193,6 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			npanel.setBorder(null);
 			npanel.addNotify(); 
 			npanel.setDoubleBuffered(false);		
-			npanel.setDocument(doc, rContext);
-		
-			HTMLCollection col = ((HTMLDocumentImpl)doc).getImages();
-			
-			imageCount = 0;
-			int localImageCount = 0;
-			for (int i=0;i<col.getLength();i++) {
-				Node node = col.item(i);
-				deltaImages(1);
-				localImageCount++;
-				HTMLImageElementImpl imgNode = (HTMLImageElementImpl)node;
-				imgNode.addImageListener(new ImageListener() {
-
-					public void imageLoaded(ImageEvent event) {
-						deltaImages(-1);
-					} });
-				
-			}
-			while(deltaImages(0) > 0) {
-				sleep(50);
-			}
-			if (localImageCount > 0)
-				sleep(200);
 			
 			BufferedImage bi = 
 			    new BufferedImage(width, 
@@ -204,9 +206,11 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 				        public void run() {
+							npanel.setDocument(doc, rContext);				        	
 							Container c = new Container();
 					        SwingUtilities.paintComponent(fgraphics, npanel, c, 0, 0, width, iheight);
-				        	//panel.print(fgraphics);
+					        
+				        	//npanel.print(fgraphics);
 				        }
 				});
 			} catch (InterruptedException e) {
@@ -240,6 +244,7 @@ public class CobraRenderer extends BaseHtmlRenderer {
 		imageCount += delta;
 		return imageCount;
 	}
+	
 	public void sleep(int n) {
 		try {
 			Thread.sleep(n);

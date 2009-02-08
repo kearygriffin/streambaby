@@ -6,7 +6,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:attribute-set name="imgset">
   <xsl:attribute name="src"><xsl:value-of select="$artwork"/></xsl:attribute>
   <xsl:attribute name="align">right</xsl:attribute>
-  <xsl:attribute name="width">25%</xsl:attribute>
+  <xsl:attribute name="width">30%</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:variable name="hasimage" select="$artwork!=''"/>
@@ -16,7 +16,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		<xsl:if test="$hasimage">
 			<xsl:element name="img" use-attribute-sets="imgset"/>
 		</xsl:if>
-		<font face="arial" color="white" size="5">
+		<font face="arial" color="white" size="4">
 			<xsl:apply-templates select="meta"/>
 		</font>
 	</body></html>

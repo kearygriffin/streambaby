@@ -99,6 +99,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	boolean isComplete = false;
 
 	long timeout_info = -1;
+	long timeout_icon = -1;
 	long timeout_status = -1;
 	long timeout_keypad = -1;
 	long timeout_idle = -1;
@@ -107,6 +108,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	long maxDurationTime = 0;
 	URI deUri;
 	ImageResource filmResource;
+	BViewPlus icon;
 
 	VideoInformation vinfo;
 	int curVideoNum = 0;
@@ -125,6 +127,9 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	public static String INFO_FONT_SIZE_STANDALONE = "small";
 	public static String INFO_FONT_SIZE = "tiny";
 	public static int INFO_SPACE = 0;
+	
+	public static int PLAY_ICON_X = 570;
+	public static int PLAY_ICON_Y = 30;
 	
 	cctext cc;
 	boolean CC = true;
@@ -232,6 +237,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		layout = lm.size(layout, e.getWidth(), e.getHeight());
 		layout = lm.align(layout, A_CENTER, A_CENTER);
 
+		icon = new BViewPlus(getAbove(), PLAY_ICON_X, PLAY_ICON_Y, 32, 32, false);
 		pleaseWait = new BViewPlus(this, layout, false);
 		pleaseWait.setResource(e.getResource());
 		pleaseWait.setVisible(false);
@@ -295,6 +301,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			cc = new cctext(getNormal(), StreamBabyConfig.cfgCCFontSize.getInt(), deUri.getPath());
 			if (cc == null || !cc.exists())
 				closeCC();
+			if (cc != null)
+				displayCCIcon();
 			gotoPosition(gotoPos, null);
 		}
 		// gotoPosition(gotoPos, "Starting");
@@ -495,9 +503,6 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				quality = sapp.getAutoQuality();
 			is = VideoModuleHelper.inst.openVideo(deUri, de
 					.getVideoInformation(), startPosition, quality);
-			canSeek = is.canPosition();
-			if (!canSeek)
-				startPosition = 0;
 			// URL streamUrl = new URL(fileName + "?start=" + startSec);
 			// debug.print("Creating name stream: " + streamUrl.toString());
 
@@ -509,6 +514,9 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				setDefaultBackground();
 
 			} else {
+				canSeek = is.canPosition();
+				if (!canSeek)
+					startPosition = 0;				
 				this.vinfo = is.getVideoInformation();
 				subDuration = is.getSubDuration();
 				if (startPosition != 0)
@@ -678,6 +686,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			keypadText.setVisible(false);
 			timeout_keypad = -1;
 			keypad.removeAllElements();
+		}
+		if (timeout_icon > 0 && date >= timeout_icon) {
+			icon.clearResource();
+			icon.setVisible(false);
+			timeout_icon = -1;
 		}
 
 		// Update stream position and duration information
@@ -1065,15 +1078,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				// Clear text and status bar
 				// Really want to leave error on screen if we are not playing
 				// multiple files
-				if (playingMultiple)
-					errorText.setVisible(false);
-				infoView.setVisible(false);
-				displayStatusBar(false);
-				// Clear keypad numbers
-				keypadText.setVisible(false);
-				timeout_keypad = -1;
-				keypad.removeAllElements();
-				timeout_info = -1;
+				clearDisplay();
 				return true;
 				/*
 				 * case KEY_INFO: // Display file name temporarily if
@@ -1101,6 +1106,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				//if (ccEnabled())
 					//cc.display(position+startPosition);
 				handleCC();
+				if (cc == null)
+					play("bonk.snd");
+				else
+					play("updown.snd");
+				displayCCIcon();
 				break;
 			case KEY_NUM0:
 				addKey(0);
@@ -1163,6 +1173,21 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		}
 		return super.handleKeyPress(code, rawcode);
 	}
+	
+	private void displayCCIcon() {
+		if (icon == null)
+			return;
+		timeout_icon = new Date().getTime() + 1000
+		* GLOBAL.timeout_icon;
+		icon.clearResource();
+		if (cc == null || !CC) {
+			icon.setResource("cc-off.png");
+		}
+		else {
+			icon.setResource("cc.png");
+		}
+		icon.setVisible(true);
+	}
 
 	private void movePosition(long l) {
 		if (!isPreviewing()) {
@@ -1178,6 +1203,21 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			movePreviewPosition(l);
 		}
 
+	}
+	
+	private void clearDisplay() {
+		if (playingMultiple)
+			errorText.setVisible(false);
+		infoView.setVisible(false);
+		displayStatusBar(false);
+		// Clear keypad numbers
+		keypadText.setVisible(false);
+		timeout_keypad = -1;
+		keypad.removeAllElements();
+		timeout_info = -1;
+		icon.clearResource();
+		icon.setVisible(true);
+		timeout_icon = -1;
 	}
 
 	private void beginPreviewMode() {
@@ -1472,6 +1512,11 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			keypadText.clearResource();
 			keypadText.remove();
 			keypadText = null;
+		}
+		if (icon != null) {
+			icon.clearResource();
+			icon.remove();
+			icon = null;
 		}
 
 		if (preview != null) {

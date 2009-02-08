@@ -561,7 +561,7 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 		    frame = null;
 
 		    // Close the codec
-		    if (codecCtx != null)
+		    if (codecCtx != null && codecCtx.codec_id != 0)
 		    	avCodec.avcodec_close(codecCtx);
 		    codecCtx = null;
 

@@ -44,7 +44,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
     private DirEntry builtRoot;
     public int autoQuality = VideoFormats.QUALITY_SAME;
 	Map<String, String> persistentCache = Collections.synchronizedMap(new HashMap<String, String>());
-	public Vector<String> lastEntry = new Vector<String> ();
+	public Vector<Object> lastEntry = new Vector<Object> ();
 	public ImageResource filmResource;
 	public List<Cleanupable> cleanupRequired = Collections.synchronizedList(new LinkedList<Cleanupable>());
  

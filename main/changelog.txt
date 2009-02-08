@@ -27,7 +27,10 @@
     * the default is pytivo-text.xsl
   * metadata is also read from MP4 files into xml in the format <meta> <tag>xxx</tag>  <tag>xxx</tag>  </meta>
    * xsl.meta determines the XSL to use.  Default=meta-html.xsl.  meta-text.xsl is also available
-    * Supports artwork, which is why meta-html is the default	
+    * Supports artwork, which is why meta-html is the default
+  * mp4 metadata processing can be turned off with meta.mp4.disable=true	
+  * config entry use.title.cachedonly= (default true), only use metadata for titles if the metadata has already been processed and cached
+  * Pressing the enter key on selection screen causes streambaby to try and cache all metadata for the directory.
  * INI entry use.title= (default true) to use the title from the metadata instead of filename for listings
  * INI entry sort.filename= (default false).  If true, streambaby will sort entries in the selection screen by filename instead of metadata title
   * If set to false, tivo use metadata title for sort.
@@ -51,6 +54,7 @@
    * both are in milliseconds and control the minimum time a CC is displayed on the screen (unless it needs to be erased to display another one)
   * added new INI cc.fontsize to configure fontsize for CC.  default=20
   * Aspect button currently turns CC on/off.  It is ON by default if a SRT file exists.
+
   
 
  

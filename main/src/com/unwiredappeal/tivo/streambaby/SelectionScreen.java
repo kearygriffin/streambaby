@@ -20,6 +20,7 @@ import com.tivo.hme.bananas.layout.LayoutManager;
 import com.tivo.hme.sdk.util.Ticker;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
+import com.unwiredappeal.tivo.metadata.MetaData;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.views.VText;
 
@@ -102,8 +103,17 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
    public boolean handleEnter(Object arg, boolean isReturn) {
 	   ((StreamBabyStream)getBApp()).setCurrentScreen(this);
 
+	   this.setPainting(false);
 	   resetTitle();
-	   
+	      // Clear out old list
+	      if (list != null) {
+	         list.clear();
+	      }
+	   this.setPainting(true);
+
+	   pleaseWait.setVisible(true);
+	   Ticker.master.add(this, System.currentTimeMillis()+200, null);
+
        //if (!isReturn)
        	//focusOnDefault();
        
@@ -111,13 +121,20 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
        //return super.handleEnter(arg, isReturn);
    }
 
-	public synchronized long tick(long tm, Object arg) {
-		
+   public void doRefresh() {
+	   this.setPainting(false);
+	   resetTitle();
+	   
 		updateFileList(de);
 		setFocusDefault(list);
 		focusOnDefault();
 		pleaseWait.setVisible(false);
-		pleaseWait.remove();
+		//pleaseWait.remove();
+		this.setPainting(true);
+
+   }
+	public synchronized long tick(long tm, Object arg) {
+		doRefresh();
 
 		flush();
 		
@@ -179,11 +196,11 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
    public void focusOnDefault() {
 	   focusOn(getLastEntry());
    }
-   public boolean focusOn(String entry) {
+   public boolean focusOn(Object entry) {
       Log.debug("focusOn entry=" + entry);
       if (entry != null) {
          for (int i=0; i<list.size(); i++) {
-            if (list.get(i).toString().equals(entry)) {
+            if (list.get(i).equals(entry)) {
                list.setFocus(i,true);
                return true;
             }
@@ -220,7 +237,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 		   return;
        DirEntry entry = (DirEntry)list.get(list.getFocus());// s.de;
           // Update lastEntry stack
-       lastEntryPush(entry.getName());
+       lastEntryPush(entry);
  
           if (entry.isFolder() == true) {
              // Entry is a dir, so update list entries to new dir
@@ -245,7 +262,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
        }
        if (list.size() > 0) {
 	       DirEntry entry = (DirEntry)list.get(list.getFocus());// s.de;       
-	       lastEntryPush(entry.getName());
+	       lastEntryPush(entry);
        }
        /*
       curDir = curDir.getParent();
@@ -287,7 +304,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 	    	  if (dlist != null && !dlist.isEmpty()) {
 	    		  ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
 		          getBApp().push(newScreen, TRANSITION_LEFT);
-		          lastEntryPush(entry.getName());	    		  
+		          lastEntryPush(entry);	    		  
 	    	  } else {
 	    		  play("bonk.snd");
 	    	  }
@@ -295,7 +312,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 	     	  ViewScreen newScreen = new ViewScreen(getBApp(), entry, StreamBabyConfig.inst.getDefaultQuality());
 	          getBApp().push(newScreen, TRANSITION_LEFT);
 	          // Update lastEntry stack
-	          lastEntryPush(entry.getName());
+	          lastEntryPush(entry);
 	      }
           
 		   break;
@@ -310,7 +327,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 	    	  if (dlist != null && !dlist.isEmpty()) {
 	    		  ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
 		          getBApp().push(newScreen, TRANSITION_LEFT);
-		          lastEntryPush(list.get(list.getFocus()).getName());	    		  
+		          lastEntryPush(list.get(list.getFocus()));	    		  
 	    	  } else {
 	    		  play("bonk.snd");
 	    	  }		    
@@ -357,22 +374,35 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
             screen.updateFileList(DIR);
             */
             return true;
+         case KEY_ENTER:
+        	 pleaseWait.setVisible(true);
+        	 cacheMetadata();
+        	 lastEntryPush(list.getFocusObject());
+        	 doRefresh();
+        	 break;
       }
       
       return super.handleKeyPress(code, rawcode);
    }
    
-   public void lastEntryPush(String name) {
-      Log.verbose("name=" + name + ", level:" + level);
+   public void cacheMetadata() {
+	   MetaData m = new MetaData();
+	   for (int i=0;i<list.size();i++) {
+		   list.get(i).getMetadata(m);
+	   }
+   }
+   
+   public void lastEntryPush(Object o) {
+      Log.verbose("name=" + o.toString()+ ", level:" + level);
       //lastEntry.push(name);
       sapp.lastEntry.setSize(Math.max(sapp.lastEntry.size(), level+1));
-      sapp.lastEntry.setElementAt(name, level);
+      sapp.lastEntry.setElementAt(o, level);
    }
-   public String getLastEntry() {
-	   String e = null;
+   public Object getLastEntry() {
+	   Object e = null;
 	   if (level < sapp.lastEntry.size())
 		   e = sapp.lastEntry.elementAt(level);
-	   Log.verbose("getLastEntry: level: " + level + ", name: " + e);
+	   Log.verbose("getLastEntry: level: " + level + ", name: " + (e == null ? "null" : e.toString()));
 	   return e;
    }
    /*

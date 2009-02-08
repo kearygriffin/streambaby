@@ -27,6 +27,7 @@ import com.coremedia.iso.boxes.MovieBox;
 import com.coremedia.iso.boxes.UserDataBox;
 import com.coremedia.iso.boxes.apple.*;
 import com.unwiredappeal.mediastreams.VideoInformation;
+import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.modules.StreamBabyModule;
 import com.unwiredappeal.tivo.utils.Log;
@@ -35,8 +36,17 @@ import com.unwiredappeal.tivo.utils.Utils;
 
 public class MP4MetadataModule extends BaseMetadataModule {
 
+	public static ConfigEntry cfgMp4Metadata = new ConfigEntry(
+			"meta.mp4.disable",
+			"false",
+			"Disable mp4 metadata processing"
+			);
+	
 	@Override
 	public boolean initialize(StreamBabyModule m) {
+		super.initialize(m);
+		if (cfgMp4Metadata.getBool() == true)
+			return false;
 		Logger.getLogger(BoxFactory.class.getName()).setLevel(Level.WARNING);
 		return true;
 	}

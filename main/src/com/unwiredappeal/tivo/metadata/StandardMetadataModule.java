@@ -24,6 +24,7 @@ import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.ConfigurationManager;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
+import com.unwiredappeal.tivo.modules.StreamBabyModule;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
 
@@ -40,6 +41,11 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			if (title != null)
 				meta.setTitle(title);
 		}
+	}
+	
+	public boolean initialize(StreamBabyModule parent) {
+		super.initialize(parent);
+		return true;
 	}
 	public boolean handlePyTivo(String data, MetaData m) {
 		PyTivoParser parser = new PyTivoParser();

@@ -386,6 +386,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"Use metadata title instead of filename when available"
 			);
 
+	public static ConfigEntry cfgUseTitleCachedOnly = new ConfigEntry(
+			"use.title.cachedonly",
+			"true",
+			"Only use cached titles in selection list"
+			);
+
 	public static ConfigEntry cfgSortByFilename= new ConfigEntry(
 			"sort.filename",
 			"false",

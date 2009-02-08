@@ -7,7 +7,7 @@
 <head>
 </head>
 <body>
-    <font face="arial" color="white" size="5">
+    <font face="arial" color="white" size="4444">
     <b><xsl:value-of select="pytivo/title"/></b>
     <br/><xsl:value-of select="pytivo/description"/>
     <font size="4">
