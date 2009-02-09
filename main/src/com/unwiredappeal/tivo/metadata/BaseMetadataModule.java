@@ -5,12 +5,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,12 +59,22 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 		return true;
 	}
 	
-	public static synchronized Templates getXsltTransformer(String xsl) throws TransformerConfigurationException {
+	public static synchronized Templates getXsltTransformer(URL xsl) throws TransformerConfigurationException {
 		Templates tp = cachedTransformers.get(xsl);
 		if (tp != null)
 			return tp;
 		// construct a transformer using the echo stylesheet
-		StreamSource xslSource = new StreamSource(xsl);
+		InputStream is;
+		try {
+			is = xsl.openConnection().getInputStream();
+		} catch (IOException e) {
+			Log.error("Error opening XSLT stream:" + xsl.toExternalForm());
+			throw new TransformerConfigurationException(e);
+		}
+		StreamSource xslSource = new StreamSource(is, xsl.toExternalForm());
+		try {
+			is.close();
+		} catch(IOException e) { }
 		TransformerFactory factory = TransformerFactory.newInstance();		
 		tp = factory.newTemplates(xslSource);
 		return tp;
@@ -73,14 +85,14 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 		if (defaultXsl == null)
 			defaultXsl = DEFAULT_XSL;
 		
-		List<String> xslFiles = new LinkedList<String>();
+		List<File> xslFiles = new LinkedList<File>();
 		if (xsl != null) {
 			String[] xslSplit = xsl.split(",");
 			for (String fn : xslSplit) {
 				String xslFileName = StreamBabyConfig.convertRelativePath(fn, StreamBabyConfig.streamBabyDir + File.separator + "stylesheets");
 				File f = new File(xslFileName);
 				if (f.exists())
-					xslFiles.add(xslFileName);
+					xslFiles.add(new File(xslFileName));
 			}
 		}
 		if (xslFiles.isEmpty()) {
@@ -88,21 +100,24 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 			File f = new File(xslFileName);
 			if (!f.exists())
 				return false;
-			xslFiles.add(xslFileName);
+			xslFiles.add(new File(xslFileName));
 		}
 		
 		
 
 		String resultStr = null;
-		for (String xslFile : xslFiles) {
+		for (File xslFile : xslFiles) {
 			if (resultStr != null)
 				source = new SAXSource(new InputSource(new StringReader(resultStr)));
 			Transformer transformer;
 			try {
-				Templates cachedXsl = getXsltTransformer(xslFile);
+				Templates cachedXsl = getXsltTransformer(xslFile.toURL());
 				transformer = cachedXsl.newTransformer();
 				//transformer = factory.newTransformer(xslSource);
 			} catch (TransformerConfigurationException e) {
+				Log.error("Unable to load xslt transformer:" + e);
+				continue;
+			} catch (MalformedURLException e) {
 				Log.error("Unable to load xslt transformer:" + e);
 				continue;
 			}
