@@ -75,6 +75,9 @@ public class DirEntry implements Comparable<DirEntry> {
 			return name;
 		if (!StreamBabyConfig.cfgUseTitle.getBool())
 			return getStrippedFilename();
+		String cachedTitle = TitleCacher.getInstance().getCachedTitle(uri);
+		if (cachedTitle != null)
+			return cachedTitle;
 		if (!cachedMeta && !StreamBabyConfig.cfgUseTitleCachedOnly.getBool()) {
 			MetaData m = new MetaData();
 			getMetadata(m);
@@ -227,6 +230,8 @@ public class DirEntry implements Comparable<DirEntry> {
 		if (isFolder())
 			return false;
 		this.hasMeta = VideoModuleHelper.inst.setMetadata(meta, this, getVideoInformation());
+		if (this.hasMeta)
+			TitleCacher.getInstance().setCachedTitle(uri, meta);
 		meta.copy(this.meta);
 		return hasMeta;
 	}

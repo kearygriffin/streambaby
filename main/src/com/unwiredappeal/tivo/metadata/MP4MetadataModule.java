@@ -162,6 +162,7 @@ public class MP4MetadataModule extends BaseMetadataModule {
 		if (lowerCaseName.endsWith(".mp4") || lowerCaseName.endsWith(".mov") || lowerCaseName.endsWith(".m4a") || lowerCaseName.endsWith(".m4v")) {
 			try {
 				SBDataSource source = new SBDataSource(f);
+				m.setReference(f);
 				iso = new IsoFile(source);
 				return parseIsoBoxes(uri, iso, m, vi);
 			} catch (FileNotFoundException e) {

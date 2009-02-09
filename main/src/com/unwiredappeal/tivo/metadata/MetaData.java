@@ -11,12 +11,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 
@@ -25,9 +27,13 @@ import org.w3c.tidy.Tidy;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.utils.Log;
 
-public class MetaData {
+public class MetaData implements Serializable {
 	
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final int METADATA_URL = 1;
 	public static final int METADATA_STRING = 2;
 	public static final int METADATA_HTML = 3;
@@ -39,7 +45,13 @@ public class MetaData {
 	int dataType = -1;
 	String urlStr = null;
 	String title = null;
+	public long refModDate = -1;
+	public String refFile;
 	
+	public void setReference(File f) {
+		this.refFile = f.getAbsolutePath();
+		this.refModDate = f.lastModified();
+	}
 	public void copy(MetaData copy) {
 		copy.data = data;
 		copy.bufferedImage = bufferedImage;
@@ -47,6 +59,8 @@ public class MetaData {
 		copy.urlStr = urlStr;
 		copy.isConverted = isConverted;
 		copy.title = title;
+		copy.refFile = refFile;
+		copy.refModDate = refModDate;
 	}
 	
 	public String getUrl() {

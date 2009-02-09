@@ -1,8 +1,8 @@
 package com.unwiredappeal.virtmem;
 
 public abstract class AbstractMemoryManager {
-	Memory freeMemory = new Memory();
-	AllocationMethod allocMethod = new Buddy();
+	protected Memory freeMemory = new Memory();
+	protected AllocationMethod allocMethod = new Buddy();
 	
 	public synchronized MemChunk alloc(int size) {
 		MemoryArea area = null;

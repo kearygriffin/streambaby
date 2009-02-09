@@ -140,6 +140,7 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 		if (f == null)
 			return null;
 		
+		m.setReference(f);
 		try {
 			m.setBaseUrl(f.toURL().toExternalForm());
 		} catch (MalformedURLException e2) {

@@ -32,7 +32,8 @@ public final static String SHORTNAME = "Buddy";
 */
 public final static String LONGNAME = "Buddy-System";
 
-public static int MIN_MEM_BLOCK = 4096;
+public static int DEFAULT_MIN_MEM_BLOCK = 4096;
+public int minMemBlock = DEFAULT_MIN_MEM_BLOCK;
 /**
 * Buddy-System is an implementation of the allocatio method class
 * and searches for the next avalable free memory area starting from
@@ -41,6 +42,15 @@ public static int MIN_MEM_BLOCK = 4096;
 */
 public Buddy() {
  super(SHORTNAME, LONGNAME);
+}
+
+public Buddy(int minMemBlock) {
+	 this();
+	 this.minMemBlock = minMemBlock;
+	}
+
+public void setMinMemBlock(int minMemBlock) {
+	this.minMemBlock = minMemBlock;
 }
 
 /**
@@ -208,8 +218,8 @@ public MemoryArea getFreeArea(Memory freeMemory, int reqSize) {
              tempMA,
              tempMA2;
 
- if (reqSize < MIN_MEM_BLOCK)
-	 reqSize = MIN_MEM_BLOCK;
+ if (reqSize < minMemBlock)
+	 reqSize = minMemBlock;
 
  // Round up the requestedSize to the next power of 2
  reqSizeRound  = getNextPow(reqSize);
