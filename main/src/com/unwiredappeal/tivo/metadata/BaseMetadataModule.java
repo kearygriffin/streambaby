@@ -59,22 +59,12 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 		return true;
 	}
 	
-	public static synchronized Templates getXsltTransformer(URL xsl) throws TransformerConfigurationException {
+	public static synchronized Templates getXsltTransformer(File xsl) throws TransformerConfigurationException {
 		Templates tp = cachedTransformers.get(xsl);
 		if (tp != null)
 			return tp;
 		// construct a transformer using the echo stylesheet
-		InputStream is;
-		try {
-			is = xsl.openConnection().getInputStream();
-		} catch (IOException e) {
-			Log.error("Error opening XSLT stream:" + xsl.toExternalForm());
-			throw new TransformerConfigurationException(e);
-		}
-		StreamSource xslSource = new StreamSource(is, xsl.toExternalForm());
-		try {
-			is.close();
-		} catch(IOException e) { }
+		StreamSource xslSource = new StreamSource(xsl);
 		TransformerFactory factory = TransformerFactory.newInstance();		
 		tp = factory.newTemplates(xslSource);
 		return tp;
@@ -111,17 +101,13 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 				source = new SAXSource(new InputSource(new StringReader(resultStr)));
 			Transformer transformer;
 			try {
-				Templates cachedXsl = getXsltTransformer(xslFile.toURL());
+				Templates cachedXsl = getXsltTransformer(xslFile);
 				transformer = cachedXsl.newTransformer();
 				//transformer = factory.newTransformer(xslSource);
 			} catch (TransformerConfigurationException e) {
 				Log.error("Unable to load xslt transformer:" + e);
 				continue;
-			} catch (MalformedURLException e) {
-				Log.error("Unable to load xslt transformer:" + e);
-				continue;
 			}
-	
 			// transform the SAXSource to the result
 			StringWriter sw = new StringWriter();
 			StreamResult result = new StreamResult(sw);

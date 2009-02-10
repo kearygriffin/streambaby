@@ -1,4 +1,4 @@
- ===SVN===
+ ===V0.22beta===
  * Changed default for quality.2channel to zero, effectively disabling it.  Newer ffmpeg doesn't like to do this for 5.1 aac -> 2 channel ac3
  * Added support for new ffmpeg, AVStream->sample_aspect_ratio 
  * Added 3gp, mov to supported extension
