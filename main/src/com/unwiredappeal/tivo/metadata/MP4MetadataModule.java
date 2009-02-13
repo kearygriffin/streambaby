@@ -181,7 +181,10 @@ public class MP4MetadataModule extends BaseMetadataModule {
 	    // System.out.println("box = " + box);
 	    if (in.getStreamPosition() - offset < size && contentSize != -1) {
 	      // System.out.println("dead bytes found in " + box);
-	      box.setDeadBytes(in.read((int) (size - (in.getStreamPosition() - offset))));
+	    	int skip = (int) (size - (in.getStreamPosition() - offset));
+	    	if (skip < 0)
+	    		throw new IOException();
+	    	box.setDeadBytes(in.read(skip));
 	    	//in.skip((int) (size - (in.getStreamPosition() - offset)));
 	    }
 
@@ -364,6 +367,9 @@ public class MP4MetadataModule extends BaseMetadataModule {
 				return parseIsoBoxes(uri, f, m);
 			} catch (FileNotFoundException e) {
 			} catch (IOException e) {
+			} catch (Exception e) {
+				Log.error("Error parsing mp4 information");
+				Log.printStackTrace(e);
 			}
 		}
 		return false;
