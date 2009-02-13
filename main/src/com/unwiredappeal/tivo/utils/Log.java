@@ -4,6 +4,8 @@ package com.unwiredappeal.tivo.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -135,5 +137,13 @@ public class Log {
 
 	public ILogger getILogger() {
 		return new ILoggerImpl();
+	}
+	public static void printStackTrace(Throwable t) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		pw.flush();
+		sw.flush();
+		t.printStackTrace(pw);
+		error(sw.toString());
 	}
 }

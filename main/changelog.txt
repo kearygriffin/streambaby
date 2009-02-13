@@ -1,4 +1,4 @@
- ===SVN===
+ ===V.023beta===
  * Attempt to fix ffmpeg crashes in av_close_input_file (function frees structure, but JNA attempts to read it back after call completes)
  * Change method of parsing title for pyTivo & tivo XML files
  * Fixed bug causing crashes if dir.x did not exit (in cache cleanup code)
