@@ -97,15 +97,17 @@ public class PreviewCacheUtils {
 				     }
 				  };
 			      File[] files = newDir.listFiles(filter);
-			      for (int i=0;i<files.length;i++) {
-			    	  File f = files[i];
-			    	  DirEntry newDirEntry = new DirEntry(f.toURI());
-			    	  if (newDirEntry.isFolder) {
-				    	  thisEntry.addEntry(newDirEntry);
-			    	  }
-			    	  else
-			    		  callback.callback(newDirEntry);
-
+			      if (files != null) {
+					      for (int i=0;i<files.length;i++) {
+					    	  File f = files[i];
+					    	  DirEntry newDirEntry = new DirEntry(f.toURI());
+					    	  if (newDirEntry.isFolder) {
+						    	  thisEntry.addEntry(newDirEntry);
+					    	  }
+					    	  else
+					    		  callback.callback(newDirEntry);
+		
+					      }
 			      }
 			      recursiveFill(thisEntry, level+1, callback);
 			  }

@@ -328,8 +328,10 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 		    codecCtx = null;
 			*/
 		    // Close the video file
-		    if (formatCtx != null)
+		    if (formatCtx != null) {
+		    	formatCtx.setAutoRead(false);
 			    avFormat.av_close_input_file(formatCtx);
+		    }
 		    formatCtx = null;
 		}
 		Log.debug("VideoInfo:\n" + vidinfo.toString());
@@ -561,13 +563,17 @@ public class FFmpegJavaVideoModule extends BaseFFmpegVideoModule implements Stre
 		    frame = null;
 
 		    // Close the codec
-		    if (codecCtx != null && codecCtx.codec_id != 0)
+		    if (codecCtx != null && codecCtx.codec_id != 0) {
+		    	codecCtx.setAutoRead(false);
 		    	avCodec.avcodec_close(codecCtx);
+		    }
 		    codecCtx = null;
 
 		    // Close the video file
-		    if (formatCtx != null)
+		    if (formatCtx != null) {
+		    	formatCtx.setAutoRead(false);
 			    avFormat.av_close_input_file(formatCtx);
+		    }
 		    formatCtx = null;
 		    
 		    if (jpgWriter != null)

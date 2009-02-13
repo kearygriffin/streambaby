@@ -31,16 +31,41 @@ import com.unwiredappeal.tivo.utils.Utils;
 public class StandardMetadataModule extends BaseMetadataModule {
 
 	private static Pattern pyTivoPattern = Pattern.compile("^\\w+\\s+:\\s+.*");
-	private static Pattern pyTivoTitlePattern= Pattern.compile(".*^title\\s+:\\s+([^\n\r]+)$.*", Pattern.MULTILINE|Pattern.DOTALL);
+	//private static Pattern pyTivoTitlePattern= Pattern.compile(".*^title\\s+:\\s+([^\n\r]+)$.*", Pattern.MULTILINE|Pattern.DOTALL);
 	private static Pattern urlSchemePattern = Pattern.compile("\\w+://.*");
 
-	private void setPyTivoTitle(String data, MetaData meta) {
+	private String getMetaTitle(String title, String episodeTitle, String seriesTitle, String isEpisodic) {
+		String t = null;
+		if (title != null)
+			t = title;
+		// If we are an episode, we can do better?
+		if (isEpisodic != null && isEpisodic.equals("true") && seriesTitle != null && seriesTitle.length() > 0 && episodeTitle != null && episodeTitle.length() > 0)
+			t = seriesTitle + " - " + episodeTitle;
+		else if (title != null && title.length() > 0)
+			t = title;
+		else if (seriesTitle != null && seriesTitle.length() > 0)
+			t = seriesTitle;
+		else if (episodeTitle != null && episodeTitle.length() > 0)
+			t = episodeTitle;
+		return t;
+		
+	}
+	private void setPyTivoTitle(PyTivoParser p, MetaData meta) {
+		/*
 		Matcher m = pyTivoTitlePattern.matcher(data);
 		if (m.matches()) {
 			String title = m.group(1);
 			if (title != null)
 				meta.setTitle(title);
 		}
+		*/
+		String episodeTitle = p.elementMap.get("episodeTitle");
+		String title  = p.elementMap.get("title");
+		String seriesTitle  = p.elementMap.get("title");
+		String isEpisodic = p.elementMap.get("isEpisodic");
+		String t = getMetaTitle(title, episodeTitle, seriesTitle, isEpisodic);
+		if (t != null)
+			meta.setTitle(t);
 	}
 	
 	public boolean initialize(StreamBabyModule parent) {
@@ -54,7 +79,7 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		boolean b = transform(m, source, StreamBabyConfig.cfgPyTivoXsl.getValue(),
 				null);
 		if (b)
-			setPyTivoTitle(data, m);
+			setPyTivoTitle(parser, m);
 		return b;
 	}
 
@@ -84,13 +109,12 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			String root = doc.getDocumentElement().getNodeName();
 			if (root == null)
 				return false;
-			String title = getFirstText(doc, "title");
-			if (title != null) {
-				String epTitle = getFirstText(doc, "episodeTitle");
-				if (epTitle != null) {
-					title = title + " - " + epTitle;
-				}
-			}
+			String episodeTitle = getFirstText(doc, "episodeTitle");
+			String title  = getFirstText(doc, "title");
+			String seriesTitle  = getFirstText(doc, "seriesTitle");
+			String isEpisodic = getFirstText(doc, "isEpisodic");
+			String t = getMetaTitle(title, episodeTitle, seriesTitle, isEpisodic);
+			
 			int index = root.lastIndexOf(':');
 			if (index >= 0) {
 				root = root.substring(index + 1);
@@ -108,8 +132,8 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			}
 			boolean b = transform(m, new SAXSource(new InputSource(new StringReader(data))), xsl,
 					null);
-			if (b && title != null)
-				m.setTitle(title);
+			if (b && t != null)
+				m.setTitle(t);
 			return b;
 
 		} catch (ParserConfigurationException e) {
