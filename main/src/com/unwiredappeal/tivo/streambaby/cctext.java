@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
@@ -15,7 +14,6 @@ import org.arabidopsis.interval.IntervalTree;
 
 import com.tivo.hme.bananas.BView;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
-import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.views.bgtext;
 
 public class cctext {

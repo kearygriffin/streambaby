@@ -3,7 +3,6 @@ package com.unwiredappeal.tivo.dir;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Hashtable;
 
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.metadata.MetaData;

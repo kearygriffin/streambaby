@@ -423,6 +423,13 @@ public class StreamBabyConfig extends ConfigurableObject {
 			);
 	
 
+	public static ConfigEntry cfgDisableVidInfoMeta= new ConfigEntry(
+			"meta.vidinfo.disable",
+			"true",
+			"Set to false to enable parsing of metadata from videoinformation module"
+			);
+	
+
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
@@ -450,7 +457,6 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"com.unwiredappeal.tivo.vm.ffjava.FFmpegJavaVideoModule",
 			"com.unwiredappeal.tivo.vm.ffexe.FFmpegExeVideoModule",
 			"com.unwiredappeal.tivo.metadata.StandardMetadataModule",
-			"com.unwiredappeal.tivo.metadata.TaggerMetadataModule",
 			"com.unwiredappeal.tivo.metadata.MP4MetadataModule"
 	};
 	

@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.MalformedURLException;
 
-import com.tivo.hme.bananas.BScrollPanePlus;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BViewPlus;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
@@ -16,7 +15,6 @@ import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.TempFileManager;
 import com.unwiredappeal.tivo.views.BScrollableText;
 import com.unwiredappeal.tivo.views.SBScrollPanePlus;
-import com.unwiredappeal.tivo.views.VText;
 
 public class MetaDataViewer {
 	public BView getView(MetaData meta, BView parent, int x, int y, int width, int height) {

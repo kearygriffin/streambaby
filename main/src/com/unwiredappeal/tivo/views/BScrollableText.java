@@ -9,7 +9,6 @@ import com.tivo.hme.sdk.HmeEvent.FontInfo;
 import com.tivo.hme.sdk.HmeEvent.FontInfo.GlyphInfo;
 import com.tivo.hme.sdk.Resource.FontResource;
 import com.unwiredappeal.tivo.streambaby.StreamBabyStream;
-import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.WordWrap;
 import com.unwiredappeal.tivo.views.VText.FontSizeInfo;
 

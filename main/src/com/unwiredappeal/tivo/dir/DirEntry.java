@@ -229,7 +229,8 @@ public class DirEntry implements Comparable<DirEntry> {
 		cachedMeta = true;
 		if (isFolder())
 			return false;
-		this.hasMeta = VideoModuleHelper.inst.setMetadata(meta, this, getVideoInformation());
+		VideoInformation vi = null;
+		this.hasMeta = VideoModuleHelper.inst.setMetadata(meta, this);
 		if (this.hasMeta)
 			TitleCacher.getInstance().setCachedTitle(uri, meta);
 		meta.copy(this.meta);

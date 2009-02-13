@@ -16,7 +16,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		<xsl:if test="$hasimage">
 			<xsl:element name="img" use-attribute-sets="imgset"/>
 		</xsl:if>
-		<font face="arial" color="white" size="4">
+		<font face="arial" color="white" size="3">
 			<xsl:apply-templates select="meta"/>
 		</font>
 	</body></html>

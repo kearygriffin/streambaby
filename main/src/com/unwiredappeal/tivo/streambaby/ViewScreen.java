@@ -1245,7 +1245,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		preview.setNextFrame(newPos, 0);
 		preview.makeVisible(true);
 		// Start up the timer
-		Ticker.master.add(this, System.currentTimeMillis(), null);
+		//Ticker.master.add(this, System.currentTimeMillis(), null);
 	}
 
 	public synchronized void setIsPreviewing(boolean b) {
@@ -1264,11 +1264,13 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		_lastSpeed = sp;
 	}
 	
-	public synchronized void handleCC() {
+	public synchronized boolean handleCC() {
 		if (ccEnabled()) {
 			long delta = System.currentTimeMillis() - lastPositionUpdate;
 			cc.display(position+startPosition+delta);
-		}
+			return true;
+		} else
+			return false;
 	}
 
 	public synchronized long tick(long tm, Object arg) {
@@ -1280,15 +1282,22 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		if (gotoPos != -1) {
 			finishGoto(gotoPos);
 			gotoPos = -1;
-			flush();
-			//return -1;
 		}
-		long ret = previewTick();
-		handleCC();
-		flush();
+		
+		long ctime = System.currentTimeMillis();		
+		long nextPreview = previewTick();
+		
+		long nextCC;
+		boolean ccret = handleCC();
+		if (ccret)
+			nextCC = ctime + 100;
+		else
+			nextCC = ctime + 500;
 
-		return System.currentTimeMillis() + 100;
-		//return ret;
+		flush();
+		
+		long nxt = (nextPreview == -1) ? nextCC : Math.min(nextPreview, nextCC);
+		return nxt;
 	}
 
 	public long previewTick() {

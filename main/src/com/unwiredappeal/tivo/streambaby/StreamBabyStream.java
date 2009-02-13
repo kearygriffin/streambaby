@@ -25,8 +25,6 @@ import com.tivo.hme.sdk.HmeEvent;
 import com.tivo.hme.sdk.ImageResource;
 import com.tivo.hme.sdk.Resolution;
 import com.tivo.hme.sdk.ResolutionInfo;
-import com.tivo.hme.sdk.Resource;
-import com.tivo.hme.sdk.Resource.FontResource;
 import com.unwiredappeal.mediastreams.AutoPreviewGenerationManager;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;

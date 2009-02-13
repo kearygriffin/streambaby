@@ -227,7 +227,7 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		return false;
 
 	}
-	public boolean setMetadata(MetaData m, URI uri, VideoInformation vi) {
+	public boolean setMetadata(MetaData m, URI uri) {
 		if (!Utils.isFile(uri))
 			return false;
 		File f = new File(uri);
@@ -254,8 +254,11 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			return true;
 		
 		// do we have metadata from the video parser?
-		if (vi.getMetadataMap().size() > 0)
-			return handleVidMeta(vi, m);
+		if (!StreamBabyConfig.cfgDisableVidInfoMeta.getBool()) {
+			VideoInformation vi = VideoInformation.getVideoInformation(uri);
+			if (vi != null && vi.getMetadataMap().size() > 0)
+				return handleVidMeta(vi, m);			
+		}
 		return false;
 	}
 

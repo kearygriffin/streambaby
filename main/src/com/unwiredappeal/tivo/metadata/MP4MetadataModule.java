@@ -8,11 +8,9 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.xml.transform.sax.SAXSource;
@@ -21,7 +19,6 @@ import org.xml.sax.InputSource;
 
 
 import com.coremedia.iso.BoxFactory;
-import com.coremedia.iso.FileRandomAccessDataSource;
 import com.coremedia.iso.IsoFile;
 import com.coremedia.iso.IsoInputStream;
 import com.coremedia.iso.IsoOutputStream;
@@ -33,7 +30,6 @@ import com.coremedia.iso.boxes.MetaBox;
 import com.coremedia.iso.boxes.MovieBox;
 import com.coremedia.iso.boxes.UserDataBox;
 import com.coremedia.iso.boxes.apple.*;
-import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.modules.StreamBabyModule;
@@ -252,7 +248,7 @@ public class MP4MetadataModule extends BaseMetadataModule {
 
 	}
 
-	protected boolean parseIsoBoxes(URI uri, File f, MetaData m, VideoInformation vi) throws IOException {
+	protected boolean parseIsoBoxes(URI uri, File f, MetaData m) throws IOException {
 		Map<String, String> metaMap = null;
 		SBDataSource isosource = new SBDataSource(f);				
 		IsoFile iso = null;
@@ -357,16 +353,15 @@ public class MP4MetadataModule extends BaseMetadataModule {
 	//setMetadataItem(vidinfo, "album", formatCtx.album);
 	//setMetadataItem(vidinfo, "genre", formatCtx.genre);
 
-	public boolean setMetadata(MetaData m, URI uri, VideoInformation vi) {
+	public boolean setMetadata(MetaData m, URI uri) {
 		if (!Utils.isFile(uri))
 			return false;
 		File f = new File(uri);
 		String lowerCaseName = f.getName();
-		IsoFile iso = null;
 		if (lowerCaseName.endsWith(".mp4") || lowerCaseName.endsWith(".mov") || lowerCaseName.endsWith(".m4a") || lowerCaseName.endsWith(".m4v")) {
 			try {
 				m.setReference(f);
-				return parseIsoBoxes(uri, f, m, vi);
+				return parseIsoBoxes(uri, f, m);
 			} catch (FileNotFoundException e) {
 			} catch (IOException e) {
 			}

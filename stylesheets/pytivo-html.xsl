@@ -7,7 +7,7 @@
 <head>
 </head>
 <body>
-    <font face="arial" color="white" size="4">
+    <font face="arial" color="white" size="3">
     <b>
 <xsl:choose>
       <xsl:when test="pytivo/isEpisode">
@@ -39,7 +39,7 @@
 
     </b>
     <br/><xsl:value-of select="pytivo/description"/>
-    <font size="4">
+    <font size="3">
     <br/><xsl:apply-templates select="pytivo/vActor[position() &lt; 4]"/>
     <br/><i><xsl:apply-templates select="pytivo/vProgramGenre"/></i>
     </font></font>

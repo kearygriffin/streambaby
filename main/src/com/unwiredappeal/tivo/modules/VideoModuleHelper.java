@@ -111,12 +111,12 @@ public class VideoModuleHelper {
 		
 	}
 
-	public boolean setMetadata(MetaData m, DirEntry de, VideoInformation vinfo) {
+	public boolean setMetadata(MetaData m, DirEntry de) {
 		URI uri = de.getUri();
 		Iterator<MetadataModule> it = getMetadataModulesIterator();
 		while(it.hasNext()) {
 			MetadataModule meta = it.next();
-			if (meta.setMetadata(m, uri, vinfo) && m.hasMetaData())
+			if (meta.setMetadata(m, uri) && m.hasMetaData())
 				return true;				
 		}
 		m.setString(de.getStrippedFilename());
