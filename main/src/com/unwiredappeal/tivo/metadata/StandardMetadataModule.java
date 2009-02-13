@@ -61,8 +61,8 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		*/
 		String episodeTitle = p.elementMap.get("episodeTitle");
 		String title  = p.elementMap.get("title");
-		String seriesTitle  = p.elementMap.get("title");
-		String isEpisodic = p.elementMap.get("isEpisodic");
+		String seriesTitle  = p.elementMap.get("seriesTitle");
+		String isEpisodic = p.elementMap.get("isEpisode");
 		String t = getMetaTitle(title, episodeTitle, seriesTitle, isEpisodic);
 		if (t != null)
 			meta.setTitle(t);
@@ -112,7 +112,7 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			String episodeTitle = getFirstText(doc, "episodeTitle");
 			String title  = getFirstText(doc, "title");
 			String seriesTitle  = getFirstText(doc, "seriesTitle");
-			String isEpisodic = getFirstText(doc, "isEpisodic");
+			String isEpisodic = getFirstText(doc, "isEpisode");
 			String t = getMetaTitle(title, episodeTitle, seriesTitle, isEpisodic);
 			
 			int index = root.lastIndexOf(':');

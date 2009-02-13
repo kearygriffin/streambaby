@@ -2,6 +2,7 @@
  * Attempt to fix ffmpeg crashes in av_close_input_file (function frees structure, but JNA attempts to read it back after call completes)
  * Change method of parsing title for pyTivo & tivo XML files
  * Fixed bug causing crashes if dir.x did not exit (in cache cleanup code)
+ * Optimized & fixed bugs in mp4 metadata reading
  
  ===V0.22beta===
  * Changed default for quality.2channel to zero, effectively disabling it.  Newer ffmpeg doesn't like to do this for 5.1 aac -> 2 channel ac3
