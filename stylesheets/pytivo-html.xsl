@@ -8,7 +8,36 @@
 </head>
 <body>
     <font face="arial" color="white" size="4">
-    <b><xsl:value-of select="pytivo/title"/></b>
+    <b>
+<xsl:choose>
+      <xsl:when test="pytivo/isEpisode">
+        <xsl:choose>
+          <xsl:when test="pytivo/seriesTitle and pytivo/episodeTitle">
+            <xsl:value-of select="pytivo/seriesTitle"/> - <xsl:value-of select="pytivo/episodeTitle"/>
+          </xsl:when>
+          <xsl:when test="pytivo/episodeTitle">
+            <xsl:value-of select="pytivo/episodeTitle"/>
+          </xsl:when>
+          <xsl:when test="pytivo/seriesTitle">
+            <xsl:value-of select="pytivo/seriesTitle"/>
+          </xsl:when>
+          <xsl:when test="pytivo/title">
+            <xsl:value-of select="pytivo/title"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- Default Title Here?? -->
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="pytivo/title">
+        <xsl:value-of select="pytivo/title"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- Default Title Here?? -->
+      </xsl:otherwise>
+  </xsl:choose>
+
+    </b>
     <br/><xsl:value-of select="pytivo/description"/>
     <font size="4">
     <br/><xsl:apply-templates select="pytivo/vActor[position() &lt; 4]"/>
