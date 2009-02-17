@@ -223,6 +223,33 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		System.out.println("Done");
 	}
 
+	public boolean isProfileOk(int profile, int level) {
+		return (profile <= 100 && level <= 41);
+	}
+	public boolean canStream(URI uri, VideoInformation vinfo) {
+		boolean b = super.canStream(uri, vinfo);
+		if (!b)
+			return b;
+		
+		
+		// Ok, so far so good.
+		Integer profile = (Integer)vinfo.getCodecExtra("mp4_profile");		
+		Integer level = (Integer)vinfo.getCodecExtra("mp4_level");
+		if (level != null && profile != null) {
+			return isProfileOk(profile.intValue(), level.intValue());
+		}
+		
+		try {
+			StreamableMP4 mp4 = new StreamableMP4(new File(uri).getAbsoluteFile(), Long.MAX_VALUE, false);
+			mp4.close();
+			vinfo.setCodecExtra("mp4_profile", new Integer(mp4.profile));
+			vinfo.setCodecExtra("mp4_level", new Integer(mp4.profileLevel));			
+			return isProfileOk(mp4.profile, mp4.profileLevel);
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
 
 
 }

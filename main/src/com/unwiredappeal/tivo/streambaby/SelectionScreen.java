@@ -3,12 +3,14 @@
 package com.unwiredappeal.tivo.streambaby;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import com.tivo.hme.bananas.BApplicationPlus;
 import com.tivo.hme.bananas.BHighlights;
 import com.tivo.hme.bananas.BListPlus;
+import com.tivo.hme.bananas.BScreen;
 import com.tivo.hme.bananas.BText;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BViewPlus;
@@ -20,6 +22,7 @@ import com.tivo.hme.bananas.layout.LayoutManager;
 import com.tivo.hme.sdk.util.Ticker;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
+import com.unwiredappeal.tivo.dir.MediaFileType;
 import com.unwiredappeal.tivo.metadata.MetaData;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.views.VText;
@@ -249,7 +252,8 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
              //newScreen.setTitle(newScreen.toString());
              getBApp().push(newScreen, TRANSITION_LEFT);
           } else {
-        	  PlayScreen newScreen = new PlayScreen(getBApp(), entry);
+        	  BScreen newScreen = entry.getFileType().createPlayScreen(getBApp(), entry);
+        	  //PlayScreen newScreen = new PlayScreen(getBApp(), entry);
              getBApp().push(newScreen, TRANSITION_LEFT);
        }
 
@@ -302,14 +306,17 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 	      if (entry.isFolder()) {
 	    	  List<DirEntry> dlist = entry.getEntryList(sapp.getPassword());
 	    	  if (dlist != null && !dlist.isEmpty()) {
-	    		  ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
+		    	  BScreen newScreen = entry.getFileType().createViewerScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
+
+	    		  //ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
 		          getBApp().push(newScreen, TRANSITION_LEFT);
 		          lastEntryPush(entry);	    		  
 	    	  } else {
 	    		  play("bonk.snd");
 	    	  }
 	      } else {
-	     	  ViewScreen newScreen = new ViewScreen(getBApp(), entry, StreamBabyConfig.inst.getDefaultQuality());
+	    	  BScreen newScreen = entry.getFileType().createViewerScreen(getBApp(), Arrays.asList(new DirEntry[] { entry }), null, StreamBabyConfig.inst.getDefaultQuality());
+	     	  //ViewScreen newScreen = new ViewScreen(getBApp(), entry, StreamBabyConfig.inst.getDefaultQuality());
 	          getBApp().push(newScreen, TRANSITION_LEFT);
 	          // Update lastEntry stack
 	          lastEntryPush(entry);
@@ -325,7 +332,8 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 		    		dlist.add(entry);
 		    }
 	    	  if (dlist != null && !dlist.isEmpty()) {
-	    		  ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
+		    	  BScreen newScreen = dlist.get(0).getFileType().createViewerScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
+	    		  //ViewScreen newScreen = new ViewScreen(getBApp(), dlist, de.getName(), StreamBabyConfig.inst.getDefaultQuality());
 		          getBApp().push(newScreen, TRANSITION_LEFT);
 		          lastEntryPush(list.get(list.getFocus()));	    		  
 	    	  } else {
@@ -434,11 +442,13 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
        {
            BView icon = new BView(parent, 0, 0, 34, parent.getHeight());
            DirEntry e = (DirEntry)get(index); // ((ViewScreen)get(index)).de;
-           if (e.isFolder()) {
-               icon.setResource(StreamBabyConfig.cfgFolderIcon.getValue());
-            } else {
-            	icon.setResource(StreamBabyConfig.cfgMovieIcon.getValue());
-            }
+           String iconPath;
+           MediaFileType ft = e.getFileType();
+           if (ft != null)
+        	   iconPath = ft.getIcon();
+           else
+        	   iconPath = StreamBabyConfig.cfgMovieIcon.getValue();
+           icon.setResource(iconPath);
            BText text = new BText(parent, 40, 0, parent.getWidth(), parent.getHeight());
            text.setFlags(RSRC_HALIGN_LEFT);
            text.setShadow(true);

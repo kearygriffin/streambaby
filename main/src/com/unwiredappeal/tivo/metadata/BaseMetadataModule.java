@@ -3,8 +3,10 @@ package com.unwiredappeal.tivo.metadata;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
@@ -147,7 +149,9 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 		Reader r = null;;
 		StringWriter w = null;
 		try {
-			r = new BufferedReader(new FileReader(f));
+			InputStream is = new FileInputStream(f);
+			r = new BufferedReader(new UnicodeReader(is, "UTF-8"));
+			//r = new BufferedReader(new FileReader(f));
 			 w = new StringWriter();
 			char[] buf = new char[4096];
 			int len;

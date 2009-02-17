@@ -40,6 +40,9 @@ public class StreamableMP4 extends InputStream {
 	long startTimePos = 0;
 	LinkedList<BArray> buffers = new LinkedList<BArray>();
 	BArray curByteArray = null;
+	public int profileLevel;
+	public int profile;
+	
 	int bytePos;
 	long filelength = -1;
 	long chunkOffset;
@@ -47,6 +50,8 @@ public class StreamableMP4 extends InputStream {
 	private long subDuration = 0;
 	public static boolean defaultReInterleave = true;
 	public static float INTERLEAVE_DURATION = 0.4f;
+	public static int forceLevel = -1;
+	public static int forceProfile = -1;	
 	public static Logger logger;
 	public List<String> formats = new ArrayList<String>();
 	private static final long MAX_CHUNK_DELTA_BEFORE_INTERLEAVE = -1; // (causes issues, leave disabled) 4 * 1024 * 1024;
@@ -877,6 +882,63 @@ public class StreamableMP4 extends InputStream {
 		//
 	}
 
+	void parseSubAtoms(MP4Atom leaf_atom, BArray dst, long dstOffset, BArray src, long offset, long boxOffset) {
+		// copy the header portion
+		copyBytes(dst, dstOffset, src, offset,ATOM_PREAMBLE_SIZE+boxOffset);
+		dstOffset += ATOM_PREAMBLE_SIZE+boxOffset;
+		offset += ATOM_PREAMBLE_SIZE+boxOffset;
+		// then copy the subboxes
+		long size = leaf_atom.size_ - ATOM_PREAMBLE_SIZE;
+		size -= boxOffset;
+		while(size >= 8) {
+			MP4Atom newLeaf = atom_read_header(src, offset);
+			long as = parseAtom(newLeaf, dst, dstOffset, src, offset);
+			dstOffset += as;
+			offset += as;
+			size -= as;
+		}
+		if (size != 0) {
+			copyBytes(dst, dstOffset, src, offset, size);
+		}
+	}
+	long parseAtom(MP4Atom leaf_atom, BArray dst, long dstOffset, BArray src, long offset) {
+		if (atom_is(leaf_atom, "stsd")) {
+			byte[] b = new byte[4];
+			b[0] = (byte) src.read_char(offset+ATOM_PREAMBLE_SIZE+8+4);
+			b[1] = (byte) src.read_char(offset+ATOM_PREAMBLE_SIZE+8+5);
+			b[2] = (byte) src.read_char(offset+ATOM_PREAMBLE_SIZE+8+6);
+			b[3] = (byte) src.read_char(offset+ATOM_PREAMBLE_SIZE+8+7);
+			String format = new String(b);
+			log("Format: " + format);
+			formats.add(format);
+			parseSubAtoms(leaf_atom, dst, dstOffset, src, offset, 8);
+		} else if (atom_is(leaf_atom, "avc1")) {
+			parseSubAtoms(leaf_atom, dst, dstOffset, src, offset, 78);
+		} else if (atom_is(leaf_atom, "avcC")) {
+			byte profile = (byte) src.read_char(offset+ATOM_PREAMBLE_SIZE+1);			
+			byte level = (byte) src.read_char(offset+ATOM_PREAMBLE_SIZE+3);
+			this.profileLevel = level;
+			this.profile = profile;
+			log("Profil: " + profile);			
+			log("Profile level: " + level);
+			copyBytes(dst, dstOffset, src, offset, leaf_atom.size_);
+			if (forceLevel > 0 && level > forceLevel) {
+				level = (byte)(forceLevel&0xff);
+				log("Resetting to profile level: " + level);
+				dst.write_char((int)dstOffset+ ATOM_PREAMBLE_SIZE+3, level);
+			}
+			if (forceProfile > 0 && profile > forceProfile) {
+				profile = (byte)(forceProfile&0xff);
+				log("Resetting to profile: " + profile);
+				dst.write_char((int)dstOffset+ ATOM_PREAMBLE_SIZE+1, profile);
+			}			
+		}
+		else 
+			copyBytes(dst, dstOffset, src, offset, leaf_atom.size_);
+		// memcpy(stbl.newp_, buffer - ATOM_PREAMBLE_SIZE,
+		// leaf_atom.size_);
+		return (long)leaf_atom.size_;
+	}
 	void stbl_parse(stbl_t stbl, BArray buffer, long off, long size)
 			throws IOException {
 		MP4Atom leaf_atom;
@@ -913,6 +975,8 @@ public class StreamableMP4 extends InputStream {
 			} else if (atom_is(leaf_atom, "ctts")) {
 				stbl.ctts_ = bufferp + off;
 			} else {
+				stbl.newp_ += parseAtom(leaf_atom, stbl.new_, stbl.newp_, buffer, (off+bufferp)-ATOM_PREAMBLE_SIZE);
+				/*
 				if (atom_is(leaf_atom, "stsd")) {
 						byte[] b = new byte[4];
 						b[0] = (byte) buffer.read_char(bufferp+off+8+4);
@@ -929,6 +993,7 @@ public class StreamableMP4 extends InputStream {
 				// memcpy(stbl.newp_, buffer - ATOM_PREAMBLE_SIZE,
 				// leaf_atom.size_);
 				stbl.newp_ += leaf_atom.size_;
+				*/
 			}
 			// long xbufferp = atom_skip(bufferp, off, leaf_atom);
 			bufferp = bufferp + (leaf_atom.size_ - ATOM_PREAMBLE_SIZE); // atom_skip(buffer,
@@ -1949,11 +2014,14 @@ public class StreamableMP4 extends InputStream {
 		long smallestTime = 0;
 		do {
 			long curTrakPos = 0;
-			if (t != -1 && chunkPositions[t] != -1)
-				curTrakPos = (long) (stts_get_time(
+			if (t != -1 && chunkPositions[t] != -1) {
+				curTrakPos = stts_get_time(
 						moov.traks_[t].mdia_.minf_.stbl_.start_,
 						moov.traks_[t].mdia_.minf_.stbl_.stts_,
-						moov.traks_[t].chunks_[chunkPositions[t]].sample_) * trackToMoovTime[t]);
+						moov.traks_[t].chunks_[chunkPositions[t]].sample_);
+				curTrakPos += moov.traks_[t].samples_[(int)(moov.traks_[t].chunks_[chunkPositions[t]].sample_)].cto_;
+				curTrakPos *= trackToMoovTime[t];
+			}
 			if (t == -1 || chunkPositions[t] == -1
 					|| (curTrakPos - smallestTime) >= interDur) {
 				t = -1;
@@ -1962,10 +2030,14 @@ public class StreamableMP4 extends InputStream {
 				for (int i = 0; i < moov.tracks_; i++) {
 					if (chunkPositions[i] == -1) // this chunk is done
 						continue;
-					long timPos = (long) (stts_get_time(
+					
+					long timPos = stts_get_time(
 							moov.traks_[i].mdia_.minf_.stbl_.start_,
 							moov.traks_[i].mdia_.minf_.stbl_.stts_,
-							moov.traks_[i].chunks_[chunkPositions[i]].sample_) * trackToMoovTime[i]);
+							moov.traks_[i].chunks_[chunkPositions[i]].sample_);
+					timPos += moov.traks_[i].samples_[(int)(moov.traks_[i].chunks_[chunkPositions[i]].sample_)].cto_;					
+					timPos *= trackToMoovTime[i];
+					
 					if (t == -1 || timPos < minPos) {
 						smallestTime = minPos;
 						minPos = timPos;

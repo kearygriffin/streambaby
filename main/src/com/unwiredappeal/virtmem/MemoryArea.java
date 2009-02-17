@@ -26,10 +26,6 @@ private int size;
 */
 private int usedSize;
 
-/**
-* Number of the process to which this memory area belongs.
-*/
-private int processNumber;
 
 /**
 * Initial value for the starting position of a new memory area.
@@ -51,7 +47,6 @@ public final static int INIT_PROCESSNR = 0;
 */
 public MemoryArea() {
  super();
- this.setProcessNumber(INIT_PROCESSNR);
  this.setStartPos(INIT_STARTPOS);
  this.setSize(INIT_SIZE);
  this.setUsedSize(INIT_SIZE);
@@ -69,13 +64,24 @@ public MemoryArea(int newStartPos, int newSize) {
 }
 
 /**
+* Creates a new memory area with given values.
+*/
+public MemoryArea(int newStartPos, int newSize, int usedSize) {
+ this();
+ this.setStartPos(newStartPos);
+ this.setSize(newSize);
+ this.setUsedSize(usedSize);
+}
+
+
+/**
  * Returns a deep copy of the memory area, all elements are new created.
  */
 public MemoryArea deepCopy(){
   MemoryArea newMemoryArea = new MemoryArea(this.getStartPos(),
                                             this.getSize());
   newMemoryArea.setUsedSize(this.getUsedSize());
-  newMemoryArea.setProcessNumber(this.getProcessNumber());
+  //newMemoryArea.setProcessNumber(this.getProcessNumber());
   return newMemoryArea;
 }
 
@@ -101,12 +107,6 @@ public int getUsedSize() {
  return this.usedSize;
 }
 
-/**
-* Returns the process number to which this memory area belongs.
-*/
-public int getProcessNumber() {
- return this.processNumber;
-}
 
 
 /**
@@ -124,12 +124,6 @@ public void setStartPos(int newStartPosKB) {
  this.startPos = newStartPosKB;
 }
 
-/**
-* Sets the process number to which this memory area belongs to.
-*/
-public void setProcessNumber(int newProcessNumber) {
- this.processNumber = newProcessNumber;
-}
 
 /**
 * Sets the size of this memory area.

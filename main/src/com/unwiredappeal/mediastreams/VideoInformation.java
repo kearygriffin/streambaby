@@ -37,6 +37,7 @@ public class VideoInformation extends InfoCache.Cacheable {
 	private String videoCodec  = UNK;
 	boolean isFile = false;
 	float pixelAspect = 0;
+	private Map<String, Object> codecExtra = new HashMap<String, Object>();
 	public VideoInformation(URI uri) {
 		this.uri= uri;
 		if (Utils.isFile(uri)) {
@@ -49,6 +50,13 @@ public class VideoInformation extends InfoCache.Cacheable {
 		}
 	}
 	
+	public void setCodecExtra(String key, Object v) {
+		codecExtra.put(key, v);
+	}
+	
+	public Object getCodecExtra(String key) {
+		return codecExtra.get(key);
+	}
 	public boolean isValid() {
 		return isValid && duration > 0;
 	}

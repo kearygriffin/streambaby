@@ -31,6 +31,8 @@ public class DirEntry implements Comparable<DirEntry> {
 	private MetaData meta = new MetaData();
 	public List<DirEntry> entryList = new ArrayList<DirEntry>();
 	
+	public MediaFileType fileType;
+	
 	public DirEntry() { }
 	
 	public DirEntry(URI uri) {
@@ -39,14 +41,23 @@ public class DirEntry implements Comparable<DirEntry> {
 		this.uri = uri;
 		this.isFolder = false;
 		this.fileName = uri.toString();
-		if (Utils.isFile(uri)) {
+		if (Utils.isFileScheme(uri)) {
 			File f = new File(uri);
-			this.isFolder = f.isDirectory() || !f.exists();
 			this.fileName = f.getName();
-		}
+			boolean isf = f.isDirectory() || !f.exists();
+			if (isf)
+				fileType = new FolderFileType();
+			else
+				fileType = new StdFileType();
+		} else
+			fileType = new StdFileType();
+		isFolder = fileType.isFolder();
 		//this.parent = parent;
 	}
 	
+	public MediaFileType  getFileType() {
+		return fileType;
+	}
 	public boolean isFolder() {
 		return isFolder;
 	}
@@ -144,7 +155,7 @@ public class DirEntry implements Comparable<DirEntry> {
 		DirEntry thisEntry = this;
 		  if (thisEntry.isFolder) {
 			  URI dir = thisEntry.getUri();
-			  if (dir == null || !Utils.isFile(dir))
+			  if (dir == null || !Utils.isFileScheme(dir))
 				  return;
 			  File newDir = new File(dir);
 		    	//Log.debug("fillEntryList for: " + newDir.getAbsolutePath() + ", exists:" + newDir.exists() + ", files: " + newDir.list());

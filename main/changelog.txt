@@ -1,8 +1,13 @@
- ===SVN===
-  * Added stack trace printout to Listener when catching uncaught exceptions
-  * disabled using ffmpeg to gather metadata.
-   * new config: meta.vidinfo.disable=true  set to false to re-enable ffmpeg gathering of metadata
-  * Added more exception handling to mp4 metadata parsing code
+===SVN===
+ * Force transcoding of MP4's if profile > High or Level > 41 
+ * Internal reorg--  Get icon for display from parsed file type (folder, video, dvd, etc)
+ * Changed re-interleaving code to work based on DTS (decoding time stamp) rather than PTS (presentation time stamp)
+ 
+ ===V0.24===
+ * Added stack trace printout to Listener when catching uncaught exceptions
+ * disabled using ffmpeg to gather metadata.
+  * new config: meta.vidinfo.disable=true  set to false to re-enable ffmpeg gathering of metadata
+ * Added more exception handling to mp4 metadata parsing code
  
  ===V.023beta===
  * Attempt to fix ffmpeg crashes in av_close_input_file (function frees structure, but JNA attempts to read it back after call completes)

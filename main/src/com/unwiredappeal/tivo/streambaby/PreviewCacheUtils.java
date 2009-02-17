@@ -54,7 +54,7 @@ public class PreviewCacheUtils {
 			alreadyRecursed = new HashSet<String>();
 		}
 		// Handle symlinks.  If we have already dealt with this directory, don't do it again!
-		if (de.isFolder && de.getUri() != null && Utils.isFile(de.getUri())) {
+		if (de.isFolder && de.getUri() != null && Utils.isFileScheme(de.getUri())) {
 			try {
 				String can = new File(de.getUri()).getCanonicalPath();
 				if (alreadyRecursed.contains(can))

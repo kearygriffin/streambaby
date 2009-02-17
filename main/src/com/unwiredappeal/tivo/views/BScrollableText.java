@@ -14,6 +14,7 @@ import com.unwiredappeal.tivo.views.VText.FontSizeInfo;
 
 public class BScrollableText extends SBScrollPanePlus {
 	FontInfo fm;
+	TivoCharacters tc;
 	public String text;
 	public String size;
 	int height;
@@ -46,6 +47,8 @@ public class BScrollableText extends SBScrollPanePlus {
 		   FontSizeInfo info = VText.getFontSize(size);
 		   FontResource font = ((StreamBabyStream)this.getBApp()).getFont("default.ttf", FONT_PLAIN, info.fontSize);
 		   fm = font.getFontInfo();
+		   if (fm != null)
+			   tc = new TivoCharacters(fm);
 		   if (fm == null) {
 			  font.addHandler(this) ;
 			  VText vt = new VText(this, 0, 0, this.getWidth(), this.getHeight(), size);
@@ -68,15 +71,10 @@ public class BScrollableText extends SBScrollPanePlus {
 
 	public class TivoStringLength implements WordWrap.StringLength {
 
-		public int stringLength(String str) {
-			double width = 0;
-			for (char c : str.toCharArray()) {
-				GlyphInfo gi = fm.getGlyphInfo(c);
-				width += gi.getAdvance();
-			}
-			return (int)(width+0.99);
-		}
 		
+		public int stringLength(String str) {
+			return tc.stringLength(str);
+		}
 	}
 	
     public void setLineHeightNoRefresh(int lineHeight) {
@@ -92,7 +90,8 @@ public class BScrollableText extends SBScrollPanePlus {
 		}
 		
 		setLineHeightNoRefresh(lineHeight);
-    	WordWrap w = new WordWrap(new TivoStringLength(), text, this.getWidth());
+		String strippedText = tc.stripInvalidChars(text);
+    	WordWrap w = new WordWrap(new TivoStringLength(), strippedText, this.getWidth());
     	String[] lines = w.split();
     	int yoff = 0;
     	for (String l : lines) {

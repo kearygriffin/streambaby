@@ -154,6 +154,13 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		sapp.addCleanupRequired(this);
 	}
 
+	/*
+	// TivoCmd tivoCmd;
+	public ViewScreen(BApplicationPlus app, DirEntry e, int kbps) {
+		this(app, Arrays.asList(new DirEntry[] { e }), null, kbps);
+	}
+	*/
+	
 	public void updateInfoView() {
 		String desc = de.getStrippedFilename();
 		if (videoList.size() > 1) {
@@ -189,10 +196,6 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		}
 	}
 
-	// TivoCmd tivoCmd;
-	public ViewScreen(BApplicationPlus app, DirEntry e, int kbps) {
-		this(app, Arrays.asList(new DirEntry[] { e }), null, kbps);
-	}
 
 	public void setDefaultBackground() {
 		if (filmResource != null)

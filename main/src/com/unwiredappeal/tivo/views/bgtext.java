@@ -12,6 +12,7 @@ import com.unwiredappeal.tivo.streambaby.StreamBabyStream;
 
 public class bgtext {
    FontInfo fm = null;
+   TivoCharacters tc = null;
    BText text;
    BView bg;
    public int x, y, w, h, fontSize;
@@ -37,8 +38,11 @@ public class bgtext {
       */
 	   FontResource font = ((StreamBabyStream)view.getBApp()).getFont("default.ttf", BView.FONT_PLAIN, fontSize);
 	   fm = font.getFontInfo();
-	   if (fm != null)
-		   h = (int)(fm.getHeight()+0.99)+1;
+	   if (fm != null) {
+		   tc = new TivoCharacters(fm);
+		   value = tc.stripInvalidChars(value);
+		   h = (int)(fm.getHeight()+0.99)+1;		   
+	   }
 
       w = stringLength(value);
       //w = value.length()*fontSize/2;
@@ -62,16 +66,11 @@ public class bgtext {
       text.setVisible(visible);
       bg.setVisible(visible);
    }
-   
+
 	public int stringLength(String str) {
-		if (fm == null)
+		if (tc== null)
 			return str.length()*fontSize/2;
-		double width = 0;
-		for (char c : str.toCharArray()) {
-			GlyphInfo gi = fm.getGlyphInfo(c);
-			width += gi.getAdvance();
-		}
-		return (int)(width+0.99);
+		return tc.stringLength(str);
 	}
    
    public void setLocation(int x, int y) {

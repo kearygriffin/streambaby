@@ -93,7 +93,6 @@ public Memory createRandomUsedMemory(Memory usedMemory) {
      newFreeMA = oldFreeMA;
      freeMem.removeMemoryArea(oldFreeMA.getStartPos());
      newFreeMA.setUsedSize(randomRequest);
-     newFreeMA.setProcessNumber(i+1);
      this.appendMemoryArea(newMem, newFreeMA);
    }
  }
@@ -114,7 +113,7 @@ public Memory buildFreeMemory(Memory usedMemory) {
  // Create a temporary help memory with all memory areas sorted by startPos
  // to use later on the method to build the free memory.
  tempUsedMemory = buildFlatMemory(usedMemory);
- tempUsedMemory.sortAscProcess();
+ tempUsedMemory.sortAscStart();
 
  // Build upon the "tempUsedMemory" the free memory by adding the
  // memory areas to a temporary memory and getting as a step by step
@@ -130,7 +129,6 @@ public Memory buildFreeMemory(Memory usedMemory) {
 
    freeMemory.removeMemoryArea(freeMA.getStartPos());
    freeMA.setUsedSize(size);
-   freeMA.setProcessNumber(i);
    this.appendMemoryArea(tempUsedMemory2, freeMA);
  }
 

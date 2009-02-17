@@ -16,28 +16,14 @@ import java.util.*;
  * increased.
  */
 @SuppressWarnings("unchecked")
-public class Memory extends Vector {
+public class Memory {
 
   /**
 	 * 
 	 */
 	private static final long serialVersionUID = 8982540786722597726L;
 
-/**
-   * Last used allocation method.
-   */
-  private String lastMethod;
-
-  /**
-   * Type of the last request.
-   */
-  private int lastRequestType;
-
-  /**
-   * Last request as a String for drawing the development of the memory history.
-   */
-  private String lastRequestString;
-
+  Vector memoryVector = new Vector();
   /**
    * Actual size of Memory as an int-value.
    */
@@ -61,9 +47,6 @@ public class Memory extends Vector {
   public Memory() {
     super();
     this.memorySize         = 0;
-    this.lastMethod         = "";
-    this.lastRequestString  = "";
-    this.lastRequestType    = 0;
   }
 
   /**
@@ -73,7 +56,7 @@ public class Memory extends Vector {
   public Memory(int newMemoryAreaCount, int newMemorySize) {
     this();
     for (int i=0; i < newMemoryAreaCount; i++)
-      super.addElement(new MemoryArea());
+      memoryVector.addElement(new MemoryArea());
 
     this.setMemorySize(newMemorySize);
   }
@@ -86,7 +69,6 @@ public class Memory extends Vector {
     else
       for (int i=0; i<this.getMemoryAreaCount(); i++)
         System.out.println(i                                          + " "
-                           + this.getMemoryArea(i).getProcessNumber() + " "
                            + this.getMemoryArea(i).getStartPos()      + " "
                            + this.getMemoryArea(i).getUsedSize()      + " "
                            + this.getMemoryArea(i).getSize()          + " "
@@ -105,8 +87,7 @@ public class Memory extends Vector {
         System.out.print("\n Loop "+ i);
         for (int j=0; j < this.getMemorySizeVector(i).getMemoryAreaCount(); j++) {
           ma = this.getMemorySizeVector(i).getMemoryArea(j);
-          System.out.print(" - "+ ma.getProcessNumber()
-                                + " "
+          System.out.print(" - "
                                 + ma.getStartPos()
                                 + " "
                                 + ma.getUsedSize()
@@ -141,9 +122,8 @@ public class Memory extends Vector {
                                             / this.getMemoryAreaCount()));
 
         // Set the process number to where this memory area belongs
-        ma.setProcessNumber(i+1);
       } while (!(newMemory.fitInMemory(newMemory, ma)));
-      newMemory.addElement(ma);
+      newMemory.memoryVector.addElement(ma);
     }
     return newMemory;
   }
@@ -248,7 +228,7 @@ public class Memory extends Vector {
    * Appends a new memory area into the memory structure
    */
   public void appendMemoryArea(MemoryArea newMemoryArea) {
-    super.addElement(newMemoryArea);
+    memoryVector.addElement(newMemoryArea);
   }
 
   /**
@@ -261,7 +241,7 @@ public class Memory extends Vector {
     while (index < this.getMemoryAreaCount() &&
           this.getMemoryArea(index).getStartPos() < newMemoryArea.getStartPos())
       index++;
-    super.add(index, newMemoryArea);
+    memoryVector.add(index, newMemoryArea);
   }
 
   /**
@@ -277,14 +257,6 @@ public class Memory extends Vector {
   }
 
   /**
-   * Returns true, if a memory area with the given processNumber
-   * is in memory.
-   */
-  public boolean isInMemoryProcess(int processNr) {
-    return (this.getMemoryAreaProcess(processNr) != null);
-  }
-
-  /**
    * Returns true, if a memory area with the given starting position
    * is in memory.
    */
@@ -297,26 +269,16 @@ public class Memory extends Vector {
    */
   public void appendMemoryAreas(int deltaMemoryAreaCount) {
     for (int i=0; i < deltaMemoryAreaCount; i++)
-      super.addElement(new MemoryArea());
+      memoryVector.addElement(new MemoryArea());
   }
 
   /**
    * Removes all memory areas from memory.
    */
   public void removeAllMemoryAreas() {
-    super.removeAllElements();
+    memoryVector.removeAllElements();
   }
 
-  /**
-   * Removes memory area from memory with the given process number.
-   */
-  public void removeMemoryAreaProcess(int processNr) {
-    MemoryArea oldMemoryArea = this.getMemoryAreaProcess(processNr);
-
-    if (oldMemoryArea != null) {
-      super.removeElement(oldMemoryArea);
-    }
-  }
 
   /**
    * Removes memory area from memory woth the given starting position.
@@ -325,7 +287,7 @@ public class Memory extends Vector {
     MemoryArea oldMemoryArea = this.getMemoryAreaStart(startPos);
 
     if (oldMemoryArea != null) {
-      super.removeElement(oldMemoryArea);
+      memoryVector.removeElement(oldMemoryArea);
     }
   }
 
@@ -368,26 +330,6 @@ public class Memory extends Vector {
     return fits;
   }
 
-  /**
-   * Returns the type of the last request.
-   */
-  public int getLastRequestType() {
-    return this.lastRequestType;
-  }
-
-  /**
-   * Returns the text of the last request.
-   */
-  public String getLastRequestString() {
-    return this.lastRequestString;
-  }
-
-  /**
-   * Returns the text of the last used allocation method.
-   */
-  public String getLastMethod() {
-    return this.lastMethod;
-  }
 
   /**
    * Returns the memory in the memorySizeVector with the given index.
@@ -417,8 +359,8 @@ public class Memory extends Vector {
    * Returns the memory area at a special index.
    */
   public MemoryArea getMemoryArea(int index) {
-    return (MemoryArea) ( (super.size() > 0)
-                          ? super.elementAt(index)
+    return (MemoryArea) ( (memoryVector.size() > 0)
+                          ? memoryVector.elementAt(index)
                           : null);
   }
 
@@ -426,7 +368,7 @@ public class Memory extends Vector {
    * Returns the index of the given memory area.
    */
   public int getIndexOfMemoryArea(MemoryArea  memoryArea) {
-    return super.indexOf(memoryArea);
+    return memoryVector.indexOf(memoryArea);
   }
 
   /**
@@ -451,21 +393,6 @@ public class Memory extends Vector {
       if (!this.getMemoryArea(i).isInitial())
         size += this.getMemoryArea(i).getSize();
     return size;
-  }
-
-  /**
-   * Returns the memory area with the given process number.
-   */
-  public MemoryArea getMemoryAreaProcess(int processNr) {
-    MemoryArea  ma    = null;
-    int         index = 0;
-
-    while (ma == null && index < this.getMemoryAreaCount()) {
-      if (this.getMemoryArea(index).getProcessNumber() == processNr)
-        ma = this.getMemoryArea(index);
-      index++;
-    }
-    return (MemoryArea) ma;
   }
 
   /**
@@ -510,7 +437,7 @@ public class Memory extends Vector {
    * Returns the number of memory areas in this memory.
    */
   public int getMemoryAreaCount() {
-    return super.size();
+    return memoryVector.size();
   }
 
   /**
@@ -538,20 +465,6 @@ public class Memory extends Vector {
     this.memorySize = newMemorySize;
   }
 
-  /**
-   * Sets the last request to this memory.
-   */
-  public void setLastRequest(int newLastRequestType, String newLastRequest) {
-    this.lastRequestType    = newLastRequestType;
-    this.lastRequestString  = newLastRequest;
-  }
-
-  /**
-   * Sets the last used allocation method.
-   */
-  public void setLastMethod(String newLastMethod) {
-    this.lastMethod = newLastMethod;
-  }
 
   /**
    * Sorts the memory allocations descending by the size.
@@ -567,8 +480,8 @@ public class Memory extends Vector {
       while (this.getMemoryArea(j).getSize() > actualMA.getSize() &&
               j <= i)
         j++;
-      super.removeElement(actualMA);
-      super.add(j, actualMA);
+      memoryVector.removeElement(actualMA);
+      memoryVector.add(j, actualMA);
     }
   }
 
@@ -586,30 +499,11 @@ public class Memory extends Vector {
       while (this.getMemoryArea(j).getSize() < actualMA.getSize() &&
               j <= i)
         j++;
-      super.removeElement(actualMA);
-      super.add(j, actualMA);
+      memoryVector.removeElement(actualMA);
+      memoryVector.add(j, actualMA);
     }
   }
 
-  /**
-   * Sorts the memory allocations ascending by the processNr.
-   */
-  public void sortAscProcess() {
-    MemoryArea  actualMA;
-    int         i,
-                j;
-
-    for (i=1; i < this.getMemoryAreaCount(); i++) {
-      actualMA = this.getMemoryArea(i);
-      j = 0;
-      while (this.getMemoryArea(j).getProcessNumber()
-                < actualMA.getProcessNumber() &&
-              j <= i)
-        j++;
-      super.removeElement(actualMA);
-      super.add(j, actualMA);
-    }
-  }
 
   /**
    * Sorts the memory allocations ascending by the starting position.
@@ -625,8 +519,8 @@ public class Memory extends Vector {
       while (this.getMemoryArea(j).getStartPos() < actualMA.getStartPos() &&
               j <= i)
         j++;
-      super.removeElement(actualMA);
-      super.add(j, actualMA);
+      memoryVector.removeElement(actualMA);
+      memoryVector.add(j, actualMA);
     }
   }
 }

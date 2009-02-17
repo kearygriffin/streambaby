@@ -4,11 +4,13 @@ import static com.tivo.hme.bananas.IBananasPlus.H_BAR_FONT;
 import static com.tivo.hme.bananas.IBananasPlus.H_BAR_TEXT_COLOR;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.tivo.hme.bananas.BApplicationPlus;
 import com.tivo.hme.bananas.BButtonPlus;
 import com.tivo.hme.bananas.BRect;
+import com.tivo.hme.bananas.BScreen;
 import com.tivo.hme.bananas.BSkin;
 import com.tivo.hme.bananas.BTextPlus;
 import com.tivo.hme.bananas.BView;
@@ -507,8 +509,10 @@ public class PlayScreen extends ScreenTemplate {
 			((StreamBabyStream) getBApp()).cachePersistentData(ViewScreen
 					.persistKey(de.getUri()), "0", true);
 		}
-		ViewScreen newScreen = new ViewScreen(getBApp(), de,
-				qual);
+		BScreen newScreen = de.getFileType().createViewerScreen(getBApp(), Arrays.asList(new DirEntry[] { de }), null, qual);
+
+		//ViewScreen newScreen = new ViewScreen(getBApp(), de,
+				//qual);
 		getBApp().push(newScreen, TRANSITION_LEFT);
 		return true;
 	}

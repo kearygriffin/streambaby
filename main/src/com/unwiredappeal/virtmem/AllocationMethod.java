@@ -99,7 +99,7 @@ public boolean isUseFullFreeMemoryArea() {
 */
 @SuppressWarnings("unchecked")
 public void appendMemoryArea(Memory usedMemory, MemoryArea newMemoryArea) {
- usedMemory.addElement(newMemoryArea);
+ usedMemory.memoryVector.addElement(newMemoryArea);
 }
 
 /**
@@ -109,12 +109,6 @@ public void mergeMemoryArea(Memory freeMemory, MemoryArea memoryArea) {
  freeMemory.mergeFreeMemoryArea(memoryArea);
 }
 
-/**
-* Removes the memoryArea with the given process number in the given memory
-*/
-public void removeMemoryAreaProcess(Memory memory, int processNr) {
- memory.removeMemoryAreaProcess(processNr);
-}
 
 /**
 * Removes the requested memoryArea in the given memory
