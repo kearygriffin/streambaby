@@ -33,15 +33,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class StreamableMP4 extends InputStream {
-	public int width = 0;
-	public int height = 0;
+	protected int width = 0;
+	protected int height = 0;
 	File file;
 	RandomAccessFile fp = null;
 	long startTimePos = 0;
 	LinkedList<BArray> buffers = new LinkedList<BArray>();
 	BArray curByteArray = null;
-	public int profileLevel;
-	public int profile;
+	protected int profileLevel;
+	protected int profile;
 	
 	int bytePos;
 	long filelength = -1;
@@ -53,7 +53,7 @@ public class StreamableMP4 extends InputStream {
 	public static int forceLevel = -1;
 	public static int forceProfile = -1;	
 	public static Logger logger;
-	public List<String> formats = new ArrayList<String>();
+	protected List<String> formats = new ArrayList<String>();
 	private static final long MAX_CHUNK_DELTA_BEFORE_INTERLEAVE = -1; // (causes issues, leave disabled) 4 * 1024 * 1024;
 
 	public static BArrayFactory bfact = new BArrayFactory() {
@@ -97,9 +97,35 @@ public class StreamableMP4 extends InputStream {
 		this.startTimePos = pos;
 		this.filelength = file.length();
 		fp = new RandomAccessFile(file, "r");
-		processMP4Headers();
+		try {
+			processMP4Headers();
+		} catch(Exception e) {
+			log("Exception parsing mp4: " + e.getMessage());
+			fp.close();
+			throw new IOException(e.getMessage());
+		}
 	}
-
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public int getProfile() {
+		return profile;
+	}
+	
+	public int getProfileLevel() {
+		return profileLevel;
+	}
+	
+	
+	public List<String> getFormats() {
+		return formats;
+	}
 	public byte[] singlebyte = new byte[1];
 
 	public int read() throws IOException {

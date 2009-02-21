@@ -430,12 +430,18 @@ public class StreamBabyConfig extends ConfigurableObject {
 			);
 	
 
+	public static ConfigEntry cfgHmeRes = new ConfigEntry(
+			"hme.res",
+			"480",
+			"Resolution to use for StreamBaby screens"
+			);
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
 			new moduleEntryHandler(),
 			"select which video modules to load"
 			);
+	
 	
 	
 

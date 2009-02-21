@@ -49,10 +49,11 @@ public class AutoPreviewGenerationManager implements Cleanupable {
 			runningGenerator = zpw;
 		}
 	}
-	public synchronized PreviewGenerator getPreviewer(URI uri,
-			VideoInformation videoInformation, int sw, int sh, boolean tryGenerate) {
+	public synchronized PreviewGenerator getPreviewer(DirEntry de, int sw, int sh, boolean tryGenerate) {
+	  URI uri = de.getUri();
+	  VideoInformation vinfo = de.getVideoInformation();
   	  ZipPreviewer generator = new ZipPreviewer();
-  	  if (generator.open(uri, videoInformation, sw, sh))
+  	  if (generator.open(uri, vinfo, sw, sh))
   		  return generator;
   	  if (genMap.containsKey(uri)) {
   		  ZipGeneratingPreview zgp = genMap.get(uri);
@@ -67,10 +68,10 @@ public class AutoPreviewGenerationManager implements Cleanupable {
   				  runningGenerator.close();
   				  runningGenerator = null;
   			  }
-  			  gen = VideoModuleHelper.inst.getPreviewHandler(uri, videoInformation, false);
+  			  gen = VideoModuleHelper.inst.getPreviewHandler(de, false);
   			  if (gen == null)
   				  return null;
-  			  ZipGeneratingPreview zpw = new ZipGeneratingPreview(uri, gen, videoInformation, sh, sh);
+  			  ZipGeneratingPreview zpw = new ZipGeneratingPreview(uri, gen, vinfo, sh, sh);
   			  genMap.put(uri, zpw);
   			  return zpw;
   		  } catch (GeneratorException e) {
@@ -96,7 +97,7 @@ public class AutoPreviewGenerationManager implements Cleanupable {
 	public static void possiblyGenerate(DirEntry de) {
 		if (AutoPreviewGenerationManager.inst.hasRunning())
 			return;
-		boolean canRealtimePreview = VideoModuleHelper.inst.canPreview(de.getUri(), de.getVideoInformation(), true);
+		boolean canRealtimePreview = VideoModuleHelper.inst.canPreview(de, true);
 		if (!canRealtimePreview) {
 			if (!Utils.isFile(de.getUri()))
 				return;
@@ -108,7 +109,7 @@ public class AutoPreviewGenerationManager implements Cleanupable {
 			//if (new File(StreamBabyConfig.cacheDir, ZipPreviewer.getCacheFile(f, "partial").getName()).exists())
 				//return;			
 			Log.info("Autogenerating preview for file: " + f.getAbsolutePath());
-			PreviewGenerator gen = AutoPreviewGenerationManager.inst.getPreviewer(de.getUri(), de.getVideoInformation(), PreviewWindow.small_PREVIEW_WIDTH, PreviewWindow.small_PREVIEW_HEIGHT, true);
+			PreviewGenerator gen = AutoPreviewGenerationManager.inst.getPreviewer(de, PreviewWindow.small_PREVIEW_WIDTH, PreviewWindow.small_PREVIEW_HEIGHT, true);
 			// We can close it immediately, as it will offer itself up to keep running
 			if (gen != null)
 				gen.close();

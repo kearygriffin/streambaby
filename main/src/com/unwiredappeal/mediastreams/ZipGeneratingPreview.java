@@ -186,11 +186,14 @@ public class ZipGeneratingPreview extends CachingPreviewGenerator  {
 					}
 						
 					byte[] b = getFrameImageData(i, false);
-					if (b == null && (len-i) > 10) {
+					if (b == null) {
 						if (getShutdown())
 							continue;
-						Log.error("Generation Error creating zip pvw: " + pvwFile.getAbsolutePath());
-						return;
+						if ((len-i) > 10) {
+							Log.error("Generation Error creating zip pvw: " + pvwFile.getAbsolutePath());
+							return;
+						}
+						continue;
 					}
 					zos.putNextEntry(new ZipEntry(ZipPreviewer.getEntryName(i)));
 					zos.write(b);

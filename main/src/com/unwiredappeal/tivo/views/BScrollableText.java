@@ -6,7 +6,6 @@ import java.util.List;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.sdk.HmeEvent;
 import com.tivo.hme.sdk.HmeEvent.FontInfo;
-import com.tivo.hme.sdk.HmeEvent.FontInfo.GlyphInfo;
 import com.tivo.hme.sdk.Resource.FontResource;
 import com.unwiredappeal.tivo.streambaby.StreamBabyStream;
 import com.unwiredappeal.tivo.utils.WordWrap;

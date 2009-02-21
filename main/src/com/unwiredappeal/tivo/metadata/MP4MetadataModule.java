@@ -30,6 +30,7 @@ import com.coremedia.iso.boxes.MetaBox;
 import com.coremedia.iso.boxes.MovieBox;
 import com.coremedia.iso.boxes.UserDataBox;
 import com.coremedia.iso.boxes.apple.*;
+import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.modules.StreamBabyModule;
@@ -356,7 +357,7 @@ public class MP4MetadataModule extends BaseMetadataModule {
 	//setMetadataItem(vidinfo, "album", formatCtx.album);
 	//setMetadataItem(vidinfo, "genre", formatCtx.genre);
 
-	public boolean setMetadata(MetaData m, URI uri) {
+	public boolean setMetadata(MetaData m, URI uri, VideoInformation vi) {
 		if (!Utils.isFile(uri))
 			return false;
 		File f = new File(uri);

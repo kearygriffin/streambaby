@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -261,8 +260,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			deUri = de.getUri();
 
 			if (this.vinfo == null
-					|| !VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri,
-							de.getVideoInformation())) {
+					|| !VideoModuleHelper.inst.canStreamOrTranscodeVideo(de)) { // Uri,
+							// de.getVideoInformation())) {
 				curVideoNum += dir;
 			} else
 				ok = true;
@@ -295,8 +294,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 
 		VideoInformation vinfo = de.getVideoInformation();
 		if (vinfo == null
-				|| !VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri, de
-						.getVideoInformation())) {
+				|| !VideoModuleHelper.inst.canStreamOrTranscodeVideo(de)) {
 			displayError("Incompatible video stream");
 		} else {
 			loadCutList();
@@ -495,8 +493,8 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		long startSec = (pos / 1000);
 		startPosition = (startSec * 1000);
 		maxDuration = 0;
-		if (!VideoModuleHelper.inst.canStreamOrTranscodeVideo(deUri, de
-				.getVideoInformation()))
+		if (!VideoModuleHelper.inst.canStreamOrTranscodeVideo(de)) // deUri, de
+				//.getVideoInformation()))
 			displayError("Incompatible video stream");
 		else {
 			VideoInputStream is = null;
@@ -504,8 +502,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 					+ startPosition / 1000 + " secs)");
 			if (quality == VideoFormats.QUALITY_AUTO)
 				quality = sapp.getAutoQuality();
-			is = VideoModuleHelper.inst.openVideo(deUri, de
-					.getVideoInformation(), startPosition, quality);
+			is = VideoModuleHelper.inst.openVideo(de, startPosition, quality);
 			// URL streamUrl = new URL(fileName + "?start=" + startSec);
 			// debug.print("Creating name stream: " + streamUrl.toString());
 
@@ -538,7 +535,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		if (queuedToPlay && isClosed) {
 			stream = createVideoStream(getContext().getBaseURI().toString()
 					+ namedStream.getStreamName(), startMimeType, true);
-			if (startMimeType.compareTo("audio/mp3") == 0)
+			if (startMimeType != null && startMimeType.compareTo("audio/mp3") == 0)
 				isMp3 = true;
 			else
 				isMp3 = false;

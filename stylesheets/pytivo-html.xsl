@@ -2,11 +2,27 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
      version="1.0">
 <xsl:output method="html" indent="no"/>
+
+<xsl:variable name="artwork" select="//image"/>
+<xsl:attribute-set name="imgset">
+  <xsl:attribute name="src"><xsl:value-of select="$artwork"/></xsl:attribute>
+  <xsl:attribute name="align">right</xsl:attribute>
+  <xsl:attribute name="width">30%</xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:variable name="hasimage" select="$artwork!=''"/>
+
+
+
 <xsl:template match="/">
 <html>
 <head>
 </head>
 <body>
+   <xsl:if test="$hasimage">
+       <xsl:element name="img" use-attribute-sets="imgset"/>
+   </xsl:if>
+
     <font face="arial" color="white" size="3">
     <b>
 <xsl:choose>

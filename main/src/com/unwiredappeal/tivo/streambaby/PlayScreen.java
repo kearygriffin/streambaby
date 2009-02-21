@@ -448,8 +448,8 @@ public class PlayScreen extends ScreenTemplate {
 			}, false);
 		}
 		// We can only adjust quality if we can transcode this puppy.
-		canTranscode = VideoModuleHelper.inst.canTranscode(de.getUri(), de.getVideoInformation());
-		canStream = VideoModuleHelper.inst.canStream(de.getUri(), de.getVideoInformation());
+		canTranscode = VideoModuleHelper.inst.canTranscode(de);
+		canStream = VideoModuleHelper.inst.canStream(de);
 		if (StreamBabyConfig.cfgQualitySelection.getBool() && canTranscode)
 			addQualityButton(false);
 		addSimpleTextButton("Go back", new ButtonHandler() { 

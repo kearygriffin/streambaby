@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 
+import com.unwiredappeal.mediastreams.mp4.MP4StreamFactory;
+import com.unwiredappeal.mediastreams.mp4.MP4Streamer;
 import com.unwiredappeal.mediastreams.mp4.StreamableMP4;
-import com.unwiredappeal.mediastreams.mp4.StreamableMP4.BArray;
-import com.unwiredappeal.mediastreams.mp4.StreamableMP4.BArrayFactory;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.utils.Log;
@@ -20,60 +20,9 @@ import com.unwiredappeal.tivo.modules.StreamBabyModule;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.modules.VideoFormats.AllowableFormats;
 import com.unwiredappeal.tivo.modules.VideoFormats.Format;
-import com.unwiredappeal.virtmem.MappedFileMemoryManager;
-import com.unwiredappeal.virtmem.MemChunk;
 
 public class MP4StreamingModule extends BaseVideoHandlerModule implements StreamBabyModule {
 	
-	public static class VirtMemBackedBArray extends StreamableMP4.BaseBArray implements  StreamableMP4.BArray {
-
-		MemChunk memChunk;
-		public VirtMemBackedBArray(int size) {
-			super(size);
-			//memChunk = MappedFileMemoryManager.manager.alloc(size);
-			memChunk = MappedFileMemoryManager.manager.alloc(size);
-		}
-		public void free() {
-			if (memChunk != null)
-				memChunk.free();
-			memChunk = null;
-		}
-
-		public int get(long index) {
-			int ret = memChunk.get((int)index) & 0xff;
-			//System.err.println("get: " + index + ", " + ret);
-			return ret;
-		}
-
-		public void set(long index, int v) {
-			v = v & 0xff;
-			memChunk.set((int)index, v);
-		}
-		public void readFromFile(RandomAccessFile fp, long offset, long len)
-				throws IOException {
-			final int BSIZE = 4096;
-			byte[] bytes = new byte[BSIZE];
-			while(len > 0) {
-				int rl = Math.min((int)len, BSIZE);
-				fp.read(bytes, 0, rl);//
-				memChunk.write((int)offset, bytes, 0, rl);
-				offset += rl;
-				len -= rl;
-			}
-			
-		}
-		
-	}
-	public static class VirtMemBArrayFactory implements BArrayFactory {
-		public static int MAX_BYTE_BACKED_SIZE = 100 * 1024; // 100k
-		public BArray getBArray(int size) {
-			if (size <= MAX_BYTE_BACKED_SIZE)
-				return new StreamableMP4.ByteArrayBackedBArray(size);
-			else
-				return new VirtMemBackedBArray(size);
-		}
-
-	}
 
 	//public static AllowableFormats streamableFormats = new AllowableFormats(new Formats(new String[] { VideoHandlerModule.CONTAINER_MP4 }, new String[] { "*" }, new String[] { "*" }), null);
 	public static AllowableFormats streamableFormats = new AllowableFormats(
@@ -126,20 +75,21 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		if (!Arrays.asList(mp4Exts).contains(ext))
 			return false;
 		try {
-			StreamableMP4 mp4 = new StreamableMP4(new File(uri), 0, false);
+			MP4Streamer mp4 = MP4StreamFactory.getInstance(new File(uri), Long.MAX_VALUE, false);
 			if (mp4.getSubDuration() <= 0)
 				return false;
-			vidinfo.setWidth(mp4.width);
-			vidinfo.setHeight(mp4.height);
+			vidinfo.setWidth(mp4.getWidth());
+			vidinfo.setHeight(mp4.getHeight());
 			vidinfo.setContainerFormat(VideoFormats.CONTAINER_MP4);
 			vidinfo.setDuration(mp4.getSubDuration());
-			if (mp4.formats.contains("avc1"))
+			List<String> formats = mp4.getFormats();
+			if (formats.contains("avc1"))
 				vidinfo.setVideoCodec(VideoFormats.VIDEO_CODEC_H264);
 			else
 				vidinfo.setVideoCodec(VideoFormats.UNKNOWN_FORMAT);
-			if (mp4.formats.contains("mp4a"))
+			if (formats.contains("mp4a"))
 				vidinfo.setAudioCodec(VideoFormats.AUDIO_CODEC_AAC);
-			else if (mp4.formats.contains("ac-3"))
+			else if (formats.contains("ac-3"))
 				vidinfo.setAudioCodec(VideoFormats.AUDIO_CODEC_AC3);
 
 			else
@@ -160,7 +110,7 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		if (!Utils.isFile(uri))
 			return null;
 
-		StreamableMP4 mis = new StreamableMP4(new File(uri), startPosition, StreamBabyConfig.cfgMp4Interleave.getBool());
+		MP4Streamer mis = MP4StreamFactory.getInstance(new File(uri), startPosition, StreamBabyConfig.cfgMp4Interleave.getBool());
 		long subDur = mis.getSubDuration();
 		if (subDur <= 0)
 			subDur = vidinfo.getDuration();
@@ -179,15 +129,9 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 	@Override
 	public boolean initialize(StreamBabyModule parentMod) {
 		super.initialize(parentMod);
+		MP4StreamFactory.initialize();
 		getPriorities().fillVideoPriority = FILL_VIDEO_PRIORITY;
 		getPriorities().streamPriority = STREAM_VIDEO_PRIORITY;		
-		StreamableMP4.logger = new StreamableMP4.Logger() {
-			public void log(String s) {
-				Log.debug(s);
-			}
-		};
-
-		StreamableMP4.bfact = new VirtMemBArrayFactory();
 		streamableFormats = configFormats(cfgStreamableFormats, cfgNotStreamableFormats, streamableFormats);
 		//if (!cfgStreamableFormats.getValue().equals("default") || !cfgNotStreamableFormats.getValue().equals("default"))
 			//streamableFormats = new AllowableFormats(cfgStreamableFormats.getValue(), cfgNotStreamableFormats.getValue());
@@ -201,7 +145,7 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		String dst = argv[1];
 		long pos = Long.parseLong(argv[2]);
 		System.err.println("In: " + src + ", out: " + dst + ", pos: " + pos);
-		StreamableMP4.bfact = new VirtMemBArrayFactory();
+		StreamableMP4.bfact = new MP4StreamFactory.VirtMemBArrayFactory();
 		StreamableMP4.logger = new StreamableMP4.Logger() {
 			public void log(String s) {
 				Log.debug(s);
@@ -240,11 +184,11 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		}
 		
 		try {
-			StreamableMP4 mp4 = new StreamableMP4(new File(uri).getAbsoluteFile(), Long.MAX_VALUE, false);
+			MP4Streamer mp4 = MP4StreamFactory.getInstance(new File(uri).getAbsoluteFile(), Long.MAX_VALUE, false);
 			mp4.close();
-			vinfo.setCodecExtra("mp4_profile", new Integer(mp4.profile));
-			vinfo.setCodecExtra("mp4_level", new Integer(mp4.profileLevel));			
-			return isProfileOk(mp4.profile, mp4.profileLevel);
+			vinfo.setCodecExtra("mp4_profile", new Integer(mp4.getProfile()));
+			vinfo.setCodecExtra("mp4_level", new Integer(mp4.getProfileLevel()));			
+			return isProfileOk(mp4.getProfile(), mp4.getProfileLevel());
 		} catch (IOException e) {
 			return false;
 		}

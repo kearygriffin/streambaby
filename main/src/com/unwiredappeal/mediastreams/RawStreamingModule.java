@@ -57,7 +57,10 @@ public class RawStreamingModule extends BaseVideoHandlerModule implements Stream
 					if (br != null) {
 						String s = br.readLine();
 						if (s != null) {
-							mimeType = s;
+							if (s.equals("null"))
+								mimeType = null;
+							else 
+								mimeType = s;
 							contentType = s;
 							s = br.readLine();
 							if (s != null)

@@ -2,27 +2,19 @@ package com.unwiredappeal.tivo.streambaby;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import com.tivo.hme.host.util.ArgumentList;
-import com.unwiredappeal.mediastreams.PreviewGenerator;
-import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.mediastreams.ZipPreviewer;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
-import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class PreviewCacheUtils {
 
@@ -157,6 +149,7 @@ public class PreviewCacheUtils {
 		Log.info("Cache Clean complete");
 		
 	}
+	/*
 	public static void generate(ArgumentList al) {
 		String filename = al.shift();
 		if (filename != null && filename.length() > 0) {
@@ -223,4 +216,5 @@ public class PreviewCacheUtils {
 
 		}
 	}
+	*/
 }

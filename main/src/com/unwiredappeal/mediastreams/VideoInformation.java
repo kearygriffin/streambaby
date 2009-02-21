@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.unwiredappeal.tivo.utils.InfoCache;
 import com.unwiredappeal.tivo.utils.Utils;
+import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
@@ -38,13 +39,13 @@ public class VideoInformation extends InfoCache.Cacheable {
 	boolean isFile = false;
 	float pixelAspect = 0;
 	private Map<String, Object> codecExtra = new HashMap<String, Object>();
-	public VideoInformation(URI uri) {
-		this.uri= uri;
+	public VideoInformation(DirEntry de) {
+		this.uri= de.getUri();
 		if (Utils.isFile(uri)) {
 			isFile = true;
 			fileLength = new File(uri).length();
 		}
-		isValid = VideoModuleHelper.inst.fillVideoInformation(uri, this);
+		isValid = VideoModuleHelper.inst.fillVideoInformation(de, this);
 		if (isValid) {
 			isValid = confirmVideoFormats();
 		}
@@ -80,8 +81,9 @@ public class VideoInformation extends InfoCache.Cacheable {
 		}
 		return hash;
 	}
-	public static synchronized VideoInformation getVideoInformation(URI uri) {
+	public static synchronized VideoInformation getVideoInformation(DirEntry de) {
 		String hash;
+		URI uri = de.getUri();
 		if (Utils.isFile(uri)) {
 			File f= new File(uri);
 			hash = hashFile(f);
@@ -92,7 +94,7 @@ public class VideoInformation extends InfoCache.Cacheable {
 		if (vinfo != null)
 			return vinfo;
 		// Doesn't exist, create it and store it
-		vinfo = new VideoInformation(uri);
+		vinfo = new VideoInformation(de);
 		InfoCache.getInstance().putEntry(CACHE_NAME, hash, vinfo);
 		return vinfo;
 	}

@@ -107,13 +107,13 @@ public class PreviewWindow extends BViewPlus {
 	   
 	if (disablePreview == 0) {
 	   	if (generator == null) {
-	   		  generator = AutoPreviewGenerationManager.inst.getPreviewer(de.getUri(), de.getVideoInformation(), sw, sh, false);
+	   		  generator = AutoPreviewGenerationManager.inst.getPreviewer(de, sw, sh, false);
 	    	  //generator = new ZipPreviewer();
 	    	  //if (!generator.open(de.getUri(), de.getVideoInformation(), sw, sh))
 	    		//  generator = null;
 	      }
 	      if (generator == null) {
-	    	  generator = VideoModuleHelper.inst.getPreviewHandler(de.getUri(), de.getVideoInformation(), true);
+	    	  generator = VideoModuleHelper.inst.getPreviewHandler(de, true);
 	    	  if (generator != null) {
 	    		  generator = new CachingPreviewGenerator(generator, de.getVideoInformation(), threadedCacher, defaultPredictive);
 	    		  if (!generator.open(de.getUri(), de.getVideoInformation(), sw, sh))
@@ -122,7 +122,7 @@ public class PreviewWindow extends BViewPlus {
 	      }
 	      if (generator == null) {
 	    	  // try zip file again, this time allow auto-generation
-	   		  generator = AutoPreviewGenerationManager.inst.getPreviewer(de.getUri(), de.getVideoInformation(), sw, sh, true);
+	   		  generator = AutoPreviewGenerationManager.inst.getPreviewer(de, sw, sh, true);
 	      }
 	      
 	}

@@ -78,7 +78,8 @@ public class StreamBabyMain  {
 	  }
 	  
 	  if (al.getBoolean("--genpreview")) {
-		  PreviewCacheUtils.generate(al);
+		  System.err.println("Err: genpreview no longer supported");
+		  //PreviewCacheUtils.generate(al);
 		  return;
 	  }
 	  if (al.getBoolean("--cleancache")) {

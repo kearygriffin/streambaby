@@ -67,6 +67,7 @@ public class VideoModuleHelper {
 		}
 	}
 	
+	/*
 	public boolean canStreamVideo(URI uri, VideoInformation vinfo) {
 		Iterator<VideoHandlerModule> it = videoModules.iterator();
 		while(it.hasNext()) {
@@ -79,10 +80,13 @@ public class VideoModuleHelper {
 		return false;
 		
 	}
+	*/
 	
-	public boolean canStreamOrTranscodeVideo(URI uri, VideoInformation vinfo) {
+	public boolean canStreamOrTranscodeVideo(DirEntry de) {
+		URI uri = de.getUri();
+		VideoInformation vinfo = de.getVideoInformation();
 		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
-		Iterator<VideoHandlerModule> it = videoModules.iterator();
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new NullGetPriority());
 		while(it.hasNext()) {
 			VideoHandlerModule m = it.next();
 			if (m.canStream(uri, vinfo)) {
@@ -96,11 +100,13 @@ public class VideoModuleHelper {
 		
 	}
 
-	public boolean canTranscode(URI uri, VideoInformation vinfo) {
+	public boolean canTranscode(DirEntry de) {
+		URI uri = de.getUri();
+		VideoInformation vinfo = de.getVideoInformation();
 		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
 		if (disableTranscode)
 			return false;
-		Iterator<VideoHandlerModule> it = videoModules.iterator();
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new NullGetPriority());
 		while(it.hasNext()) {
 			VideoHandlerModule m = it.next();
 			if (m.canTranscode(uri, vinfo))
@@ -113,10 +119,13 @@ public class VideoModuleHelper {
 
 	public boolean setMetadata(MetaData m, DirEntry de) {
 		URI uri = de.getUri();
-		Iterator<MetadataModule> it = getMetadataModulesIterator();
+		VideoInformation vi = null;
+		if (!StreamBabyConfig.cfgDisableVidInfoMeta.getBool())
+			vi = de.getVideoInformation();
+		Iterator<MetadataModule> it = getMetadataModulesIterator(de);
 		while(it.hasNext()) {
 			MetadataModule meta = it.next();
-			if (meta.setMetadata(m, uri) && m.hasMetaData())
+			if (meta.setMetadata(m, uri, vi) && m.hasMetaData())
 				return true;				
 		}
 		m.setString(de.getStrippedFilename());
@@ -125,8 +134,10 @@ public class VideoModuleHelper {
 		
 	}
 	
-	public boolean canStream(URI uri, VideoInformation vinfo) {
-		Iterator<VideoHandlerModule> it = videoModules.iterator();
+	public boolean canStream(DirEntry de) {
+		URI uri = de.getUri();
+		VideoInformation vinfo = de.getVideoInformation();
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new NullGetPriority());
 		while(it.hasNext()) {
 			VideoHandlerModule m = it.next();
 			if (m.canStream(uri, vinfo)) {
@@ -140,7 +151,15 @@ public class VideoModuleHelper {
 	public static interface GetPriority {
 		int getPriority(VideoHandlerModule m);
 	}
-	private Iterator<VideoHandlerModule> getVideoModulesIterator(final GetPriority p) {
+	public static class NullGetPriority implements GetPriority {
+
+		public int getPriority(VideoHandlerModule m) {
+			return 0;
+		}
+		
+	}
+	
+	private Iterator<VideoHandlerModule> getVideoModulesIterator(DirEntry de, final GetPriority p) {
 		List<VideoHandlerModule> sortedList = new ArrayList<VideoHandlerModule>(videoModules);
 		Collections.sort(sortedList, new Comparator<VideoHandlerModule>() {
 
@@ -149,10 +168,12 @@ public class VideoModuleHelper {
 			}
 			
 		});
-		return sortedList.iterator();
+		Iterator<VideoHandlerModule> it = de.getFileType().filterVideoModulesIterator(sortedList);
+		return it;
+		//return sortedList.iterator();
 	}
 
-	private Iterator<MetadataModule> getMetadataModulesIterator() {
+	private Iterator<MetadataModule> getMetadataModulesIterator(DirEntry de) {
 		List<MetadataModule> sortedList = new ArrayList<MetadataModule>(metadataModules);
 		Collections.sort(sortedList, new Comparator<MetadataModule>() {
 
@@ -161,14 +182,18 @@ public class VideoModuleHelper {
 			}
 			
 		});
-		return sortedList.iterator();
+		Iterator<MetadataModule> it = de.getFileType().filterMetadataModulesIterator(sortedList);
+		return it;		
+		//return sortedList.iterator();
 	}
 	
 
 	
-	public VideoInputStream openStreamableVideo(URI uri, VideoInformation vinfo, long startPosition) {
+	public VideoInputStream openStreamableVideo(DirEntry de, long startPosition) {
+		URI uri = de.getUri();
+		VideoInformation vinfo = de.getVideoInformation();
 		VideoInputStream st = null;
-		Iterator<VideoHandlerModule> it = getVideoModulesIterator(new GetPriority() { 
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new GetPriority() { 
 				public int getPriority(VideoHandlerModule m) 
 				{ return m.getPriorities().streamPriority; }
 			}
@@ -187,12 +212,14 @@ public class VideoModuleHelper {
 		return st;
 		
 	}
-	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vinfo, long startPos, int qual) {
+	public VideoInputStream openTranscodedVideo(DirEntry de, long startPos, int qual) {
+		URI uri = de.getUri();
+		VideoInformation vinfo = de.getVideoInformation();
 		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
 		if (disableTranscode)
 			return null;
 		VideoInputStream st = null;
-		Iterator<VideoHandlerModule> it = getVideoModulesIterator(new GetPriority() { 
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new GetPriority() { 
 			public int getPriority(VideoHandlerModule m) 
 			{ return m.getPriorities().transcodePriority; }
 		}
@@ -211,17 +238,19 @@ public class VideoModuleHelper {
 		return st;
 		
 	}
-	public PreviewGenerator getPreviewHandler(URI uri, VideoInformation vinfo, boolean realtime) {
+	public PreviewGenerator getPreviewHandler(DirEntry de, boolean realtime) {
+		URI uri = de.getUri();
+		VideoInformation vi = de.getVideoInformation();
 		PreviewGenerator st = null;
-		Iterator<VideoHandlerModule> it = getVideoModulesIterator(new GetPriority() { 
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new GetPriority() { 
 			public int getPriority(VideoHandlerModule m) 
 			{ return m.getPriorities().previewPriority; }
 		}
 		);
 		while(st == null && it.hasNext()) {
 			VideoHandlerModule m = it.next();
-			if (m.canPreview(uri, vinfo, realtime)) {
-				st = m.getPreviewHandler(uri, vinfo, realtime);
+			if (m.canPreview(uri, vi, realtime)) {
+				st = m.getPreviewHandler(uri, vi, realtime);
 			}
 				
 		}
@@ -229,7 +258,7 @@ public class VideoModuleHelper {
 	}
 	
 	
-	public boolean handleSpecial(URI uri, VideoInformation vidinfo) {
+	private boolean handleSpecial(URI uri, VideoInformation vidinfo) {
 		if (Utils.isFile(uri)) {
 			if (uri.getPath().toLowerCase().endsWith(".tivo")) {
 				vidinfo.setContainerFormat(VideoFormats.CONTAINER_TIVO);
@@ -242,9 +271,10 @@ public class VideoModuleHelper {
 		}
 		return true;
 	}
-	public boolean fillVideoInformation(URI uri, VideoInformation vidinfo) {
+	public boolean fillVideoInformation(DirEntry de, VideoInformation vidinfo) {
+		URI uri = de.getUri();
 		Log.debug("GetVidInfo: " + uri);
-		Iterator<VideoHandlerModule> it = getVideoModulesIterator(new GetPriority() { 
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new GetPriority() { 
 			public int getPriority(VideoHandlerModule m) 
 			{ return m.getPriorities().fillVideoPriority; }
 		}
@@ -260,8 +290,10 @@ public class VideoModuleHelper {
 		return b;				
 	}
 	
-	public boolean canPreview(URI uri, VideoInformation vi, boolean realtime) {
-		Iterator<VideoHandlerModule> it = videoModules.iterator();
+	public boolean canPreview(DirEntry de, boolean realtime) {
+		VideoInformation vi = de.getVideoInformation();
+		URI uri = de.getUri();
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new NullGetPriority());
 		boolean b = false;
 		while(!b && it.hasNext()) {
 			VideoHandlerModule m = it.next();
@@ -289,8 +321,8 @@ public class VideoModuleHelper {
 		Log.debug("Bitrate for quality: " + br);
 		return br;
 	}
-	public VideoInputStream openVideo(URI deUri,
-			VideoInformation videoInformation, long startPosition, int qual) {
+	public VideoInputStream openVideo(DirEntry de, long startPosition, int qual) {
+		VideoInformation videoInformation = de.getVideoInformation();
 		if (qual == VideoFormats.QUALITY_AUTO) {
 			// openVideo should never be called with QUALITY_AUTO
 			Log.error("ERROR!: openVideo called with QUALITY_AUTO.  This should never happen. Assuming QUALITY_SAME");
@@ -299,10 +331,10 @@ public class VideoModuleHelper {
 		VideoInputStream vis = null;
 		if (qual == VideoFormats.QUALITY_SAME || videoInformation.getBitRate() <= getBitRateForQual(qual)) {
 			Log.debug("quality setting is above quality of video, streaming normally");
-			vis = openStreamableVideo(deUri, videoInformation, startPosition);
+			vis = openStreamableVideo(de, startPosition);
 		}
 		if (vis != null)
 			return vis;
-		return openTranscodedVideo(deUri, videoInformation, startPosition, qual);
+		return openTranscodedVideo(de, startPosition, qual);
 	}
 }

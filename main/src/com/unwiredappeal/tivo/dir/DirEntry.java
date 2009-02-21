@@ -227,7 +227,7 @@ public class DirEntry implements Comparable<DirEntry> {
 		VideoInformation vinfo = getVideoInformation();
 		if (!vinfo.isValid())
 			return false;
-		if (VideoModuleHelper.inst.canStreamOrTranscodeVideo(getUri(), vinfo))
+		if (VideoModuleHelper.inst.canStreamOrTranscodeVideo(this))
 			return true;
 		return false;
 	}
@@ -240,7 +240,6 @@ public class DirEntry implements Comparable<DirEntry> {
 		cachedMeta = true;
 		if (isFolder())
 			return false;
-		VideoInformation vi = null;
 		this.hasMeta = VideoModuleHelper.inst.setMetadata(meta, this);
 		if (this.hasMeta)
 			TitleCacher.getInstance().setCachedTitle(uri, meta);
@@ -250,7 +249,7 @@ public class DirEntry implements Comparable<DirEntry> {
 	
 	public VideoInformation getVideoInformation() {
 		if (vinfo == null)
-			vinfo = VideoInformation.getVideoInformation(uri);
+			vinfo = VideoInformation.getVideoInformation(this);
 		return vinfo;
 	}
 

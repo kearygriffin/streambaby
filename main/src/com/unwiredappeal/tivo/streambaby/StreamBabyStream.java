@@ -292,6 +292,18 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
    @Override
    protected Resolution getPreferredResolution(ResolutionInfo resInfo) {
        Resolution r= new Resolution("640x480-PAR=1/1");
+
+       int y = StreamBabyConfig.cfgHmeRes.getInt();
+       if (y > 0) {
+    	   Iterator<Resolution> it = resInfo.getSupportedResolutions().iterator();
+    	   while(it.hasNext()) {
+    		   Resolution ir = it.next();
+    		   if (ir.getHeight() == y && ir.getPixelAspectDenominator() == ir.getPixelAspectNumerator())
+    			   return ir;
+    	   }
+       }
+       
+
        return r;
    }
 

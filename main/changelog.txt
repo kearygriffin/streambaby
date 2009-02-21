@@ -2,6 +2,7 @@
  * Force transcoding of MP4's if profile > High or Level > 41 
  * Internal reorg--  Get icon for display from parsed file type (folder, video, dvd, etc)
  * Changed re-interleaving code to work based on DTS (decoding time stamp) rather than PTS (presentation time stamp)
+ * pytivo-html.xsl supports image : tag with URL to image to use in metadata
  
  ===V0.24===
  * Added stack trace printout to Listener when catching uncaught exceptions
