@@ -109,7 +109,7 @@ public class AutoPreviewGenerationManager implements Cleanupable {
 			//if (new File(StreamBabyConfig.cacheDir, ZipPreviewer.getCacheFile(f, "partial").getName()).exists())
 				//return;			
 			Log.info("Autogenerating preview for file: " + f.getAbsolutePath());
-			PreviewGenerator gen = AutoPreviewGenerationManager.inst.getPreviewer(de, PreviewWindow.small_PREVIEW_WIDTH, PreviewWindow.small_PREVIEW_HEIGHT, true);
+			PreviewGenerator gen = AutoPreviewGenerationManager.inst.getPreviewer(de, PreviewWindow._small_PREVIEW_WIDTH, PreviewWindow._small_PREVIEW_HEIGHT, true);
 			// We can close it immediately, as it will offer itself up to keep running
 			if (gen != null)
 				gen.close();

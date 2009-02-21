@@ -50,10 +50,7 @@ public class GLOBAL {
 	public static int icon_W = 24;
 
 	// status bar
-	public static int statusBG_W = 540; // 376+53;
-	public static int statusBG_H = 15;
-	public static int statusBG_X = (640 - statusBG_W) / 2;
-	public static int statusBG_Y = 375;
+        public static int statusBG_Y_from_bottom = 150;
 	public static Color statusBG_COLOR = Color.black;
 	public static String status_FONT = "default-18.font";
 	public static Color statusBAR_COLOR = Color.green;

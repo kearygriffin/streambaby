@@ -77,7 +77,7 @@ public class PlayScreen extends ScreenTemplate {
 			layout = lm.safeAction(layout, this, 0, 25);
 			layout = lm.indentX(layout, -20);
 			layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
-			layout = lm.indentY(layout, 55);
+			layout = lm.indentY(layout, 60);
 
 			int bottom = calcListLayout(4).getBounds().y;
 			int height = bottom - layout.getBounds().y;
@@ -109,7 +109,7 @@ public class PlayScreen extends ScreenTemplate {
 		layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
 		layout = lm.indentY(layout, 65);
 		int height = ViewUtils.getHeight(this, H_BAR);
-		layout = lm.valign(layout, 295 - (rows * height));
+		layout = lm.valign(layout, ((int)(.62 * getHeight())) - (rows * height));
 		return layout;
 	}
 
@@ -527,7 +527,9 @@ public class PlayScreen extends ScreenTemplate {
 		switch (code) {
 		case KEY_CHANNELUP:
 		case KEY_CHANNELDOWN:
-			return mview.handleKeyPress(code, rawcode);
+			if (mview != null)
+				return mview.handleKeyPress(code, rawcode);
+			break;
 		case KEY_SELECT:
 			BButtonPlus<ButtonHandler> b = buttonsList.get(curButton);
 			return b.getValue().select();

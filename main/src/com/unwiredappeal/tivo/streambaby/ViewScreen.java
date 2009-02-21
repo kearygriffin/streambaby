@@ -118,7 +118,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	public PreviewWindow preview = null;
 	BView metaview;
 
-	public static int INFO_VIEW_HEIGHT = 300;
+	public static float INFO_VIEW_HEIGHT_PER = .62f;
 	public static float INFO_VIEW_TRANSPARENCY = 0.20f;
 	public static int INFO_VIEW_ARC = 50;
 	public static float INFO_VIEW_STROKE = 12.0f;
@@ -210,14 +210,14 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		infoView = new BRoundedPanel(getNormal(), sapp
 				.getSafeActionHorizontal(), sapp.getSafeActionVertical(), this
 				.getWidth()
-				- (sapp.getSafeActionHorizontal() * 2), INFO_VIEW_HEIGHT,
+				- (sapp.getSafeActionHorizontal() * 2), (int)(this.getHeight() * INFO_VIEW_HEIGHT_PER),
 				INFO_VIEW_ARC, INFO_VIEW_STROKE, INFO_VIEW_COLOR,
 				INFO_VIEW_TRANSPARENCY);
 		infoView.setVisible(false);
 
 		// keypad text (when numbers pressed)
 		keypadText = new VText(getNormal(), SAFE_ACTION_H,
-				GLOBAL.statusBG_Y + 35, 1, "");
+				       this.getHeight() - GLOBAL.statusBG_Y_from_bottom + 35, 1, "");
 		keypadText.setVisible(false);
 
 		// Error screen text (for error reporting)

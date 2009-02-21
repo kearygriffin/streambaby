@@ -22,19 +22,8 @@ import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
 public class PreviewWindow extends BViewPlus {
 
-   public static int small_PREVIEW_WIDTH = 352;
-   public static int small_PREVIEW_HEIGHT = 288;
-   public static final int small_width = small_PREVIEW_WIDTH + 20;
-   public static final int small_height = small_PREVIEW_HEIGHT + 20;
-   public static final int small_x = (640-small_width)/2;
-   public static final int small_y = ((480-small_height)/2) - 50;
-   
-   public static int big_PREVIEW_WIDTH = 640;
-   public static int big_PREVIEW_HEIGHT = 480;
-   public static final int big_width = big_PREVIEW_WIDTH;
-   public static final int big_height = big_PREVIEW_HEIGHT;
-   public static final int big_x = (640-big_width)/2;
-   public static final int big_y = ((480-big_height)/2);
+    public static int _small_PREVIEW_WIDTH =  352;
+    public static int _small_PREVIEW_HEIGHT = 288;
 
    public Boolean visible = false;
    public int currentDisplayFrame = -1; 
@@ -75,6 +64,21 @@ public class PreviewWindow extends BViewPlus {
    public static PreviewWindow getPreviewWindow(BView parent, DirEntry de) {
 	   PreviewGenerator generator = null;
 	   boolean useBig = StreamBabyConfig.cfgPreviewBig.getBool();
+
+	   int small_PREVIEW_WIDTH = (int)(parent.getWidth() * .55);
+	   int small_PREVIEW_HEIGHT = (int)(parent.getHeight() * .55);
+	   int small_width = small_PREVIEW_WIDTH + 20;
+	   int small_height = small_PREVIEW_HEIGHT + 20;
+	   int small_x = (parent.getWidth()-small_width)/2;
+	   int small_y = ((parent.getHeight()-small_height)/2) - 50;
+   
+	   int big_PREVIEW_WIDTH = parent.getWidth();
+	   int big_PREVIEW_HEIGHT = parent.getHeight();
+	   int big_width = big_PREVIEW_WIDTH;
+	   int big_height = big_PREVIEW_HEIGHT;
+	   int big_x = (parent.getWidth()-big_width)/2;
+	   int big_y = ((parent.getHeight()-big_height)/2);
+
 	   int PREVIEW_WIDTH = useBig ? big_PREVIEW_WIDTH : small_PREVIEW_WIDTH;
 	   int PREVIEW_HEIGHT = useBig ? big_PREVIEW_HEIGHT : small_PREVIEW_HEIGHT;
 	   int width = useBig ? big_width : small_width;
@@ -95,6 +99,7 @@ public class PreviewWindow extends BViewPlus {
 
 	   float aspect = de.getVideoInformation().getAspect();
 	   if (is16x9) {
+		   if ((float)parent.getWidth() / (float)parent.getHeight() < 1.4f)
 		   aspect = aspect / 1.33f;
 	   }
 	   int sh = PREVIEW_HEIGHT;

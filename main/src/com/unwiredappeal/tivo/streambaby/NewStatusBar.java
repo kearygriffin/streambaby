@@ -20,9 +20,10 @@ public class NewStatusBar extends BShuttleBarPlus {
    int bufferEnd;
    
    public NewStatusBar(BView parent) {
-	   super(parent, GLOBAL.statusBG_X, GLOBAL.statusBG_Y,
-		         GLOBAL.statusBG_W, false);
-	   progressX = progress.getX() ;      
+       super(parent,  (parent.getWidth() - (parent.getWidth() * 4 / 5)) / 2,
+	     parent.getHeight() - GLOBAL.statusBG_Y_from_bottom,
+	     (parent.getWidth() * 4 / 5), false);
+       progressX = progress.getX() ;      
    }
    
    public void makeVisible(Boolean state) {

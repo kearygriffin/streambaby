@@ -20,7 +20,6 @@ import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.mediastreams.VideoInputStream;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
-import com.unwiredappeal.tivo.streambaby.PreviewWindow;
 import com.unwiredappeal.tivo.utils.PropertyReplacer;
 import com.unwiredappeal.tivo.utils.SocketProcessInputStream;
 import com.unwiredappeal.tivo.utils.Utils;
@@ -314,7 +313,7 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 			}
 			this.nextSec = secs;
 			String sockStr = "tcp://127.0.0.1:" + ss.getPort();
-			String scale = PreviewWindow.small_PREVIEW_WIDTH + "x" + PreviewWindow.small_PREVIEW_HEIGHT;
+			String scale = 352 + "x" + 288;
 			String[] args = new String[] { "-ss", Integer.toString(secs), "-i", filename, "-s", scale, "-qscale", Integer.toString(qscale) };
 			List<String> argsList = new ArrayList<String>();
 			argsList.addAll(Arrays.asList(args));
