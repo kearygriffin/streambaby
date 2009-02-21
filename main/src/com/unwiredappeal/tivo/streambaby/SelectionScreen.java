@@ -72,9 +72,9 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
       Layout layout = safeTitle;
 
       layout = lm.relativeY(layout, true);
-      layout = lm.safeAction(layout, this, 0, 25);
+      layout = lm.safeAction(layout, this, 0, 30);
       layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
-      
+
       list = new StandardList(getNormal(), layout);   
 
       //updateFileList(de);
@@ -428,7 +428,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
         */
        public StandardList(BView parent, Layout layout)
        {
-           super(parent, layout);
+           super(parent, layout, 45, true);
            setBarAndArrows(BAR_HANG, BAR_DEFAULT, "pop", H_RIGHT);
            BHighlights h = this.getHighlights();
            h.setPageHint(H_PAGEUP,   A_RIGHT+13, A_TOP    - 5);

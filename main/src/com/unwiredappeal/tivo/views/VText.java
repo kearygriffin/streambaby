@@ -7,6 +7,7 @@ import com.tivo.hme.bananas.BTextPlus;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.sdk.Resource.FontResource;
 import com.unwiredappeal.tivo.streambaby.GLOBAL;
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.streambaby.StreamBabyStream;
 
 public class VText extends BTextPlus<String> {
@@ -33,6 +34,7 @@ public class VText extends BTextPlus<String> {
    }
    public static FontSizeInfo getFontSize(String type) {
 	      //text = new BText(view, x, y, w, h*h_multiplier);
+              int y_res = StreamBabyConfig.cfgHmeRes.getInt();
 	      int fontSize = 30;
 	      int h;
 	      h = 30;
@@ -48,17 +50,32 @@ public class VText extends BTextPlus<String> {
 	         fontSize = 25;
 	         h = 27;
 	      }
-	      if (type.equals("title")) {
-	         fontSize += 18;
-	         h += 18;
-	      }
-	      if (type.equals("small")) {
-	         fontSize -= 10;
-	         h -= 10;
-	      }
-	      if (type.equals("tiny")) {
-	    	  fontSize -= 15;
-	    	  h -= 15;
+	      if (y_res < 720) {
+		  if (type.equals("title")) {
+		      fontSize += 18;
+		      h += 18;
+		  }
+		  if (type.equals("small")) {
+		      fontSize -= 10;
+		      h -= 10;
+		  }
+		  if (type.equals("tiny")) {
+		      fontSize -= 15;
+		      h -= 15;
+		  }
+	      } else {
+		  if (type.equals("title")) {
+		      fontSize += 18;
+		      h += 18;
+		  }
+		  if (type.equals("small")) {
+		      fontSize -= 5;
+		      h -= 5;
+		  }
+		  if (type.equals("tiny")) {
+		      fontSize -= 10;
+		      h -= 10;
+		  }
 	      }
 	   
 	      return new FontSizeInfo(fontSize, h);
