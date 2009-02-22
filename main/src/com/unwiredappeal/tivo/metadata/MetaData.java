@@ -181,7 +181,7 @@ public class MetaData implements Serializable {
 		
 	}
 	public void setHtml(String html) {
-		//Log.verbose("PreTidy: " + html);
+	    // Log.verbose("PreTidy: " + html);
 		if (StreamBabyConfig.cfgForceTidy.getBool()) {
 			Tidy t = new Tidy();
 			t.setQuiet(true);

@@ -3,11 +3,10 @@
      version="1.0">
 <xsl:output method="html" indent="no"/>
 
+<xsl:param name="stylesheet">default.css</xsl:param>
 <xsl:variable name="artwork" select="//image"/>
 <xsl:attribute-set name="imgset">
   <xsl:attribute name="src"><xsl:value-of select="$artwork"/></xsl:attribute>
-  <xsl:attribute name="align">right</xsl:attribute>
-  <xsl:attribute name="width">30%</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:variable name="hasimage" select="$artwork!=''"/>
@@ -17,14 +16,16 @@
 <xsl:template match="/">
 <html>
 <head>
+<link rel="stylesheet" type="text/css" href="{$stylesheet}" />
 </head>
 <body>
    <xsl:if test="$hasimage">
        <xsl:element name="img" use-attribute-sets="imgset"/>
    </xsl:if>
 
-    <font face="arial" color="white" size="3">
-    <b>
+   <div id="global">
+
+<h1>
 <xsl:choose>
       <xsl:when test="pytivo/isEpisode">
         <xsl:choose>
@@ -52,13 +53,11 @@
         <!-- Default Title Here?? -->
       </xsl:otherwise>
   </xsl:choose>
-
-    </b>
-    <br/><xsl:value-of select="pytivo/description"/>
-    <font size="3">
-    <br/><xsl:apply-templates select="pytivo/vActor[position() &lt; 4]"/>
-    <br/><i><xsl:apply-templates select="pytivo/vProgramGenre"/></i>
-    </font></font>
+</h1>
+<p><xsl:value-of select="pytivo/description"/></p>
+    <p><xsl:apply-templates select="pytivo/vActor[position() &lt; 4]"/></p>
+    <p class="genre"><xsl:apply-templates select="pytivo/vProgramGenre"/></p>
+</div>
 </body>
 </html>
 </xsl:template>

@@ -3,11 +3,9 @@
 package com.unwiredappeal.tivo.views;
 
 import com.unwiredappeal.tivo.streambaby.GLOBAL;
-import com.unwiredappeal.tivo.config.StreamBabyConfig;
 
 public class VFont {
     public static int getFontSize(String size) {
-	int y_res = StreamBabyConfig.cfgHmeRes.getInt();
 	int fontSize = 30;
 	try {
 	    fontSize = Integer.parseInt(size);
@@ -21,7 +19,7 @@ public class VFont {
 	    if (GLOBAL.FONT_SIZE.equals("small") ) {
 		fontSize = 25;
 	    }
-	    if (y_res < 720) {
+	    if (GLOBAL.y_res < 720) {
 		if (size.equals("title")) {
 		    fontSize += 18;
 		}

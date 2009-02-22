@@ -30,6 +30,7 @@ import org.xml.sax.InputSource;
 
 import com.unwiredappeal.tivo.config.ConfigurableObject;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
+import com.unwiredappeal.tivo.streambaby.GLOBAL;
 import com.unwiredappeal.tivo.modules.StreamBabyModule;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.TempFileManager;
@@ -71,6 +72,9 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 	}
 	
 	protected  boolean transform(MetaData m, SAXSource source, String xsl, String defaultXsl) {
+
+	    String cssFileName = StreamBabyConfig.convertRelativePath(StreamBabyConfig.cfgMetaCSS.getValue() + "-" + GLOBAL.y_res + ".css", StreamBabyConfig.streamBabyDir + File.separator + "stylesheets");
+
 		if (defaultXsl == null)
 			defaultXsl = DEFAULT_XSL;
 		
@@ -107,6 +111,8 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 				Log.error("Unable to load xslt transformer:" + e);
 				continue;
 			}
+
+			transformer.setParameter("stylesheet", cssFileName);
 			// transform the SAXSource to the result
 			StringWriter sw = new StringWriter();
 			StreamResult result = new StreamResult(sw);
@@ -120,6 +126,7 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 		}
 		if (resultStr != null)
 			m.setString(resultStr);
+		Log.debug(resultStr);
 		return resultStr != null;
 	}
 

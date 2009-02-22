@@ -60,4 +60,7 @@ public class GLOBAL {
 	//public static String DEFAULT_FFMPEG_PATH = "ffmpeg";
 	//public static String DEFAULT_WIN_FFMPEG_PATH = "native/ffmpeg";
 
+    // To store the vertical resolution we are actually using
+    public static int y_res = 480;
+
 }

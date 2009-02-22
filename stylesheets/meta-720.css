@@ -1,0 +1,21 @@
+#global {
+    color:white;
+    font-family: arial;
+    font-size: 20;
+}
+
+h1,h2 {
+    font-size:25;
+    color:#F7BE81;
+}
+
+p.genre {
+    font-style:italic;
+}
+
+img {
+    float:right;
+    width:150;
+    height:200;
+}
+

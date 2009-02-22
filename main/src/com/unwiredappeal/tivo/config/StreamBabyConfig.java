@@ -358,10 +358,16 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgDefaultCss = new ConfigEntry(
 			"html.css",
-			"streambaby.css",
-			"Default stylesheet to use for html rendering"
+			"base-style.css",
+			"Default basename stylesheet to use for html rendering (will add -yres.css to it)"
 			);
 
+	public static ConfigEntry cfgMetaCSS = new ConfigEntry(
+			"meta.css",
+			"meta",
+			"basename of stylesheet to use for metadata.  Appends that basename -yres.css"
+			);
+	
 	public static ConfigEntry cfgPyTivoXsl = new ConfigEntry(
 			"xsl.pytivo",
 			"pytivo-text.xsl",

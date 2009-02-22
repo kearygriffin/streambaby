@@ -298,11 +298,13 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
     	   Iterator<Resolution> it = resInfo.getSupportedResolutions().iterator();
     	   while(it.hasNext()) {
     		   Resolution ir = it.next();
-    		   if (ir.getHeight() == y && ir.getPixelAspectDenominator() == ir.getPixelAspectNumerator())
-    			   return ir;
+    		   if (ir.getHeight() == y && ir.getPixelAspectDenominator() == ir.getPixelAspectNumerator()) {
+		       GLOBAL.y_res = y;
+		       return ir;
+		   }
     	   }
        }
-       
+       GLOBAL.y_res = 480;
 
        return r;
    }

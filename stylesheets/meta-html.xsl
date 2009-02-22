@@ -2,23 +2,22 @@
 <xsl:stylesheet version="1.0"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="html" omit-xml-declaration="yes" indent="no"/>
+<xsl:param name="stylesheet">default.css</xsl:param>
 <xsl:variable name="artwork" select="//artwork"/>
 <xsl:attribute-set name="imgset">
   <xsl:attribute name="src"><xsl:value-of select="$artwork"/></xsl:attribute>
-  <xsl:attribute name="align">right</xsl:attribute>
-  <xsl:attribute name="width">30%</xsl:attribute>
 </xsl:attribute-set>
 
 <xsl:variable name="hasimage" select="$artwork!=''"/>
 
 <xsl:template match="/">
-	<html><body>
+	<html><head><link rel="stylesheet" type="text/css" href="{$stylesheet}" /></head><body>
 		<xsl:if test="$hasimage">
-			<xsl:element name="img" use-attribute-sets="imgset"/>
+		       <xsl:element name="img" use-attribute-sets="imgset"/>
 		</xsl:if>
-		<font face="arial" color="white" size="3">
+		<div id="global">
 			<xsl:apply-templates select="meta"/>
-		</font>
+		</div>
 	</body></html>
 </xsl:template>
 
@@ -31,30 +30,27 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 </xsl:template>
 
 <xsl:template match="album">
-	<xsl:value-of select="."/>
-	<xsl:text> </xsl:text>
-	<xsl:value-of select="/meta/year"/>
-	<br/>
+  <p>
+    <xsl:value-of select="."/>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="/meta/year"/>
+  </p>
 </xsl:template>
 
 <xsl:template match="name">
-	<xsl:value-of select="."/>
-	<br/>
+  <h1><xsl:value-of select="."/></h1>
 </xsl:template>
 <xsl:template match="tracktitle">
-	<xsl:value-of select="."/>
-	<br/>
+  <h2><xsl:value-of select="."/></h2>
 </xsl:template>
 
 
 <xsl:template match="artist">
-	<xsl:value-of select="."/>
-	<br/>
+  <p><xsl:value-of select="."/></p>
 </xsl:template>
 
 <xsl:template match="comment">
-	<xsl:value-of select="."/>
-	<br/>
+  <p><xsl:value-of select="."/></p>
 </xsl:template>
 
 

@@ -75,7 +75,7 @@ public class HtmlKitRenderer extends BaseHtmlRenderer {
 	        SBHtmlEditorKit kit = new SBHtmlEditorKit(baseUrl);
 			pane.setEditorKit(kit);
 			//pane.setPreferredSize(new Dimension(width, 0));
-			File css = new File(StreamBabyConfig.convertRelativePath(StreamBabyConfig.cfgDefaultCss.getValue(), StreamBabyConfig.streamBabyDir + File.separator));
+			File css = new File(StreamBabyConfig.convertRelativePath(StreamBabyConfig.cfgDefaultCss.getValue(), StreamBabyConfig.streamBabyDir + File.separator + "stylesheets"));
 			if (css.exists()) {
 				try {
 					kit.getStyleSheet().importStyleSheet(css.toURL());
