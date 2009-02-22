@@ -15,6 +15,7 @@ import org.arabidopsis.interval.IntervalTree;
 import com.tivo.hme.bananas.BView;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.views.bgtext;
+import com.unwiredappeal.tivo.views.VFont;
 
 public class cctext {
 	
@@ -43,10 +44,10 @@ public class cctext {
    
    String lastCC = null;
    
-   public cctext(BView view, int fontSize, String file) {
+   public cctext(BView view, String fontSize, String file) {
 	   minCCTime = StreamBabyConfig.cfgCCMinTime.getInt()/1000.0;
 	   minCCTimePerChar = StreamBabyConfig.cfgCCMinTimePerChar.getInt()/1000.0;
-      this.fontSize = fontSize;
+      this.fontSize = VFont.getFontSize(fontSize);
       this.view = view;
       if (! file.toLowerCase().endsWith(".srt")) {
          file = file.replaceFirst("^(.+)\\..+$", "$1.srt");

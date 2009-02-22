@@ -418,8 +418,8 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgCCFontSize = new ConfigEntry(
 			"cc.fontsize",
-			"20",
-			"Minimum time to leave a CC on the screen (absolute) in ms"
+			"small",
+			"Size of font as either absolute integer, or medium, small, tiny"
 			);
 	
 

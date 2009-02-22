@@ -16,6 +16,10 @@ public class bgtext {
    BView bg;
    public int x, y, w, h, fontSize;
 
+    public bgtext(BView view, String fontSize, String value) {
+	this(view, VFont.getFontSize(fontSize), value);
+    }
+
    public bgtext(BView view, int fontSize, String value) {
 	   this.fontSize = fontSize;
 	   h = fontSize + 2;

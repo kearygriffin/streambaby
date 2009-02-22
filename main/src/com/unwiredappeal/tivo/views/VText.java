@@ -33,52 +33,9 @@ public class VText extends BTextPlus<String> {
 	   }
    }
    public static FontSizeInfo getFontSize(String type) {
-	      //text = new BText(view, x, y, w, h*h_multiplier);
-              int y_res = StreamBabyConfig.cfgHmeRes.getInt();
-	      int fontSize = 30;
-	      int h;
-	      h = 30;
-	      if (GLOBAL.FONT_SIZE.equals("large") ) {
-	         fontSize = 35;
-	         h = 35;
-	      }
-	      if (GLOBAL.FONT_SIZE.equals("medium") ) {
-	         fontSize = 30;
-	         h = 30;
-	      }
-	      if (GLOBAL.FONT_SIZE.equals("small") ) {
-	         fontSize = 25;
-	         h = 27;
-	      }
-	      if (y_res < 720) {
-		  if (type.equals("title")) {
-		      fontSize += 18;
-		      h += 18;
-		  }
-		  if (type.equals("small")) {
-		      fontSize -= 10;
-		      h -= 10;
-		  }
-		  if (type.equals("tiny")) {
-		      fontSize -= 15;
-		      h -= 15;
-		  }
-	      } else {
-		  if (type.equals("title")) {
-		      fontSize += 18;
-		      h += 18;
-		  }
-		  if (type.equals("small")) {
-		      fontSize -= 5;
-		      h -= 5;
-		  }
-		  if (type.equals("tiny")) {
-		      fontSize -= 10;
-		      h -= 10;
-		  }
-	      }
-	   
-	      return new FontSizeInfo(fontSize, h);
+       //text = new BText(view, x, y, w, h*h_multiplier);
+       int fontSize = VFont.getFontSize(type);
+       return new FontSizeInfo(fontSize, fontSize);
    }
    public static FontResource setupText(BTextPlus<String> t, String type, int fontSize) {
 	      t.setColor(GLOBAL.text_COLOR);

@@ -127,9 +127,6 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	public static String INFO_FONT_SIZE = "tiny";
 	public static int INFO_SPACE = 0;
 	
-	public static int PLAY_ICON_X = 570;
-	public static int PLAY_ICON_Y = 30;
-	
 	cctext cc;
 	boolean CC = true;
 	
@@ -232,14 +229,19 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				"small");
 		waitText.setFlags(RSRC_HALIGN_CENTER | RSRC_TEXT_WRAP);
 
+		LayoutManager lmIcon = new LayoutManager(getNormal());
+ 		Layout safeTitleIcon = lmIcon.safeTitle(this);
+ 		Layout layoutIcon = safeTitleIcon;
+		layoutIcon = lmIcon.size(layoutIcon, 32, 32);
+ 		layoutIcon = lmIcon.align(layoutIcon, A_TOP, A_RIGHT);
+		icon = new BViewPlus(getAbove(), layoutIcon);
+
 		LayoutManager lm = new LayoutManager(getNormal());
 		Layout safeTitle = lm.safeTitle(this);
 		Layout layout = safeTitle;
 		Element e = getBApp().getSkin().get(IBananasPlus.H_PLEASE_WAIT);
 		layout = lm.size(layout, e.getWidth(), e.getHeight());
 		layout = lm.align(layout, A_CENTER, A_CENTER);
-
-		icon = new BViewPlus(getAbove(), PLAY_ICON_X, PLAY_ICON_Y, 32, 32, false);
 		pleaseWait = new BViewPlus(this, layout, false);
 		pleaseWait.setResource(e.getResource());
 		pleaseWait.setVisible(false);
@@ -299,7 +301,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		} else {
 			loadCutList();
 			closeCC();
-			cc = new cctext(getNormal(), StreamBabyConfig.cfgCCFontSize.getInt(), deUri.getPath());
+			cc = new cctext(getNormal(), StreamBabyConfig.cfgCCFontSize.getValue(), deUri.getPath());
 			if (cc == null || !cc.exists())
 				closeCC();
 			if (cc != null)
