@@ -43,7 +43,7 @@ public class BScrollableText extends SBScrollPanePlus {
 				v.clearResource();
 				v.remove();
 			}
-		   FontSizeInfo info = VText.getFontSize(size);
+		   FontSizeInfo info = VText.getFontSize(this, size);
 		   FontResource font = ((StreamBabyStream)this.getBApp()).getFont("default.ttf", FONT_PLAIN, info.fontSize);
 		   fm = font.getFontInfo();
 		   if (fm != null)
@@ -82,7 +82,7 @@ public class BScrollableText extends SBScrollPanePlus {
     }
 
 	public void createTextViews() {
-		int lineHeight = (int)(fm.getHeight()+0.99)+1;
+		int lineHeight = (int)(fm.getHeight()+0.99)+2;
 		int newheight = (height / lineHeight) * lineHeight;
 		if (newheight != this.getHeight()) {
 			this.setBounds(this.getX(), this.getY(), this.getWidth(), newheight);

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.utils.TempFileManager;
 
 public abstract class BaseHtmlRenderer implements SBHtmlRenderer {
@@ -15,6 +16,7 @@ public abstract class BaseHtmlRenderer implements SBHtmlRenderer {
 	protected String html = null;
 	protected int width = -1, height = -1;
 	protected boolean urlBased = false;
+	protected String cssFileName;
 	
 	public void setHtmlDocument(String html, String urlBase) {
 		this.url = null;
@@ -64,5 +66,9 @@ public abstract class BaseHtmlRenderer implements SBHtmlRenderer {
 
 	public void setModified(boolean b) {
 		isModified = b;
+	}
+	
+	public void setBaseCSS(String fn) {
+		cssFileName = fn;
 	}
 }

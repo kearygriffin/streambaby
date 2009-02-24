@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import com.tivo.hme.bananas.BApplicationPlus;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BViewPlus;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
@@ -72,6 +73,10 @@ public class MetaDataViewer {
 				url = meta.getUrl();
 			try {
 				SBHtmlRenderer r = SBHtmlRendererFactory.getRenderer();
+				int yres = ((BApplicationPlus)parent.getBApp()).getCurrentResolution().getHeight();
+				String cssFileName = StreamBabyConfig.convertRelativePath(StreamBabyConfig.cfgMetaCSS.getValue() + "-" + yres  + ".css", StreamBabyConfig.streamBabyDir + File.separator + "stylesheets");					
+
+				r.setBaseCSS(cssFileName);
 				if (r == null)
 					return null;
 				if (url != null)

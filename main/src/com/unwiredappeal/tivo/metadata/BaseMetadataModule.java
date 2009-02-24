@@ -73,7 +73,7 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 	
 	protected  boolean transform(MetaData m, SAXSource source, String xsl, String defaultXsl) {
 
-	    String cssFileName = StreamBabyConfig.convertRelativePath(StreamBabyConfig.cfgMetaCSS.getValue() + "-" + GLOBAL.y_res + ".css", StreamBabyConfig.streamBabyDir + File.separator + "stylesheets");
+	    //String cssFileName = StreamBabyConfig.convertRelativePath(StreamBabyConfig.cfgMetaCSS.getValue() + "-" + GLOBAL.y_res + ".css", StreamBabyConfig.streamBabyDir + File.separator + "stylesheets");
 
 		if (defaultXsl == null)
 			defaultXsl = DEFAULT_XSL;
@@ -112,7 +112,7 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 				continue;
 			}
 
-			transformer.setParameter("stylesheet", cssFileName);
+			//transformer.setParameter("stylesheet", cssFileName);
 			// transform the SAXSource to the result
 			StringWriter sw = new StringWriter();
 			StreamResult result = new StreamResult(sw);

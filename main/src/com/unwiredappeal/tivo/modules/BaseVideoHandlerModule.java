@@ -37,7 +37,7 @@ public class BaseVideoHandlerModule extends ConfigurableObject implements VideoH
 		return false;
 	}
 	public boolean canStream(URI uri, VideoInformation vinfo) {
-		return isFormatStreamable(vinfo);
+		return ((vinfo.getAudioBps() == 44100 || vinfo.getAudioBps() == 48000) && isFormatStreamable(vinfo));
 	}
 	
 	public boolean canPreview(boolean realtime) {

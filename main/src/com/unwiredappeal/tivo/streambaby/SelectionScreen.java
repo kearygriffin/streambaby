@@ -16,6 +16,7 @@ import com.tivo.hme.bananas.BView;
 import com.tivo.hme.bananas.BViewPlus;
 import com.tivo.hme.bananas.IBananasPlus;
 import com.tivo.hme.bananas.PlusSupport;
+import com.tivo.hme.bananas.ViewUtils;
 import com.tivo.hme.bananas.BSkin.Element;
 import com.tivo.hme.bananas.layout.Layout;
 import com.tivo.hme.bananas.layout.LayoutManager;
@@ -71,9 +72,16 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
       Layout safeTitle = lm.safeTitle(this);
       Layout layout = safeTitle;
 
+      float stretchy = .98f;
+      int safeY = -5;
+      if (this.getBApp().getCurrentResolution().getHeight() == 720) {
+    	  stretchy = .95f;
+    	  safeY = -5;
+      }
       layout = lm.relativeY(layout, true);
-      layout = lm.safeAction(layout, this, 0, 30);
+      layout = lm.safeAction(layout, this, 0, safeY);
       layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
+      layout = lm.stretchHeight(layout, stretchy);
 
       list = new StandardList(getNormal(), layout);   
 
@@ -428,7 +436,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
         */
        public StandardList(BView parent, Layout layout)
        {
-           super(parent, layout, 45, true);
+           super(parent, layout, Math.min(45, ViewUtils.getHeight(parent, H_BAR)), true);
            setBarAndArrows(BAR_HANG, BAR_DEFAULT, "pop", H_RIGHT);
            BHighlights h = this.getHighlights();
            h.setPageHint(H_PAGEUP,   A_RIGHT+13, A_TOP    - 5);

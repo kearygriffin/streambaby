@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
+import com.tivo.hme.bananas.BApplicationPlus;
 import com.unwiredappeal.mediastreams.MP4StreamingModule;
 import com.unwiredappeal.mediastreams.MpegStreamingModule;
 import com.unwiredappeal.mediastreams.RawStreamingModule;
@@ -233,7 +234,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgBackgroundImage = new ConfigEntry(
 			"background.image",
-			"blue.jpg",
+			"background-%r.jpg",
 			"background image to use"
 			);
 	
@@ -370,7 +371,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgPyTivoXsl = new ConfigEntry(
 			"xsl.pytivo",
-			"pytivo-text.xsl",
+			"pytivo-html.xsl",
 			"xslt to use for transforming pytivo metadata.  Relative to stylesheets or abs"
 			);
 	
@@ -382,7 +383,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgTivoXmlXsl = new ConfigEntry(
 			"xsl.tvbusenvelope",
-			"tivo-pyxml.xsl,pytivo-text.xsl",
+			"tivo-pyxml.xsl,pytivo-html.xsl",
 			"xslt to use for transforming tivo XML metadata.  Relative to stylesheets or abs"
 			);
 
@@ -438,7 +439,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public static ConfigEntry cfgHmeRes = new ConfigEntry(
 			"hme.res",
-			"480",
+			"720",
 			"Resolution to use for StreamBaby screens"
 			);
 	// This always be last
@@ -856,6 +857,17 @@ public class StreamBabyConfig extends ConfigurableObject {
 			delta = (int)((qual / (float)qrange) * range);
 		}
 		return cfgQualityLowestRes.getInt() + delta;
+
+	}
+
+	public static String getBackgroundImage(BApplicationPlus app) {
+		String img = StreamBabyConfig.cfgBackgroundImage.getValue();
+		if (img.indexOf("%r") >= 0) {
+			String yres;
+			yres = Integer.toString(app.getCurrentResolution().getHeight());
+			img = img.replaceAll("%r", yres);
+		}
+		return img;
 
 	}
 

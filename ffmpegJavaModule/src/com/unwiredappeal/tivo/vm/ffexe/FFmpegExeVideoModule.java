@@ -87,13 +87,13 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 	
 	public static ConfigEntry cfgFFmpegSameQArgs = new ConfigEntry(
 			"ffmpegexe.transcode.sameqargs",
-			"-sameq -ab 192k",
+			"-sameq -ab 192k -ar ${asamplerate}",
 			"Argument to pass for ffmpeg to transcode at same qual as orig"
 			);
 	
 	public static ConfigEntry cfgFFmpegBpsQualArgs = new ConfigEntry(
 			"ffmpegexe.transcode.qualargs",
-			"-bufsize 4096k -b ${bitrate}k -maxrate 8000k -ab ${abitrate}k -s ${xres}x${yres}",
+			"-bufsize 4096k -b ${bitrate}k -maxrate 8000k -ab ${abitrate}k -s ${xres}x${yres} -ar ${asamplerate}",
 			"Arguments to pass to ffmpeg to transcode at a particular kbps"
 			);
 
@@ -598,9 +598,13 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 			vbr = StreamBabyConfig.inst.getVideoBr(qual);
 
 		}
+		int sr = 48000;
+		if (vi.getAudioBps() == 44100)
+			sr = 44100;
 		PropertyReplacer pr = new PropertyReplacer();
 		pr.set("bitrate", vbr);
 		pr.set("abitrate", abr);
+		pr.set("asamplerate", sr);
 		pr.set("xres", xres);
 		pr.set("yres", yres);
 		pr.set("closest.mpeg.fps", getClosestMpegRate(vi.getFps()));

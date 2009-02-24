@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -26,20 +27,40 @@ import org.lobobrowser.html.parser.InputSourceImpl;
 import org.lobobrowser.html.style.RenderState;
 import org.lobobrowser.html.test.SimpleHtmlRendererContext;
 import org.lobobrowser.html.test.SimpleUserAgentContext;
+import org.w3c.css.sac.InputSource;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.css.CSSStyleSheet;
 import org.w3c.dom.html2.HTMLCollection;
 import org.xml.sax.SAXException;
 
+import com.steadystate.css.parser.CSSOMParser;
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.html.BaseHtmlRenderer;
 import com.unwiredappeal.tivo.utils.Log;
 
 public class CobraRenderer extends BaseHtmlRenderer {
 
-	@SuppressWarnings({ "serial", "deprecation" })
+	private CSSStyleSheet css;
+
+	@SuppressWarnings({ "serial", "deprecation", "unchecked" })
 	public BufferedImage[] getImages(final int width, final int height) {
 		if (!isModified() && this.width == width && this.height == height)
 			return bis;
+		if (css == null) {
+			CSSOMParser cssParser = new CSSOMParser();			
+			 try {
+				css = cssParser.parseStyleSheet(new InputSource(new FileReader(new File(cssFileName))));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		File fileToDelete = null;
 		Graphics graphics = null;
 		
@@ -94,7 +115,12 @@ public class CobraRenderer extends BaseHtmlRenderer {
 			try {
 				doc = builder.createDocument(new InputSourceImpl(new FileReader(new File(new URI(rurl))), baseUrl));
 				//((HTMLDocumentImpl)doc).setBaseURI(baseUrl);
-				((HTMLDocumentImpl)doc).load();
+				HTMLDocumentImpl docImpl = ((HTMLDocumentImpl)doc);
+				docImpl.load();
+				if (css != null) {
+					docImpl.getStyleSheets().add(css);				
+					docImpl.allInvalidated(true);
+				}					
 				//doc = builder.parse(rurl);
 			} catch (SAXException e1) {
 				return null;

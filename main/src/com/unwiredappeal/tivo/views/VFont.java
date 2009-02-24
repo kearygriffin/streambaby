@@ -2,10 +2,13 @@
 
 package com.unwiredappeal.tivo.views;
 
+import com.tivo.hme.bananas.BApplicationPlus;
+import com.tivo.hme.bananas.BView;
 import com.unwiredappeal.tivo.streambaby.GLOBAL;
 
 public class VFont {
-    public static int getFontSize(String size) {
+    public static int getFontSize(BView view, String size) {
+    int yres = ((BApplicationPlus)view.getBApp()).getCurrentResolution().getHeight();
 	int fontSize = 30;
 	try {
 	    fontSize = Integer.parseInt(size);
@@ -19,7 +22,7 @@ public class VFont {
 	    if (GLOBAL.FONT_SIZE.equals("small") ) {
 		fontSize = 25;
 	    }
-	    if (GLOBAL.y_res < 720) {
+	    if (yres < 720) {
 		if (size.equals("title")) {
 		    fontSize += 18;
 		}

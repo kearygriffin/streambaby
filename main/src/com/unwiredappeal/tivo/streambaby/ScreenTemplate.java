@@ -6,6 +6,7 @@ import com.tivo.hme.bananas.BApplicationPlus;
 import com.tivo.hme.bananas.BScreenPlus;
 import com.tivo.hme.bananas.BText;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
+import com.unwiredappeal.tivo.views.VFont;
 
 public class ScreenTemplate extends BScreenPlus {
 
@@ -16,14 +17,16 @@ public class ScreenTemplate extends BScreenPlus {
        //
        // set the title of the screen
        //
-       int safeTitleH = getBApp().getSafeTitleHorizontal();
+       int safeTitleH = getBApp().getSafeTitleHorizontal()*2;
        int safeTitleV = getBApp().getSafeTitleVertical();
-       BText title = new BText(getNormal(), safeTitleH, safeTitleV, (getWidth()-(safeTitleH*2)), 54);
+       int fs = VFont.getFontSize(this, "medium");
+       BText title = new BText(getNormal(), safeTitleH, safeTitleV, (getWidth()-(getBApp().getSafeTitleHorizontal()*2)), fs*2+(fs/2));
        title.setValue(this.toString());
        title.setColor(getTitleColor());
        title.setShadow(getTitleShadowColor(), getTitleShadowOffset());
-       title.setFlags(RSRC_VALIGN_TOP);
-       title.setFont(getTitleFont());
+       title.setFlags(RSRC_VALIGN_TOP|RSRC_HALIGN_CENTER|RSRC_TEXT_WRAP);
+       
+       title.setFont("default-" + fs + ".font");
        titleText = title;
        /*
       titleText = new VText(
@@ -37,7 +40,7 @@ public class ScreenTemplate extends BScreenPlus {
    }
    
    public void resetBackground() {
-  	  getBelow().setResource(StreamBabyConfig.cfgBackgroundImage.getValue());
+  	  getBelow().setResource(StreamBabyConfig.getBackgroundImage(this.getBApp()));
 	      if (this.toString() != null) {
 	          // Set background and title
 	          //getBelow().setResource(GLOBAL.BACKGROUND_PICTURE); 

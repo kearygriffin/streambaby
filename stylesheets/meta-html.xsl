@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="html" omit-xml-declaration="yes" indent="no"/>
-<xsl:param name="stylesheet">default.css</xsl:param>
+<!-- xsl:param name="stylesheet">default.css</xsl:param -->
 <xsl:variable name="artwork" select="//artwork"/>
 <xsl:attribute-set name="imgset">
   <xsl:attribute name="src"><xsl:value-of select="$artwork"/></xsl:attribute>
@@ -11,7 +11,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:variable name="hasimage" select="$artwork!=''"/>
 
 <xsl:template match="/">
-	<html><head><link rel="stylesheet" type="text/css" href="{$stylesheet}" /></head><body>
+	<html><head></head><body>
 		<xsl:if test="$hasimage">
 		       <xsl:element name="img" use-attribute-sets="imgset"/>
 		</xsl:if>

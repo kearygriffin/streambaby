@@ -3,7 +3,7 @@
      version="1.0">
 <xsl:output method="html" indent="no"/>
 
-<xsl:param name="stylesheet">default.css</xsl:param>
+<!-- xsl:param name="stylesheet">default.css</xsl:param -->
 <xsl:variable name="artwork" select="//image"/>
 <xsl:attribute-set name="imgset">
   <xsl:attribute name="src"><xsl:value-of select="$artwork"/></xsl:attribute>
@@ -16,7 +16,6 @@
 <xsl:template match="/">
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="{$stylesheet}" />
 </head>
 <body>
    <xsl:if test="$hasimage">

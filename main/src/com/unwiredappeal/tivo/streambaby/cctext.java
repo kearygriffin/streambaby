@@ -47,7 +47,7 @@ public class cctext {
    public cctext(BView view, String fontSize, String file) {
 	   minCCTime = StreamBabyConfig.cfgCCMinTime.getInt()/1000.0;
 	   minCCTimePerChar = StreamBabyConfig.cfgCCMinTimePerChar.getInt()/1000.0;
-      this.fontSize = VFont.getFontSize(fontSize);
+      this.fontSize = VFont.getFontSize(view, fontSize);
       this.view = view;
       if (! file.toLowerCase().endsWith(".srt")) {
          file = file.replaceFirst("^(.+)\\..+$", "$1.srt");

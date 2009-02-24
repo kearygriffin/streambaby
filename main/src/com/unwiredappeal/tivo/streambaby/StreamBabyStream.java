@@ -291,7 +291,6 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
    }
    @Override
    protected Resolution getPreferredResolution(ResolutionInfo resInfo) {
-       Resolution r= new Resolution("640x480-PAR=1/1");
 
        int y = StreamBabyConfig.cfgHmeRes.getInt();
        if (y > 0) {
@@ -299,13 +298,13 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
     	   while(it.hasNext()) {
     		   Resolution ir = it.next();
     		   if (ir.getHeight() == y && ir.getPixelAspectDenominator() == ir.getPixelAspectNumerator()) {
-		       GLOBAL.y_res = y;
+		       //GLOBAL.y_res = y;
 		       return ir;
 		   }
     	   }
        }
-       GLOBAL.y_res = 480;
-
+       Resolution r= new Resolution("640x480-PAR=1/1");
+       //GLOBAL.y_res = 480;       
        return r;
    }
 

@@ -2,6 +2,7 @@
 
 package com.unwiredappeal.tivo.views;
 
+import com.tivo.hme.bananas.BApplication;
 import com.tivo.hme.bananas.BScreen;
 import com.tivo.hme.bananas.BTextPlus;
 import com.tivo.hme.bananas.BView;
@@ -14,14 +15,14 @@ public class VText extends BTextPlus<String> {
    public boolean visible = true;
    public VText(BView view, int x, int y, int width, int height, String type) {
 	   super(view, x, y, width, height, true);
-	   FontSizeInfo info = getFontSize(type);
+	   FontSizeInfo info = getFontSize(this, type);
 	   setupText(this, type, info.fontSize);
 
    }
 
    public VText(BView view, int x, int y, int h_multiplier, String type) {
-	 super(view, x, y, view.getScreen().getWidth()-(BScreen.SAFE_TITLE_H*2), getFontSize(type).h*h_multiplier+(getFontSize(type).h), true);
-      setupText(this, type, getFontSize(type).fontSize);
+	 super(view, x, y, view.getScreen().getWidth()-(BScreen.SAFE_TITLE_H*2), getFontSize(view, type).h*h_multiplier+(getFontSize(view, type).h), true);
+      setupText(this, type, getFontSize(this, type).fontSize);
    }
 
    public static class FontSizeInfo {
@@ -32,9 +33,9 @@ public class VText extends BTextPlus<String> {
 		   this.fontSize = fontSize;
 	   }
    }
-   public static FontSizeInfo getFontSize(String type) {
+   public static FontSizeInfo getFontSize(BView view, String type) {
        //text = new BText(view, x, y, w, h*h_multiplier);
-       int fontSize = VFont.getFontSize(type);
+       int fontSize = VFont.getFontSize(view, type);
        return new FontSizeInfo(fontSize, fontSize);
    }
    public static FontResource setupText(BTextPlus<String> t, String type, int fontSize) {

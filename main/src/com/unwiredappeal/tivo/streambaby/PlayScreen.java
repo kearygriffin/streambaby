@@ -14,11 +14,14 @@ import com.tivo.hme.bananas.BScreen;
 import com.tivo.hme.bananas.BSkin;
 import com.tivo.hme.bananas.BTextPlus;
 import com.tivo.hme.bananas.BView;
+import com.tivo.hme.bananas.BViewPlus;
 import com.tivo.hme.bananas.IBananasPlus;
 import com.tivo.hme.bananas.ViewUtils;
+import com.tivo.hme.bananas.BSkin.Element;
 import com.tivo.hme.bananas.layout.Layout;
 import com.tivo.hme.bananas.layout.LayoutManager;
 import com.tivo.hme.sdk.Resource;
+import com.tivo.hme.sdk.util.Ticker;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.utils.Log;
@@ -26,7 +29,7 @@ import com.unwiredappeal.tivo.metadata.MetaData;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 
-public class PlayScreen extends ScreenTemplate {
+public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 
 	private DirEntry de;
 	int buttonHeight;
@@ -37,6 +40,9 @@ public class PlayScreen extends ScreenTemplate {
 	int qual;
 	boolean canStream;
 	boolean canTranscode;
+	boolean isReturn;
+
+	private BViewPlus pleaseWait;
 
 	BView mview = null;
 	public abstract class ButtonHandler {
@@ -63,20 +69,54 @@ public class PlayScreen extends ScreenTemplate {
 	public PlayScreen(BApplicationPlus app, DirEntry de) {
 		super(app);
 		this.de = de;
+
+	      LayoutManager lm = new LayoutManager(getNormal());
+	      layout = lm.safeTitle(this);
+
+	      Element e = getBApp().getSkin().get(IBananasPlus.H_PLEASE_WAIT);
+	      layout = lm.size(layout, e.getWidth(), e.getHeight());
+	      layout = lm.align(layout, A_CENTER, A_CENTER);
+
+	      pleaseWait = new BViewPlus(this, layout);
+	      pleaseWait.setResource(e.getResource());
+	      pleaseWait.setVisible(true);
+	      
+		  //title = de.getStrippedFilename();
+		  resetTitle();
+
+	}
+	
+	public synchronized long tick(long tm, Object arg) {
+		
+		render();
+		flush();
+		return 0;
+	}
+
+	public void render() {
+		this.setPainting(false);
 		qual = StreamBabyConfig.inst.getDefaultQuality();
 		MetaDataViewer mv = new MetaDataViewer();
 		MetaData meta = new MetaData();
 		boolean hasMeta = de.getMetadata(meta);
 		if (hasMeta) {
+		      float stretchy = 1f;
+		      int safeY = 25;
+		      if (this.getBApp().getCurrentResolution().getHeight() == 720) {
+		    	  stretchy = 1.05f;
+		    	  safeY = 35;
+		      }
+
 			LayoutManager lm = new LayoutManager(getNormal());
 			Layout safeTitle = lm.safeTitle(this);
 			Layout layout = safeTitle;
 
 			layout = lm.relativeY(layout, false);		
 			
-			layout = lm.safeAction(layout, this, 0, 25);
+			layout = lm.safeAction(layout, this, 0, safeY);
 			layout = lm.indentX(layout, -20);
 			layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
+			layout = lm.stretchHeight(layout, stretchy);
 			layout = lm.indentY(layout, 60);
 
 			int bottom = calcListLayout(4).getBounds().y;
@@ -95,27 +135,46 @@ public class PlayScreen extends ScreenTemplate {
 		 * setFocusDefault(list);
 		 */
 		resetTitle();
-	}
 
+		setupList(isReturn);
+
+		pleaseWait.setVisible(false);
+		this.setPainting(true);		
+	}
 	public Layout calcListLayout(int rows) {
 
 		LayoutManager lm = new LayoutManager(getNormal());
 		Layout safeTitle = lm.safeTitle(this);
 		Layout layout = safeTitle;
 
+	      float stretchy = .98f;
+	      int safeY = 25;
+	      if (this.getBApp().getCurrentResolution().getHeight() == 720) {
+	    	  stretchy = 1.04f;
+	    	  safeY = 35;
+	      }
+
 		layout = lm.relativeY(layout, false);
 		// layout = lm.stretchWidth(layout, 0.9f);
-		layout = lm.safeAction(layout, this, 0, 25);
+		layout = lm.safeAction(layout, this, -20, safeY);
 		layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
+		layout = lm.stretchHeight(layout, stretchy);
 		layout = lm.indentY(layout, 65);
-		int height = ViewUtils.getHeight(this, H_BAR);
-		layout = lm.valign(layout, ((int)(.62 * getHeight())) - (rows * height));
+		int height =  Math.min(45, ViewUtils.getHeight(this, H_BAR));
+		//layout = lm.valign(layout, ((int)(.62 * getHeight())) - (rows * height));
+		int y = (int)(.62 * getHeight());
+		y = (int)(y * stretchy);
+		layout = lm.valign(layout, y - (rows * height));
 		return layout;
 	}
 
 	public boolean handleEnter(Object arg, boolean isReturn) {
 		((StreamBabyStream)getBApp()).setCurrentScreen(this);
-		setupList(isReturn);
+		this.isReturn = isReturn;
+		if (isReturn)
+			render();
+		else
+	      Ticker.master.add(this, System.currentTimeMillis()+200, null);
 		return true;
 	}
 

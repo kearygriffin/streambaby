@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ffmpeg-java"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/bananas.jar"/>
-	<classpathentry kind="var" path="STREAMBABY/lib/bananas-plus-0.1.1-streambabyr1.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/bananas-plus-0.1.1-streambabyr1.jar" sourcepath="/TOOLS/bananas-plus-read-only/src/java"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/bcel-5.2.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/bsh-2.0b4.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/cobra.jar" sourcepath="/TOOLS/cobra-0.98.4/src"/>

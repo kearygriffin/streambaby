@@ -546,7 +546,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			stream.addHandler(this);
 			Resource r = stream;
 			if (StreamBabyConfig.inst._DEBUG && sapp.isSimulator()) {
-				r = createImage(StreamBabyConfig.cfgBackgroundImage.getValue());
+				r = createImage(StreamBabyConfig.getBackgroundImage(this.getBApp()));
 			}
 			getBelow().setResource(r);
 			queuedToPlay = false;
