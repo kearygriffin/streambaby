@@ -56,7 +56,7 @@
 			<src path="${src}"/>
 			<classpath>
 				<pathelement path="lib/jna.jar" />
- 				<pathelement location="build/classes"/>
+ 				<!--pathelement location="build/classes"/ -->
  				<pathelement location="lib/jna.jar"/>
  				<pathelement location="../lib/bcel-5.2.jar"/>
 			</classpath>			
