@@ -71,7 +71,7 @@ public class AutoPreviewGenerationManager implements Cleanupable {
   			  gen = VideoModuleHelper.inst.getPreviewHandler(de, false);
   			  if (gen == null)
   				  return null;
-  			  ZipGeneratingPreview zpw = new ZipGeneratingPreview(uri, gen, vinfo, sh, sh);
+  			  ZipGeneratingPreview zpw = new ZipGeneratingPreview(uri, gen, vinfo, sw, sh);
   			  genMap.put(uri, zpw);
   			  return zpw;
   		  } catch (GeneratorException e) {

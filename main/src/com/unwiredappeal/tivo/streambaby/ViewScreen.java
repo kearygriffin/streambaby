@@ -42,6 +42,7 @@ import com.unwiredappeal.tivo.metadata.MetaData;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 import com.unwiredappeal.tivo.views.BRoundedPanel;
+import com.unwiredappeal.tivo.views.VFont;
 import com.unwiredappeal.tivo.views.VText;
 
 public class ViewScreen extends ScreenTemplate implements Ticker.Client,
@@ -213,8 +214,10 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		infoView.setVisible(false);
 
 		// keypad text (when numbers pressed)
+		String kpFontType = "";
+		int kpfs = VText.getFontSize(this, kpFontType).h;
 		keypadText = new VText(getNormal(), SAFE_ACTION_H,
-				       this.getHeight() - GLOBAL.statusBG_Y_from_bottom + 35, 1, "");
+				       (int)(this.getHeight() - (kpfs*3)), 1, kpFontType);
 		keypadText.setVisible(false);
 
 		// Error screen text (for error reporting)

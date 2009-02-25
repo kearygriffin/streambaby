@@ -6,9 +6,13 @@
  * Internal changes to possibly support another MP4 pseudo-streaming module
  * added config option hme.res to set hme resolution to use
  * Added Yoav's patches to add HD support
+<<<<<<< Updated upstream:main/changelog.txt
  * Force transcode if audio is not 44100k or 48000k
  * When transcoding force sample rate of 44100k or 48000k
  
+=======
+ * test 
+>>>>>>> Stashed changes:main/changelog.txt
  ===V0.24===
  * Added stack trace printout to Listener when catching uncaught exceptions
  * disabled using ffmpeg to gather metadata.

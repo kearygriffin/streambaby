@@ -87,6 +87,7 @@ public class PreviewWindow extends BViewPlus {
 	   int y = useBig ? big_y : small_y;
 
 	   boolean is16x9 = true;
+		Resolution curRes = ((StreamBabyStream)parent.getBApp()).getResolutionInfo().getCurrentResolution();
 		List<Resolution> reses = ((StreamBabyStream)parent.getBApp()).getResolutionInfo().getSupportedResolutions();
 		Iterator<Resolution> it = reses.iterator();
 		while(it.hasNext()) {
@@ -98,7 +99,7 @@ public class PreviewWindow extends BViewPlus {
 		}
 
 	   float aspect = de.getVideoInformation().getAspect();
-	   if (is16x9) {
+	   if (is16x9 && curRes.getWidth() == 640) {
 		   if ((float)parent.getWidth() / (float)parent.getHeight() < 1.4f)
 		   aspect = aspect / 1.33f;
 	   }

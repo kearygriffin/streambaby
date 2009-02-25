@@ -111,7 +111,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
    public void resetTitle() {
 	   setTitle(this.toString());
    }
-   public boolean handleEnter(Object arg, boolean isReturn) {
+   public synchronized boolean handleEnter(Object arg, boolean isReturn) {
 	   ((StreamBabyStream)getBApp()).setCurrentScreen(this);
 
 	   this.setPainting(false);

@@ -17,10 +17,14 @@ public class ScreenTemplate extends BScreenPlus {
        //
        // set the title of the screen
        //
-       int safeTitleH = getBApp().getSafeTitleHorizontal()*2;
+       float leftmul = 1.75f;
+       float rightmul = 1f;
+       
+       int safeTitleH = (int)(getBApp().getSafeTitleHorizontal()*leftmul);
+       int width = (int)((getWidth()-safeTitleH) - getBApp().getSafeTitleHorizontal()*rightmul);
        int safeTitleV = getBApp().getSafeTitleVertical();
        int fs = VFont.getFontSize(this, "medium");
-       BText title = new BText(getNormal(), safeTitleH, safeTitleV, (getWidth()-(getBApp().getSafeTitleHorizontal()*2)), fs*2+(fs/2));
+       BText title = new BText(getNormal(), safeTitleH, safeTitleV, width, fs*2+(fs/2));
        title.setValue(this.toString());
        title.setColor(getTitleColor());
        title.setShadow(getTitleShadowColor(), getTitleShadowOffset());

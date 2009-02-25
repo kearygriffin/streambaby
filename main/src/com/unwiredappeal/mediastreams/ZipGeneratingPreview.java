@@ -17,6 +17,7 @@ import com.unwiredappeal.tivo.utils.Log;
 
 public class ZipGeneratingPreview extends CachingPreviewGenerator  {
 
+	int sw, sh;
 	public static class GeneratorException extends Exception {
 
 		public GeneratorException(String string) {
@@ -35,6 +36,8 @@ public class ZipGeneratingPreview extends CachingPreviewGenerator  {
 	GenThread gt = null;
 	public ZipGeneratingPreview(URI uri, PreviewGenerator gen, VideoInformation vidinfo, int sw, int sh) throws GeneratorException {
 		super(gen, vidinfo, false, false);
+		this.sw = sw;
+		this.sh = sh;
 		this.uri = uri;
 		boolean opened = this.open(uri, vidinfo, sw, sh);
 		if (!opened)
@@ -94,7 +97,8 @@ public class ZipGeneratingPreview extends CachingPreviewGenerator  {
 			return null;
 		byte[] b= new byte[idx.len];
 		idx.chunk.read(0, b);
-		return b;
+		ScalingUtils su = new ScalingUtils(sw, sh);
+		return su.scaleData(b);
 	}
 
 	@Override

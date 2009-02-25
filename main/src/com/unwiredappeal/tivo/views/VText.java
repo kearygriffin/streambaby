@@ -26,8 +26,8 @@ public class VText extends BTextPlus<String> {
    }
 
    public static class FontSizeInfo {
-	   int h;
-	   int fontSize;
+	   public int h;
+	   public int fontSize;
 	   public FontSizeInfo(int h, int fontSize) {
 		   this.h = h;
 		   this.fontSize = fontSize;
