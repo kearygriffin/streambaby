@@ -2,8 +2,6 @@
 DIR=`dirname $0`
 ant release
 RET=$?
-git checkout master
-git stash apply
 USER=`head -n 1 .gcpasswd`
 PW=`tail -n 1 .gcpasswd`
 FN=`ls dist/*.zip | sed -n "s/.*\/\(.*\)\.zip/\1/p"`

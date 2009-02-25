@@ -1,4 +1,4 @@
-===SVN===
+===V0.25===
  * Force transcoding of MP4's if profile > High or Level > 41 
  * Internal reorg--  Get icon for display from parsed file type (folder, video, dvd, etc)
  * Changed re-interleaving code to work based on DTS (decoding time stamp) rather than PTS (presentation time stamp)
@@ -6,14 +6,10 @@
  * Internal changes to possibly support another MP4 pseudo-streaming module
  * added config option hme.res to set hme resolution to use
  * Added Yoav's patches to add HD support
-<<<<<<< Updated upstream:main/changelog.txt
  * Force transcode if audio is not 44100k or 48000k
  * When transcoding force sample rate of 44100k or 48000k
  
-=======
- * test 
->>>>>>> Stashed changes:main/changelog.txt
- ===V0.24===
+===V0.24===
  * Added stack trace printout to Listener when catching uncaught exceptions
  * disabled using ffmpeg to gather metadata.
   * new config: meta.vidinfo.disable=true  set to false to re-enable ffmpeg gathering of metadata
