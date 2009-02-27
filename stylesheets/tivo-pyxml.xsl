@@ -10,8 +10,8 @@
 
 <xsl:template match="program">
 	<xsl:apply-templates select="title"/>
-	<xsl:apply-templates select="seriesTitle"/>
-
+	<xsl:apply-templates select="isEpisode"/>
+	<xsl:apply-templates select="series/seriesTitle"/>
 	<xsl:apply-templates select="episodeTitle"/>
 	<xsl:apply-templates select="description"/>
 	<xsl:apply-templates select="vActor"/>
@@ -24,7 +24,13 @@
 <xsl:template match="episodeTitle">
 	<episodeTitle><xsl:value-of select="."/></episodeTitle>
 </xsl:template>
+<xsl:template match="isEpisode">
+	<isEpisode><xsl:value-of select="."/></isEpisode>
+</xsl:template>
 
+<xsl:template match="seriesTitle">
+<seriesTitle><xsl:value-of select="."/></seriesTitle>
+</xsl:template>
 <xsl:template match="description">
 	<description><xsl:value-of select="."/></description>
 </xsl:template>

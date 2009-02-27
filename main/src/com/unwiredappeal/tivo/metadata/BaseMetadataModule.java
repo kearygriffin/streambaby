@@ -65,7 +65,7 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 			return tp;
 		// construct a transformer using the echo stylesheet
 		StreamSource xslSource = new StreamSource(xsl);
-		TransformerFactory factory = TransformerFactory.newInstance();		
+		TransformerFactory factory = net.sf.saxon.TransformerFactoryImpl.newInstance();		
 		tp = factory.newTemplates(xslSource);
 		return tp;
 

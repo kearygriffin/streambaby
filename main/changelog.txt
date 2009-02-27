@@ -8,7 +8,9 @@
  * Added Yoav's patches to add HD support
  * Force transcode if audio is not 44100k or 48000k
  * When transcoding force sample rate of 44100k or 48000k
- 
+ * Change default to HD
+ * Change default xsl for pytivo metadata to HTML version
+
 ===V0.24===
  * Added stack trace printout to Listener when catching uncaught exceptions
  * disabled using ffmpeg to gather metadata.

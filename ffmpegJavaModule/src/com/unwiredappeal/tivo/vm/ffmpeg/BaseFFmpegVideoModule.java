@@ -38,6 +38,7 @@ public class BaseFFmpegVideoModule extends BaseVideoHandlerModule {
 		audioCodecMap.put("liba52", VideoFormats.AUDIO_CODEC_AC3);		
 		audioCodecMap.put("mp4a", VideoFormats.AUDIO_CODEC_AAC);
 		audioCodecMap.put("aac", VideoFormats.AUDIO_CODEC_AAC);
+		audioCodecMap.put("libfaad", VideoFormats.AUDIO_CODEC_AAC);
 		audioCodecMap.put("mpeg4aac", VideoFormats.AUDIO_CODEC_AAC);
 
 		videoCodecMap.put("h264",VideoFormats.VIDEO_CODEC_H264);
