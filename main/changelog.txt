@@ -11,7 +11,7 @@
  * Change default to HD
  * Change default xsl for pytivo metadata to HTML version
 
-===V0.24===
+ ===V0.24===
  * Added stack trace printout to Listener when catching uncaught exceptions
  * disabled using ffmpeg to gather metadata.
   * new config: meta.vidinfo.disable=true  set to false to re-enable ffmpeg gathering of metadata
