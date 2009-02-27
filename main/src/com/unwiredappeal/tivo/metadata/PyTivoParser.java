@@ -52,7 +52,8 @@ public class PyTivoParser extends BaseParser
 		    }
 		    if (closeElement) {
 	 		    endCData();
-	 		    contentHandler.endElement(namespaceURI, key, key);            	    	
+	 		    contentHandler.endElement(namespaceURI, key, key);   
+	 		    elementMap.put(key, lastElementData);	 		    
 		    }
 			contentHandler.endElement(namespaceURI, "pytivo", "pytivo");
 			contentHandler.endDocument();
