@@ -26,6 +26,8 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import net.sf.saxon.TransformerFactoryImpl;
+
 import org.xml.sax.InputSource;
 
 import com.unwiredappeal.tivo.config.ConfigurableObject;
@@ -65,7 +67,7 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 			return tp;
 		// construct a transformer using the echo stylesheet
 		StreamSource xslSource = new StreamSource(xsl);
-		TransformerFactory factory = net.sf.saxon.TransformerFactoryImpl.newInstance();		
+		TransformerFactoryImpl factory = new TransformerFactoryImpl();		
 		tp = factory.newTemplates(xslSource);
 		return tp;
 
