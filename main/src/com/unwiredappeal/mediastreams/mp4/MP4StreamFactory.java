@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 
 import com.unwiredappeal.mediastreams.mp4.StreamableMP4.BArray;
 import com.unwiredappeal.mediastreams.mp4.StreamableMP4.BArrayFactory;
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.virtmem.MappedFileMemoryManager;
 import com.unwiredappeal.virtmem.MemChunk;
@@ -74,6 +75,9 @@ public class MP4StreamFactory {
 	}
 
 	public static MP4Streamer getInstance(File file, long startPos, boolean reinterleave) throws IOException {
-		return new CPortMP4Streamer(file, startPos, reinterleave);
+		if (StreamBabyConfig.cfgUseAltMp4.getBool())
+			return new JavaMP4Splitter(file, startPos, reinterleave);
+		else
+			return new CPortMP4Streamer(file, startPos, reinterleave);
 	}
 }

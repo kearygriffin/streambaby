@@ -145,25 +145,18 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		String dst = argv[1];
 		long pos = Long.parseLong(argv[2]);
 		System.err.println("In: " + src + ", out: " + dst + ", pos: " + pos);
-		StreamableMP4.bfact = new MP4StreamFactory.VirtMemBArrayFactory();
-		StreamableMP4.logger = new StreamableMP4.Logger() {
-			public void log(String s) {
-				Log.debug(s);
-			}
-		};
-
-		StreamableMP4 is = new StreamableMP4(new File(src), pos, true);
-		System.err.println("SubDur: " + is.getSubDuration()/1000.0);
+		MP4Streamer mp4 = MP4StreamFactory.getInstance(new File(src).getAbsoluteFile(), pos, true);
+		System.err.println("SubDur: " + mp4.getSubDuration()/1000.0);
 		OutputStream os = new FileOutputStream(new File(dst));
 		final int IO_BUFFER_SIZE = 4 * 1024;
 
 		byte[] b = new byte[IO_BUFFER_SIZE];
 		int read;
-		while ((read = is.read(b)) != -1) {
+		while ((read = mp4.read(b)) != -1) {
 			os.write(b, 0, read);
 		}
 		os.close();
-		is.close();
+		mp4.close();
 		System.out.println("Done");
 	}
 

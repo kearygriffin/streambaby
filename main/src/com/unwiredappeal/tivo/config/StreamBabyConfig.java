@@ -442,6 +442,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"720",
 			"Resolution to use for StreamBaby screens"
 			);
+	
+	public static ConfigEntry cfgUseAltMp4 = new ConfigEntry(
+			"alt.mp4split",
+			"false",
+			"Use alternate MP4 splitter/streamer"
+			);
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
