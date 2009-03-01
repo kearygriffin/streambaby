@@ -6,6 +6,8 @@ package mp4.util.atom;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import mp4.util.MP4Log;
+
 /**
  * The container atom for a single track of a presentation. Movie presentation typically
  * have two tracks, one for sound and one for video.
@@ -186,11 +188,11 @@ public class TrakAtom extends ContainerAtom {
   public TrakAtom cut(float time, long movieTimeScale) {
     TrakAtom cutTrak = new TrakAtom();
     long mediaTimeScale = mdia.getMdhd().getTimeScale();
-    long mediaTime = (long)(time * mediaTimeScale);
-    System.out.println("DBG: media time " + mediaTime);
+    long mediaTime = (long)(Math.rint(time * mediaTimeScale));
+    MP4Log.log("DBG: media time " + mediaTime);
 //    if (edts != null) {
 //      mediaTime = edts.editTime(time, mediaTimeScale, movieTimeScale);
-//      System.out.println("DBG: media time after edit " + mediaTime);
+//      MP4Log.log("DBG: media time after edit " + mediaTime);
 //    }
     cutTrak.setTkhd(tkhd.cut());
     cutTrak.setMdia(mdia.cut(mediaTime));

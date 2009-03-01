@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import mp4.util.MP4Log;
+
 import com.unwiredappeal.mediastreams.mp4.StreamableMP4.BArray;
 import com.unwiredappeal.mediastreams.mp4.StreamableMP4.BArrayFactory;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
@@ -70,6 +72,13 @@ public class MP4StreamFactory {
 		};
 
 		StreamableMP4.bfact = new VirtMemBArrayFactory();
+		MP4Log.logger = new MP4Log.MP4Logger() {
+
+			public void log(String str) {
+				Log.debug(str);
+			}
+			
+		};
 		
 		return true;
 	}

@@ -6,6 +6,8 @@ package mp4.util.atom;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import mp4.util.MP4Log;
+
 /**
  * The sample table container atom contains the atoms with the information
  * for converting from media time to sample number to sample location.
@@ -130,20 +132,26 @@ public class StblAtom extends ContainerAtom {
     if (getStss() != null) {
       keyFrame = getStss().getKeyFrame(sampleNum);
     }
-    System.out.println("\tDBG: sampleNum " + sampleNum + " sync frame " + keyFrame);
+    MP4Log.log("\tDBG: sampleNum " + sampleNum + " sync frame " + keyFrame);
     
     long chunk = getStsc().sampleToChunk(keyFrame);
-    System.out.println("\tDBG: chunk " + chunk);
+    MP4Log.log("\tDBG: chunk " + chunk);
     
-    long offset = getStco().getChunkOffset(chunk);
-    System.out.println("\tDBG: offset " + offset);
+    //long offset = getStco().getChunkOffset(chunk);
+    //MP4Log.log("\tDBG: offset " + offset);
     
     StblAtom cutStbl = new StblAtom();
     cutStbl.stsd = stsd.cut();
     cutStbl.stts = stts.cut(keyFrame);
     cutStbl.stsz = stsz.cut(keyFrame);
     cutStbl.stsc = stsc.cut(keyFrame);
-    cutStbl.stco = stco.cut(chunk);
+    
+    long chunkOffset = 0;
+    for (long i=keyFrame-1;i>0 && getStsc().sampleToChunk(i) == chunk;i--) {
+    	chunkOffset += stsz.getSampleSize(i);
+    }
+    cutStbl.stco = stco.cut(chunk, chunkOffset);
+    // Adjust the offset of the first chunk
     if (ctts != null) {
       cutStbl.ctts = ctts.cut(keyFrame);
     }

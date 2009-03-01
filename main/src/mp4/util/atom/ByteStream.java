@@ -3,7 +3,6 @@ package mp4.util.atom;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * A byte stream class contains the data from the mp4 file.  We use this

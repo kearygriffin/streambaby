@@ -42,7 +42,6 @@ import com.unwiredappeal.tivo.metadata.MetaData;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 import com.unwiredappeal.tivo.views.BRoundedPanel;
-import com.unwiredappeal.tivo.views.VFont;
 import com.unwiredappeal.tivo.views.VText;
 
 public class ViewScreen extends ScreenTemplate implements Ticker.Client,

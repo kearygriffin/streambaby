@@ -54,7 +54,7 @@ public class Mp4Dump extends DefaultAtomVisitor {
         this.out = new PrintStream(outputfn);
       }
     } catch (FileNotFoundException e) {
-      System.err.println("File not found " + inputfn);
+      MP4Log.log("File not found " + inputfn);
       e.printStackTrace();
       System.exit(-1);
     }
@@ -364,10 +364,10 @@ public class Mp4Dump extends DefaultAtomVisitor {
   }
   
   private static void help() {
-    System.out.println("Mp4Dump <args>");
-    System.out.println("  -in inputfile.mp4");
-    System.out.println("  [-out outputfile.txt]\tdefault=System.out");
-    System.out.println("  [-top num]\tdefault=all");
+    MP4Log.log("Mp4Dump <args>");
+    MP4Log.log("  -in inputfile.mp4");
+    MP4Log.log("  [-out outputfile.txt]\tdefault=System.out");
+    MP4Log.log("  [-top num]\tdefault=all");
     System.exit(-1);
   }
   
@@ -384,7 +384,7 @@ public class Mp4Dump extends DefaultAtomVisitor {
         size = reader.printAtom();
       }
     } catch (AtomException e) {
-      System.err.println("Invalid atom descriptor");
+      MP4Log.log("Invalid atom descriptor");
       e.printStackTrace();
     }
   }

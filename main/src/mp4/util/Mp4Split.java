@@ -7,12 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.Iterator;
 
-import com.unwiredappeal.tivo.utils.Log;
-import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 
 import mp4.util.atom.Atom;
 import mp4.util.atom.AtomException;
@@ -120,7 +116,7 @@ public class Mp4Split extends DefaultAtomVisitor {
 				Class<?> cls = Class.forName(Atom.typeToClassName(word));
 				atom = (Atom) cls.newInstance();
 			} catch (ClassNotFoundException e) {
-				Log.warn("UnknownAtom: " + Atom.typeToClassName(word));
+				MP4Log.log("UnknownAtom: " + Atom.typeToClassName(word));
 				//if (word[2] == 'h' && word[3] == 'd')
 					//atom = new UnkHdAtom(word);
 				//else
@@ -146,9 +142,9 @@ public class Mp4Split extends DefaultAtomVisitor {
   public Mp4Split(String fn) {
     try {
       mp4file = new DataInputStream(new FileInputStream(fn));
-      System.out.println("DBG: file size " + new File(fn).length());
+      MP4Log.log("DBG: file size " + new File(fn).length());
     } catch (FileNotFoundException e) {
-      System.err.println("File not found " + fn);
+      MP4Log.log("File not found " + fn);
       System.exit(-1);
     }
   }
@@ -168,6 +164,9 @@ public class Mp4Split extends DefaultAtomVisitor {
 			long offset = 0;
 			while (ftyp == null || moov == null || mdat == null) {
 				Atom atom = parseAtom();
+				if (atom == null) {
+					throw new IOException("Couldn't find all required MP4 atoms");
+				}
 				if (atom instanceof FtypAtom)
 					ftyp = (FtypAtom) atom;
 				else if (atom instanceof MoovAtom)
@@ -182,8 +181,8 @@ public class Mp4Split extends DefaultAtomVisitor {
 			// moov = (MoovAtom) parseAtom();
 			// mdat = (MdatAtom) parseAtom();
 
-			Log.debug("DBG: moov size " + moov.dataSize());
-			Log.debug("DBG: mdat size " + mdat.dataSize());
+			MP4Log.log("DBG: moov size " + moov.dataSize());
+			MP4Log.log("DBG: mdat size " + mdat.dataSize());
 
 			// Remove all but one video, one audio track
 			// this makes some things a little easier
@@ -214,8 +213,8 @@ public class Mp4Split extends DefaultAtomVisitor {
 			cutMoov.setIods(null);
 			cutMoov.recomputeSize();
 			
-			Log.debug("DBG: moov chunk " + moov.firstDataByteOffset());
-			Log.debug("DBG: cut moov chunk "
+			MP4Log.log("DBG: moov chunk " + moov.firstDataByteOffset());
+			MP4Log.log("DBG: cut moov chunk "
 					+ cutMoov.firstDataByteOffset());
 			long mdatSkip = cutMoov.firstDataByteOffset()
 					- moov.firstDataByteOffset();
@@ -226,12 +225,12 @@ public class Mp4Split extends DefaultAtomVisitor {
 			long updateAmount = mdatSkip + (mdatOffset - newMdatOffset);
 			//long updateAmount = mdatSkip + (moov.size() - cutMoov.size());
 
-			Log.debug("DBG: updateAmount " + updateAmount);
+			MP4Log.log("DBG: updateAmount " + updateAmount);
 			cutMoov.fixupOffsets(-updateAmount);
 
-			Log.debug("DBG: movie skip " + mdatSkip);
+			MP4Log.log("DBG: movie skip " + mdatSkip);
 
-			Log.debug("DBG: Cut Movie time "
+			MP4Log.log("DBG: Cut Movie time "
 					+ cutMoov.getMvhd().getDurationNormalized() + " sec ");
 
 			/*
@@ -242,7 +241,7 @@ public class Mp4Split extends DefaultAtomVisitor {
 			 */
 
 		} catch (AtomException e) {
-			Log.error("Error parseing Mp4 file " + e);
+			MP4Log.log("Error parseing Mp4 file " + e);
 			throw new IOException(e.getMessage());
 		}
 	}
@@ -254,24 +253,24 @@ public class Mp4Split extends DefaultAtomVisitor {
       MoovAtom moov = (MoovAtom) parseAtom();
       MdatAtom mdat = (MdatAtom) parseAtom();
       
-      System.out.println("DBG: moov size " + moov.dataSize());
-      System.out.println("DBG: mdat size " + mdat.dataSize());
+      MP4Log.log("DBG: moov size " + moov.dataSize());
+      MP4Log.log("DBG: mdat size " + mdat.dataSize());
   
       MoovAtom cutMoov = moov.cut(time);
-      System.out.println("DBG: moov chunk " + moov.firstDataByteOffset());
-      System.out.println("DBG: cut moov chunk " + cutMoov.firstDataByteOffset());
+      MP4Log.log("DBG: moov chunk " + moov.firstDataByteOffset());
+      MP4Log.log("DBG: cut moov chunk " + cutMoov.firstDataByteOffset());
       long mdatSkip = cutMoov.firstDataByteOffset() - moov.firstDataByteOffset();
       MdatAtom cutMdat = mdat.cut(mdatSkip);
       
       // update stco segment by mdatSkip + difference in moov size
       long updateAmount = mdatSkip + (moov.size() - cutMoov.size());
       
-      System.out.println("DBG: updateAmount " + updateAmount);
+      MP4Log.log("DBG: updateAmount " + updateAmount);
       cutMoov.fixupOffsets(-updateAmount);
       
-      System.out.println("DBG: movie skip " + mdatSkip);
+      MP4Log.log("DBG: movie skip " + mdatSkip);
       
-      System.out.println("DBG: Cut Movie time " + cutMoov.getMvhd().getDurationNormalized() + " sec ");
+      MP4Log.log("DBG: Cut Movie time " + cutMoov.getMvhd().getDurationNormalized() + " sec ");
       
       DataOutputStream dos = new DataOutputStream(new FileOutputStream(outputFile));
       ftyp.writeData(dos);
@@ -281,11 +280,11 @@ public class Mp4Split extends DefaultAtomVisitor {
       }
       
      } catch (AtomException e) {
-      System.err.println("Error parseing Mp4 file " + e);
+      MP4Log.log("Error parseing Mp4 file " + e);
     } catch (FileNotFoundException e) {
-      System.err.println("Error creating file output stream");
+      MP4Log.log("Error creating file output stream");
     } catch (IOException e) {
-      System.err.println("Error writing output ");
+      MP4Log.log("Error writing output ");
       e.printStackTrace();
     }
   }
@@ -322,11 +321,11 @@ public class Mp4Split extends DefaultAtomVisitor {
   }
   
   private static void help() {
-    System.out.println("Mp4Split <args>");
-    System.out.println("  -in <inputfile.mp4>");
-    System.out.println("  -out <outputfile.mp4>");
-    System.out.println("  -time <seconds>");
-    System.out.println("  [-no_mdat]");
+    MP4Log.log("Mp4Split <args>");
+    MP4Log.log("  -in <inputfile.mp4>");
+    MP4Log.log("  -out <outputfile.mp4>");
+    MP4Log.log("  -time <seconds>");
+    MP4Log.log("  [-no_mdat]");
     System.exit(-1);
   }
   
@@ -337,11 +336,11 @@ public class Mp4Split extends DefaultAtomVisitor {
     	calcSplitMp4();
 	    writeSplitMp4(new DataOutputStream(new FileOutputStream(new File(outputFile))));
 	} catch (FileNotFoundException e) {
-		System.out.println("Err: FileNoutFound: " + e.getMessage());
+		MP4Log.log("Err: FileNoutFound: " + e.getMessage());
 	} catch (IOException e) {
-		System.out.println("Err: IOException: " + e.getMessage());
+		MP4Log.log("Err: IOException: " + e.getMessage());
 	}	
-	System.out.println("Complete.");
+	MP4Log.log("Complete.");
   }
     
   /**

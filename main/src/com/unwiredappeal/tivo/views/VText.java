@@ -2,13 +2,11 @@
 
 package com.unwiredappeal.tivo.views;
 
-import com.tivo.hme.bananas.BApplication;
 import com.tivo.hme.bananas.BScreen;
 import com.tivo.hme.bananas.BTextPlus;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.sdk.Resource.FontResource;
 import com.unwiredappeal.tivo.streambaby.GLOBAL;
-import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.streambaby.StreamBabyStream;
 
 public class VText extends BTextPlus<String> {

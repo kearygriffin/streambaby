@@ -8,6 +8,7 @@ package mp4.util.atom;
  * type, including information specific to the type of track.  The format
  * depends on where the media is sound, video, or hint
  */
+@SuppressWarnings("unused")
 public class StsdAtom extends LeafAtom {
   private static final int ENTRY_OFFSET = 4;
   // common sample entry offsets

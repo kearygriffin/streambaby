@@ -6,6 +6,7 @@ package mp4.util.atom;
 /**
  * The media header atom.
  */
+@SuppressWarnings("unused")
 public class MdhdAtom extends LeafAtom {
   private static final int CREATION_TIME_OFFSET = 4;
   private static final int MODIFICATION_TIME_OFFSET = 8;

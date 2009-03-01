@@ -80,8 +80,9 @@ public class StcoAtom extends LeafAtom {
    * subsequent to the specified chunk.
    * @param bs the byte stream where the new data is added
    * @param chunkNum the chunk where the atom should be split 
+   * @param chunkOffset the delta into the firstChunk (in the case we are splitting a chunk)
    */
-  public StcoAtom cut(long chunkNum) {    
+  public StcoAtom cut(long chunkNum, long chunkOffset) {    
     // create the new table
     StcoAtom cutStco = new StcoAtom();
     long numEntries = getNumEntries();
@@ -91,6 +92,7 @@ public class StcoAtom extends LeafAtom {
     for (long i = chunkNum; i <= numEntries; i++, entryNumber++) {
       cutStco.setChunkOffset(entryNumber, getChunkOffset(i));
     }
+    cutStco.setChunkOffset(0, cutStco.getChunkOffset(1) + chunkOffset);
     return cutStco;
   }
   

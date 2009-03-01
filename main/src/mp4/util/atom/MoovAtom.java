@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import mp4.util.MP4Log;
+
 /**
  * The movie atom is a top-level atom.  It contains the metadata for a presentation.
  */
@@ -174,8 +176,8 @@ public class MoovAtom extends ContainerAtom {
     long movieTimeScale = mvhd.getTimeScale();
     long duration = mvhd.getDuration();
     
-    System.out.println("DBG: Movie time " + (duration/movieTimeScale) + " sec, cut at " + time + "sec");
-    System.out.println("\tDBG: ts " + movieTimeScale + " cut at " + (time * movieTimeScale));
+    MP4Log.log("DBG: Movie time " + (duration/movieTimeScale) + " sec, cut at " + time + "sec");
+    MP4Log.log("\tDBG: ts " + movieTimeScale + " cut at " + (time * movieTimeScale));
     
     MoovAtom cutMoov = new MoovAtom();
     cutMoov.setMvhd(mvhd.cut());
@@ -192,7 +194,7 @@ public class MoovAtom extends ContainerAtom {
       cutMoov.addTrack(cutTrak);
       // need to convert the media time-scale to the movie time-scale
       long cutDuration = cutTrak.convertDuration(movieTimeScale);
-      System.out.println("DBG: cutDuration " + cutDuration);
+      MP4Log.log("DBG: cutDuration " + cutDuration);
       cutTrak.fixupDuration(cutDuration);
       if (cutDuration > cutMoov.getMvhd().getDuration()) {
         cutMoov.getMvhd().setDuration(cutDuration);
@@ -200,17 +202,17 @@ public class MoovAtom extends ContainerAtom {
       if (cutDuration < minDuration) {
         minDuration = cutDuration;
       }
-      //time = cutDuration / movieTimeScale;
-      //System.out.println("DBG: new time " + time);
+      //time = (duration - cutDuration) / (float) movieTimeScale;
+      //MP4Log.log("DBG: new time " + time);
     }
     // check if any edits need to be added 
 /*    for (Iterator<TrakAtom> i = cutMoov.getTracks(); i.hasNext(); ) { 
       TrakAtom trak = i.next();
       long trakDuration = trak.convertDuration(movieTimeScale);
-      System.out.println("DBG: trak duration " + trakDuration);
+      MP4Log.log("DBG: trak duration " + trakDuration);
       if (trakDuration > minDuration) {
         long editDuration = trak.convertToMediaScale(trakDuration - minDuration, movieTimeScale);
-        System.out.println("\tDBG: edit duration " + editDuration);
+        MP4Log.log("\tDBG: edit duration " + editDuration);
         // add an edit to the media
         trak.addEdit(editDuration);
         trak.recomputeSize();
@@ -231,15 +233,15 @@ public class MoovAtom extends ContainerAtom {
       long mediaTime = (long)(time * mediaTimeScale);
       if (stbl.getStss() != null) {
         long sampleNum = stbl.getStts().timeToSample(mediaTime);
-        System.out.println("DBG: sampleNum " + sampleNum);
+        MP4Log.log("DBG: sampleNum " + sampleNum);
         sampleNum = stbl.getStss().getKeyFrame(sampleNum);
-        System.out.println("DBG: new key frame " + sampleNum);
+        MP4Log.log("DBG: new key frame " + sampleNum);
         mediaTime = stbl.getStts().sampleToTime(sampleNum);
       }
       float realTime = (float)mediaTime / mediaTimeScale;
       if (realTime < adjustedTime)
     	  adjustedTime = realTime;
-      System.out.println("DBG: track " + trak.getTkhd().getTrackId() +
+      MP4Log.log("DBG: track " + trak.getTkhd().getTrackId() +
           " spec time " + (long)(time * mediaTimeScale) + " adj time " + mediaTime +
           " spec time sec " + (long)(time) + " adj time sec " + (mediaTime/mediaTimeScale));
     }

@@ -9,6 +9,7 @@ package mp4.util.atom;
  * In the absence of an edit list, the presentaiton of a track starts at the
  * beginning of the overall presentation.
  */
+@SuppressWarnings("unused")
 public class TkhdAtom extends LeafAtom {
   private static final int CREATION_TIME_OFFSET = 4;
   private static final int MODIFICATION_TIME_OFFSET = 8;

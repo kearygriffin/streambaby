@@ -29,15 +29,12 @@ import org.lobobrowser.html.test.SimpleHtmlRendererContext;
 import org.lobobrowser.html.test.SimpleUserAgentContext;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.css.CSSStyleSheet;
 import org.w3c.dom.html2.HTMLCollection;
 import org.xml.sax.SAXException;
 
 import com.steadystate.css.parser.CSSOMParser;
-import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.html.BaseHtmlRenderer;
 import com.unwiredappeal.tivo.utils.Log;
 

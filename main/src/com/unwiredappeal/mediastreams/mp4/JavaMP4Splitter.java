@@ -27,21 +27,25 @@ public class JavaMP4Splitter extends MP4Streamer {
 			try {
 				calcSplitMp4();
 				pi = new PipedInputStream();
-				final PipedOutputStream po = new PipedOutputStream(pi);
-				// writeSplitMp4(new DataOutputStream(po));
-				(new Thread() {
-					public void run() {
-						try {
-							writeSplitMp4(new DataOutputStream(po));
-							po.close();
-						} catch (IOException e) {
+				// startPos == Long.MAX_VALUE is used to signal parsing only
+				if (startPos < Long.MAX_VALUE) {
+					pi = new PipedInputStream();
+					final PipedOutputStream po = new PipedOutputStream(pi);
+					// writeSplitMp4(new DataOutputStream(po));
+					(new Thread() {
+						public void run() {
 							try {
+								writeSplitMp4(new DataOutputStream(po));
 								po.close();
-							} catch (IOException e1) {
+							} catch (IOException e) {
+								try {
+									po.close();
+								} catch (IOException e1) {
+								}
 							}
 						}
-					}
-				}).start();
+					}).start();
+				}
 			} catch (IOException e) {
 				try {
 					mp4file.close();

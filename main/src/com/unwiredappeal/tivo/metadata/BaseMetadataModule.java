@@ -21,7 +21,6 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -32,7 +31,6 @@ import org.xml.sax.InputSource;
 
 import com.unwiredappeal.tivo.config.ConfigurableObject;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
-import com.unwiredappeal.tivo.streambaby.GLOBAL;
 import com.unwiredappeal.tivo.modules.StreamBabyModule;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.TempFileManager;

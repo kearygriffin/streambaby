@@ -81,7 +81,17 @@ public class StszAtom extends LeafAtom {
     }
     return data.getUnsignedInt(TABLE_OFFSET + ((int)(sampleNum - 1)* ENTRY_SIZE));
   }
-  
+  /**
+   * Return the size of the specified sample.  The sample numbers are 1 based.
+   * @param sampleNum the sample numbers
+   * @return the size of the sample
+   */
+   public long getSampleSize(long sampleNum) {
+	   if (getSampleSize() > 0)
+		   return getSampleSize();
+	   else
+		   return getTableSampleSize(sampleNum);
+   }
   /**
    * Set the sample size for the specified table entry
    * @param sampleNum the sample number

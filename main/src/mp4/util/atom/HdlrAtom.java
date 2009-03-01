@@ -7,9 +7,9 @@ package mp4.util.atom;
  * The media handler type atom.  This indicates the media type, i.e.
  * video, sound, etc.
  */
+@SuppressWarnings("unused")
 public class HdlrAtom extends LeafAtom {
   // this is component_type in QT spec.
-  @SuppressWarnings("unused")
   private static final int PREDEFINED_OFFSET = 4;
   // this is component_subtype in QT spec.
   private static final int HANDLER_TYPE_OFFSET = 8;
