@@ -55,7 +55,7 @@ public class JavaMP4Splitter extends MP4Streamer {
 			}
 		}
 
-		public InputStream getOutputStream() {
+		public InputStream getInputStream() {
 			return pi;
 		}
 		
@@ -69,7 +69,7 @@ public class JavaMP4Splitter extends MP4Streamer {
 	Splitter split;
 
 	private JavaMP4Splitter(Splitter sp) {
-		super(sp.getOutputStream());
+		super(sp.getInputStream());
 		split = sp;
 	}
 

@@ -138,27 +138,6 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		
 		return true;
 	}
-	
-	public static void main(String[] argv) throws Exception {
-		String src = argv[0];
-		String dst = argv[1];
-		long pos = Long.parseLong(argv[2]);
-		System.err.println("In: " + src + ", out: " + dst + ", pos: " + pos);
-		MP4Streamer mp4 = MP4StreamFactory.getInstance(new File(src).getAbsoluteFile(), pos, true);
-		System.err.println("SubDur: " + mp4.getSubDuration()/1000.0);
-		OutputStream os = new FileOutputStream(new File(dst));
-		final int IO_BUFFER_SIZE = 4 * 1024;
-
-		byte[] b = new byte[IO_BUFFER_SIZE];
-		int read;
-		while ((read = mp4.read(b)) != -1) {
-			os.write(b, 0, read);
-		}
-		os.close();
-		mp4.close();
-		System.out.println("Done");
-	}
-
 	public boolean isProfileOk(int profile, int level) {
 		return (profile <= 100 && level <= 41);
 	}
@@ -184,6 +163,27 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		} catch (IOException e) {
 			return false;
 		}
+	}
+
+	
+	public static void main(String[] argv) throws Exception {
+		String src = argv[0];
+		String dst = argv[1];
+		long pos = Long.parseLong(argv[2]);
+		System.err.println("In: " + src + ", out: " + dst + ", pos: " + pos);
+		MP4Streamer mp4 = MP4StreamFactory.getInstance(new File(src).getAbsoluteFile(), pos, true);
+		System.err.println("SubDur: " + mp4.getSubDuration()/1000.0);
+		OutputStream os = new FileOutputStream(new File(dst));
+		final int IO_BUFFER_SIZE = 4 * 1024;
+
+		byte[] b = new byte[IO_BUFFER_SIZE];
+		int read;
+		while ((read = mp4.read(b)) != -1) {
+			os.write(b, 0, read);
+		}
+		os.close();
+		mp4.close();
+		System.out.println("Done");
 	}
 
 
