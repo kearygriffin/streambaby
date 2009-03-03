@@ -52,7 +52,8 @@ public class StblAtom extends ContainerAtom {
     if (old.ctts != null) {
       ctts = new CttsAtom(old.ctts);
     }
-    stss = new StssAtom(old.stss);
+    if (old.stss != null)
+    	stss = new StssAtom(old.stss);
   }
   
   public StsdAtom getStsd() {

@@ -7,22 +7,31 @@ import java.io.RandomAccessFile;
 
 public class RandomAccessFileInputStream extends RandomAccessInputStream {
 
-	public static  int BUFFER_SIZE = 16 * 1024;
-	byte[] buf = new byte[BUFFER_SIZE];
+	public static  int DEFAULT_BUFFER_SIZE = 16 * 1024;
+	byte[] buf = null;
 	long filePos = 0;
-	int bufp = BUFFER_SIZE;
+	int bufp;
 	int curBufSize = 0;
 	RandomAccessFile fp;
 	long markPos;
 	byte[] singlebyteb = new byte[1];
-	public RandomAccessFileInputStream(File file)
+
+	
+	public RandomAccessFileInputStream(File file, int bufferSize)
 			throws FileNotFoundException {
 		fp = new RandomAccessFile(file, "r");
+		buf = new byte[bufferSize];
+		resetBuffer();
+	}
+	
+	public RandomAccessFileInputStream(File file)
+	throws FileNotFoundException {
+		this(file, DEFAULT_BUFFER_SIZE);
 	}
 
 	public RandomAccessFileInputStream(String filename)
 	throws FileNotFoundException {
-		this(new File(filename));
+		this(new File(filename), DEFAULT_BUFFER_SIZE);
 	}
 
 	/* (non-Javadoc)
@@ -42,7 +51,7 @@ public class RandomAccessFileInputStream extends RandomAccessInputStream {
 		if (bufp >= curBufSize) {
 			if (filePos != fp.getFilePointer())
 				fp.seek(filePos);
-			int len = fp.read(buf, 0, BUFFER_SIZE);
+			int len = fp.read(buf, 0, buf.length);
 			curBufSize = Math.max(len, 0);
 			bufp = 0;
 		}
@@ -141,7 +150,7 @@ public class RandomAccessFileInputStream extends RandomAccessInputStream {
 	  }
 	  
 	  private void resetBuffer() {
-		  bufp = BUFFER_SIZE;
+		  bufp = buf.length;
 	  }
 	  
 	  /* (non-Javadoc)

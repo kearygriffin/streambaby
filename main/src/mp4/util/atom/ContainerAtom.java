@@ -37,13 +37,18 @@ public abstract class ContainerAtom extends Atom {
     return true;
   }
   
-  public abstract void addChild(Atom child);
+  public void addChild(Atom child) {
+	  unkChildren.add(child);
+  }
   
   /**
    * Recompute the size of the container by summing the size of each
    * contained atom
    */
-  protected abstract void recomputeSize();
+  protected void recomputeSize() {
+	  long newSize = unknownChildrenSize();
+	  setSize(ATOM_HEADER_SIZE + newSize);
+  }
   
   protected void addUnknownChild(Atom child) {
 	  unkChildren.add(child);
@@ -61,4 +66,9 @@ public abstract class ContainerAtom extends Atom {
 	  return siz;
   }
   
+  @Override
+  public void writeData(DataOutput out) throws IOException {
+    writeHeader(out);
+    writeUnknownChildren(out);
+  }
 }

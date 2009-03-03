@@ -5,6 +5,7 @@ package mp4.util.atom;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,6 +109,22 @@ public class MoovAtom extends ContainerAtom {
   }
   
   /**
+   * Return the number of traks in this moov
+   * @return number of tracks
+   */
+  public int getTrackCount() {
+	  return traks.size();
+  }
+  
+  /**
+   * Return the specified trak
+   * @return a TrakAtom for the requested trak
+   */
+  public TrakAtom getTrack(int index) {
+    return traks.get(index);
+  }
+
+  /**
    * Add a track to the movie.  If no tracks have been added, then allocate
    * space for the tracks.
    * @param trak a new track.
@@ -188,8 +205,20 @@ public class MoovAtom extends ContainerAtom {
       cutMoov.setUdta(udta.cut());
     }
     long minDuration = Long.MAX_VALUE;
-    // iterate over each track and cut the track
+    // Make sure traks with stss atom go first
+    List<TrakAtom> noStssTrakList = new ArrayList<TrakAtom>();
+    List<TrakAtom> trakList = new ArrayList<TrakAtom>();
     for (Iterator<TrakAtom> i = getTracks(); i.hasNext(); ) {
+    	TrakAtom a = i.next();
+    	if (a.getMdia().getMinf().getStbl().getStss() != null)
+    		trakList.add(a);
+    	else
+    		noStssTrakList.add(a);
+    }
+    trakList.addAll(noStssTrakList);
+
+    // iterate over each track and cut the track
+    for (Iterator<TrakAtom> i = trakList.iterator(); i.hasNext(); ) {
       TrakAtom cutTrak = i.next().cut(time, movieTimeScale);
       cutMoov.addTrack(cutTrak);
       // need to convert the media time-scale to the movie time-scale
@@ -202,8 +231,8 @@ public class MoovAtom extends ContainerAtom {
       if (cutDuration < minDuration) {
         minDuration = cutDuration;
       }
-      //time = (duration - cutDuration) / (float) movieTimeScale;
-      //MP4Log.log("DBG: new time " + time);
+      time = (duration - cutDuration) / (float) movieTimeScale;
+      MP4Log.log("DBG: new time " + time);
     }
     // check if any edits need to be added 
 /*    for (Iterator<TrakAtom> i = cutMoov.getTracks(); i.hasNext(); ) { 
@@ -221,7 +250,7 @@ public class MoovAtom extends ContainerAtom {
 */    cutMoov.recomputeSize();
     return cutMoov;
   }
-  
+
   /**
    */
   public float findAdjustedTime(float time) {

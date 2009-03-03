@@ -9,6 +9,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.List;
 
+import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 
 import mp4.util.Mp4Split;
@@ -20,24 +21,29 @@ public class JavaMP4Splitter extends MP4Streamer {
 
 		private PipedInputStream pi;
 
-		public Splitter(File f, long startPos, boolean reinterleave)
+		public Splitter(File f, long startPos, final boolean reinterleave)
 				throws IOException {
 			time = startPos / 1000.0f;
-			mp4file = new DataInputStream(new RandomAccessFileInputStream(f));
+			int bufSize = 16384;
+			// There is a lot of seeking for interleaving, don't use a big buffer
+			if (reinterleave)
+				bufSize = 4096;
+			mp4file = new DataInputStream(new RandomAccessFileInputStream(f, bufSize));
 			try {
-				calcSplitMp4();
+				calcSplitMp4(reinterleave);
 				pi = new PipedInputStream();
 				// startPos == Long.MAX_VALUE is used to signal parsing only
 				if (startPos < Long.MAX_VALUE) {
-					pi = new PipedInputStream();
 					final PipedOutputStream po = new PipedOutputStream(pi);
 					// writeSplitMp4(new DataOutputStream(po));
 					(new Thread() {
+						@Override
 						public void run() {
 							try {
 								writeSplitMp4(new DataOutputStream(po));
 								po.close();
 							} catch (IOException e) {
+								Log.error("IOException: " + e);
 								try {
 									po.close();
 								} catch (IOException e1) {

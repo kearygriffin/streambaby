@@ -24,6 +24,13 @@ public class StcoAtom extends LeafAtom {
    */
   public StcoAtom(StcoAtom old) {
     super(old);
+    long numEntries = old.getNumEntries();
+    this.allocateData(numEntries);
+    this.setNumEntries(numEntries);
+    int entryNumber = 0;
+    for (long i = 1; i <= numEntries; i++, entryNumber++) {
+      this.setChunkOffset(entryNumber, old.getChunkOffset(i));
+    }    
   }
 
   /**

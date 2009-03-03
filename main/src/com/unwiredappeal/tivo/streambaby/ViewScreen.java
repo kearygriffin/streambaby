@@ -186,9 +186,10 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			int h = infoView.getInnerBounds().height - (_infoText.getHeight() + INFO_SPACE);
 			MetaDataViewer viewer = new MetaDataViewer();
 			metaview = viewer.getView(meta, infoView, infoView.getInnerBounds().x, y, infoView.getInnerBounds().width, h);
-			metaview.setVisible(infoView.getVisible());
-			if (metaview != null)
+			if (metaview != null) {
 				infoView.addInner(metaview);
+				metaview.setVisible(infoView.getVisible());
+			}
 		}
 	}
 

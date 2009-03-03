@@ -50,6 +50,8 @@ public class Mp4Split extends DefaultAtomVisitor {
 	protected MdatAtom mdat;
 	protected MoovAtom cutMoov;
 	protected MdatAtom cutMdat;
+	Mp4InterleaveWriter iwriter = null;
+	boolean lastAtom = false;
   
   @Override
   protected void defaultAction(Atom atom) throws AtomException {
@@ -76,6 +78,14 @@ public class Mp4Split extends DefaultAtomVisitor {
   @Override
   public void visit(MdatAtom atom) throws AtomException {
     atom.setInputStream(mp4file);
+    try {
+    	if (atom.dataSize() != 0 && mp4file.markSupported())
+    		mp4file.skip(atom.dataSize());
+    	else
+    		lastAtom = true;
+    } catch(IOException e) {
+    	throw new AtomException(e.getMessage());
+    }
   }
   
 	/**
@@ -86,6 +96,8 @@ public class Mp4Split extends DefaultAtomVisitor {
 	 */
 	private Atom parseAtom() throws AtomException {
 		// get the atom size
+		if (lastAtom)
+			throw new AtomException("Already parsed last atom!");
 		byte[] word = new byte[Atom.ATOM_WORD];
 		int num;
 		try {
@@ -137,6 +149,7 @@ public class Mp4Split extends DefaultAtomVisitor {
   /**
    * Constructor for the Mpeg-4 file splitter.  It opens the 
    * @param fn
+ * @throws IOException 
    */
 	/*
   public Mp4Split(String fn) {
@@ -152,13 +165,20 @@ public class Mp4Split extends DefaultAtomVisitor {
 
 	public void writeSplitMp4(DataOutputStream dos) throws IOException {
 		ftyp.writeData(dos);
-		cutMoov.writeData(dos);
-		if (this.writeMdat) {
-			cutMdat.writeData(dos);
+		if (iwriter != null) {
+			iwriter.write(dos, writeMdat);
+		} else {
+			cutMoov.writeData(dos);
+			if (this.writeMdat) {
+				cutMdat.writeData(dos);
+			}
 		}
 	}
 
 	public void calcSplitMp4() throws IOException {
+		calcSplitMp4(false);
+	}
+	public void calcSplitMp4(boolean reinterleave) throws IOException {
 		long mdatOffset = 0;
 		try {
 			long offset = 0;
@@ -205,8 +225,8 @@ public class Mp4Split extends DefaultAtomVisitor {
 					it.remove();
 			}
 
-			float common = moov.findAdjustedTime(time);
-			cutMoov = moov.cut(common);
+			//float common = moov.findAdjustedTime(time);
+			cutMoov = moov.cut(time);
 			
 			// Remove the IODS atom
 			// because it may point to tracks we have already removed
@@ -239,6 +259,12 @@ public class Mp4Split extends DefaultAtomVisitor {
 			 * cutMoov.writeData(dos); if (Mp4Split.mdat) {
 			 * cutMdat.writeData(dos); }
 			 */
+
+			if (reinterleave) {
+				iwriter = new Mp4InterleaveWriter(cutMoov, cutMdat, ftyp.size() + cutMoov.size() + Atom.ATOM_HEADER_SIZE);
+				iwriter.calcInterleave();
+			}
+
 
 		} catch (AtomException e) {
 			MP4Log.log("Error parseing Mp4 file " + e);

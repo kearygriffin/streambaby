@@ -87,6 +87,15 @@ public class SttsAtom extends TimeToSampleAtom {
     return 0;
   }
 
+  public long getTotalSampleCount() {
+	    long numEntries = getNumEntries();
+	    long sampleCnt = 0;
+	    for (int i = 0; i < numEntries; i++ ) {
+	      long count = getSampleCount(i);
+	      sampleCnt += count;
+	    }	  
+	    return sampleCnt;
+  }
   /**
    * Given a time in the media return the data sample.
    * @param time the media time value

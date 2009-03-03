@@ -424,7 +424,7 @@ public class Listener extends HttpServer implements IListener
             try {
                 InputStream assetStr = factory.fetchAsset(http);
                 try {
-                  OutputStream out = http.getOutputStream(assetStr.available());
+                  OutputStream out = http.getOutputStream(/*assetStr.available()*/-1);
                   byte data[] = new byte[READ_BUFFER_SIZE];
                   int n;
                   while ((n = assetStr.read(data, 0, data.length)) > 0) {

@@ -6,7 +6,7 @@ package mp4.util.atom;
 /**
  * The user data atom.
  */
-public class UdtaAtom extends LeafAtom {
+public class UdtaAtom extends ContainerAtom {
 
   /**
    * Constructor for a user-data atom.

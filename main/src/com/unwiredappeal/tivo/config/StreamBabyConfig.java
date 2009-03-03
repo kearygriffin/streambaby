@@ -444,9 +444,9 @@ public class StreamBabyConfig extends ConfigurableObject {
 			);
 	
 	public static ConfigEntry cfgUseAltMp4 = new ConfigEntry(
-			"alt.mp4split",
+			"java.mp4split",
 			"false",
-			"Use alternate MP4 splitter/streamer"
+			"Use cahoon's java based MP4 splitter/streamer"
 			);
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
@@ -651,7 +651,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 		
 		int bsize = cfgReadBufferSize.getInt();
 		if (bsize > 0) {
-			RandomAccessFileInputStream.BUFFER_SIZE= bsize;
+			RandomAccessFileInputStream.DEFAULT_BUFFER_SIZE= bsize;
 			Listener.READ_BUFFER_SIZE = bsize;
 		}
 
