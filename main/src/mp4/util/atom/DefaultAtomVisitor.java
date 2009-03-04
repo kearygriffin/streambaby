@@ -137,7 +137,36 @@ public class DefaultAtomVisitor extends AtomVisitor {
     defaultAction(atom);
   }
   @Override
+  public void visit(Avc1Atom atom) throws AtomException {
+    defaultAction(atom);
+  }
+  @Override
+  public void visit(AvcCAtom atom) throws AtomException {
+    defaultAction(atom);
+  }
+  
+  @Override
+  public void visit(MetaAtom atom) throws AtomException {
+    defaultAction(atom);
+  }  
+
+  @Override
+  public void visit(IlstAtom atom) throws AtomException {
+    defaultAction(atom);
+  }  
+
+  @Override
+  public void visit(AppleMetaAtom atom) throws AtomException {
+    defaultAction(atom);
+  }  
+
+  @Override
+  public void visit(DataAtom atom) throws AtomException {
+    defaultAction(atom);
+  }  
+  
+  @Override
   public void visit(UnknownAtom atom) throws AtomException {
     defaultAction(atom);
-  }    
+  }      
 }

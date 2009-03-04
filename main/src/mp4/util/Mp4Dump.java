@@ -202,8 +202,9 @@ public class Mp4Dump extends DefaultAtomVisitor {
 
   @Override
   public void visit(StsdAtom atom) throws AtomException {
-    printLeafHeader(atom);
+    //printLeafHeader(atom);
     out.print(" entries " + atom.getNumEntries());
+    /*
     for (int i = 0 ; i < atom.getNumEntries(); i++) {
       if (mediaHandler.isVideo()) {
         out.print(" " + atom.getWidth() + "x" + atom.getHeight());
@@ -213,6 +214,7 @@ public class Mp4Dump extends DefaultAtomVisitor {
       }
       out.println();
     }
+    */
  }
 
   @Override

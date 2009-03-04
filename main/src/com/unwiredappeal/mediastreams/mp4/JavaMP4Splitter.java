@@ -7,12 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
 
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 
 import mp4.util.Mp4Split;
+import mp4.util.atom.TrakAtom;
 
 public class JavaMP4Splitter extends MP4Streamer {
 
@@ -70,6 +74,64 @@ public class JavaMP4Splitter extends MP4Streamer {
 					/ (float) cutMoov.getMvhd().getTimeScale();			
 		}
 
+		public int getWidth() {
+			TrakAtom trak = findAvc1Trak();
+			if (trak == null)
+				return 0;
+			int width = trak.getMdia().getMinf().getStbl().getStsd().getAvc1().getWidth();
+			return width;
+		}
+
+		private TrakAtom findAvc1Trak() {
+			Iterator<TrakAtom> it = cutMoov.getTracks();
+			while(it.hasNext()) {
+				TrakAtom a = it.next();
+				if (a.getMdia().getHdlr().isVideo()) {
+					if (a.getMdia().getMinf().getStbl().getStsd().getAvc1() != null)
+						return a;
+				}
+			}
+ 			return null;
+		}
+
+		public int getProfileLevel() {
+			TrakAtom trak = findAvc1Trak();
+			if (trak == null)
+				return 0;
+			int p = 0; // trak.getMdia().getMinf().getStbl().getStsd().getProfileLevel();
+			return p;
+		}
+
+		public int getProfile() {
+			TrakAtom trak = findAvc1Trak();
+			if (trak == null)
+				return 0;
+			int p = 0; // trak.getMdia().getMinf().getStbl().getStsd().getProfile();
+			return p;
+		}
+
+		public int getHeight() {
+			TrakAtom trak = findAvc1Trak();
+			if (trak == null)
+				return 0;
+			int height = trak.getMdia().getMinf().getStbl().getStsd().getAvc1().getHeight();
+			return height;
+		}
+
+		public List<String> getFormats() {
+			List<String> formats = new ArrayList<String>();
+			Iterator<TrakAtom> it = cutMoov.getTracks();
+			while(it.hasNext()) {
+				TrakAtom a = it.next();
+				byte[] dformat = a.getMdia().getMinf().getStbl().getStsd().getDataFormat();
+				if (dformat != null) {
+					String dfStr = new String(dformat);
+					formats.add(dfStr);
+				}
+			}
+			return formats;
+		}
+
 	}
 
 	Splitter split;
@@ -82,31 +144,31 @@ public class JavaMP4Splitter extends MP4Streamer {
 	public JavaMP4Splitter(File f, long startPos, boolean reinterleave)
 			throws IOException {
 		this(new Splitter(f, startPos, reinterleave));
+		getWidth();
+		getHeight();
+		getProfileLevel();
+		getProfile();
+		getFormats();
 		// mp4 = (StreamableMP4)this.in;
 	}
 
 	@Override
 	public List<String> getFormats() {
-		// TODO Auto-generated method stub
-		return null;
+		return split.getFormats();
 	}
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return split.getHeight();
 	}
 
 	@Override
 	public int getProfile() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+		return split.getProfile();	}
 
 	@Override
 	public int getProfileLevel() {
-		// TODO Auto-generated method stub
-		return 0;
+		return split.getProfileLevel();
 	}
 
 	@Override
@@ -116,8 +178,7 @@ public class JavaMP4Splitter extends MP4Streamer {
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return split.getWidth();
 	}
 
 }

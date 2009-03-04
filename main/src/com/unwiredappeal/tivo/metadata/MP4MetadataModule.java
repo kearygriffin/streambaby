@@ -1,13 +1,16 @@
 package com.unwiredappeal.tivo.metadata;
 
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -15,21 +18,17 @@ import java.util.logging.Logger;
 
 import javax.xml.transform.sax.SAXSource;
 
+import mp4.util.Mp4Parser;
+import mp4.util.Mp4Split;
+import mp4.util.atom.Atom;
+import mp4.util.atom.AtomException;
+import mp4.util.atom.IlstAtom;
+import mp4.util.atom.MetaAtom;
+import mp4.util.atom.MoovAtom;
+
 import org.xml.sax.InputSource;
 
 
-import com.coremedia.iso.BoxFactory;
-import com.coremedia.iso.IsoFile;
-import com.coremedia.iso.IsoInputStream;
-import com.coremedia.iso.IsoOutputStream;
-import com.coremedia.iso.RandomAccessDataSource;
-import com.coremedia.iso.boxes.Box;
-import com.coremedia.iso.boxes.BoxContainer;
-import com.coremedia.iso.boxes.BoxInterface;
-import com.coremedia.iso.boxes.MetaBox;
-import com.coremedia.iso.boxes.MovieBox;
-import com.coremedia.iso.boxes.UserDataBox;
-import com.coremedia.iso.boxes.apple.*;
 import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.tivo.config.ConfigEntry;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
@@ -37,6 +36,7 @@ import com.unwiredappeal.tivo.modules.StreamBabyModule;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 import com.unwiredappeal.tivo.utils.Utils;
+import mp4.util.atom.*;
 
 public class MP4MetadataModule extends BaseMetadataModule {
 
@@ -51,7 +51,6 @@ public class MP4MetadataModule extends BaseMetadataModule {
 		super.initialize(m);
 		if (cfgMp4Metadata.getBool() == true)
 			return false;
-		Logger.getLogger(BoxFactory.class.getName()).setLevel(Level.WARNING);
 		return true;
 	}
 	public static final int PRIORITY=40;
@@ -64,213 +63,119 @@ public class MP4MetadataModule extends BaseMetadataModule {
 	}
 	
 
-	 @SuppressWarnings("unchecked")
-	 public static class SBBoxFactory extends BoxFactory {
-		   
-	   Class[] arBoxesToParse = new Class[] { 
-			   MovieBox.class,
-			   UserDataBox.class,
-			   MetaBox.class,
-			   AppleItemListBox.class,
-			   AppleNameBox.class,
-			   AppleArtistBox.class,
-				AppleAlbumBox.class,
-				AppleCommentBox.class,
-				AppleCopyrightBox.class,
-				AppleCustomGenreBox.class,
-				AppleRecordingYearBox.class,
-				AppleTrackNumberBox.class,
-				AppleTrackAuthorBox.class,
-				AppleTrackTitleBox.class,
-				AppleTvEpisodeBox.class,
-				AppleTvSeasonBox.class,
-				AppleCoverBox.class,
-			   
-	   };
-	   
-	   List<Class> boxesToParse = Arrays.asList(arBoxesToParse);
-	   
-	   public static class EmptyBox extends Box {
-		   long bcontentSize;
-		   long bsize;
-		   long boffset;
-		   
-			protected EmptyBox(byte[] type, long size, long offset) {
-				super(type);
-				this.boffset = offset;
-				this.bsize = size;
-			}
-	
-			@Override
-			protected void getContent(IsoOutputStream os) throws IOException {
-				//
-			}
-	
-			@Override
-			protected long getContentSize() {
-				return bcontentSize;
-			}
-	
-			@Override
-			public String getDisplayName() {
-				return "EmptyBox";
-			}
-	
-			@Override
-			public void parse(IsoInputStream in, long contentSize, BoxFactory boxFactory)
-					throws IOException {
-				this.bcontentSize = contentSize;
-			    if (in.getStreamPosition() - boffset < bsize && contentSize != -1) {
-				    in.skip((int) (bsize - (in.getStreamPosition() - boffset)));
-				 }
-			}
-		   
-	   }
-	   protected boolean parseThisBox(Box box) {
-		   return boxesToParse.contains(box.getClass());
-	   }
-	  /**
-	   * Parses the next size and type, creates a box instance and parses the box's content.
-	   *
-	   * @param in     the IsoInputStream pointing to the ISO file
-	   * @param parent the current box's parent (null if no parent)
-	   * @return the box just parsed
-	   * @throws IOException if reading from <code>in</code> fails
-	   */
-	  public Box parseBox(IsoInputStream in, BoxInterface parent) throws IOException {
-	    long offset = in.getStreamPosition();
-
-	    long size = in.readUInt32();
-	    // do plausibility check
-	    if (size < 8 && size > 1) {
-	      Log.warn("Plausibility check failed: size < 8 (size = " + size + "). Stop parsing!");
-	      throw new IOException();
-	    } else if ((offset + size) > parent.getIsoFile().getOriginalIso().length()) {
-	      Log.warn("Plausibility check failed: offset + size > file size (size = " + size + "). Stop parsing!");
-	      throw new IOException();
-	    }
-
-
-	    byte[] type = in.read(4);
-
-	    byte[] usertype = null;
-	    long contentSize;
-
-	    if (size == 1) {
-	      size = in.readUInt64();
-	      contentSize = size - 16;
-	    } else if (size == 0) {
-	      //throw new RuntimeException("Not supported!");
-	      contentSize = -1;
-	      size = 1;
-	    } else {
-	      contentSize = size - 8;
-	    }
-	    if (Arrays.equals(type, IsoFile.fourCCtoBytes("uuid"))) {
-	      usertype = in.read(16);
-	      contentSize -= 16;
-	    }
-	    Box box = createBox(type, usertype,
-	            parent.getType());
-	    if (!parseThisBox(box)) {
-	    	box = new EmptyBox(box.getType(), size, offset);
-	    }
-	    box.setParent((BoxContainer) parent);
-	   // LOG.finest("Creating " + IsoFile.bytesToFourCC(box.getType()) + " box: (" + box.getDisplayName() + ")");
-	    // System.out.println("parsing " + Arrays.toString(box.getType()) + " " + box.getClass().getName() + " size=" + size);
-	    box.parse(in, contentSize, this);
-	    // System.out.println("box = " + box);
-	    if (in.getStreamPosition() - offset < size && contentSize != -1) {
-	      // System.out.println("dead bytes found in " + box);
-	    	int skip = (int) (size - (in.getStreamPosition() - offset));
-	    	if (skip < 0)
-	    		throw new IOException();
-	    	box.setDeadBytes(in.read(skip));
-	    	//in.skip((int) (size - (in.getStreamPosition() - offset)));
-	    }
-
-	    /*if (box.getSize() < 10000000) {
-		      ByteArrayOutputStream baos = new ByteArrayOutputStream((int) box.getSize());
-		      box.getBox(new IsoOutputStream(baos), new RandomAccessFile(box.getIsoFile().getFile(), "r"));
-		      RandomAccessFile raf = new RandomAccessFile(box.getIsoFile().getFile(), "r");
-		      raf.seek(offset);
-		      byte[] orig = new byte[(int) box.getSize()];
-		      raf.readFully(orig);
-
-		      if (!Arrays.equals(baos.toByteArray(), orig)) {
-		        String a = dumpBytes(baos.toByteArray());
-		        String b = dumpBytes(orig);
-//		        throw new RuntimeException("The written box content is not equal to the actual content in the file");
-		        System.err.print("content");
-		        box.getBox(new IsoOutputStream(baos), new RandomAccessFile(box.getIsoFile().getFile(), "r"));
-		      }
-		    } */
-	    /*
-	    if (size != box.getSize()) {
-	      //    System.err.println();
-	      box.getSize();
-	    }
-	    */
-	    box.offset = offset;
-
-	    assert size == box.getSize() : "Reconstructed " + IsoFile.bytesToFourCC(box.getType()) + " Size is not equal to the number of parsed bytes! (" + box.getDisplayName() + ")"
-	            + " Actual Box size: " + box.getSize() + " Calculated size: " + size;
-	    return box;
-	  }
-	}
-	
-	public static class StreamBabyIsoFile extends IsoFile {
-		public BoxFactory sbBoxFactory = new SBBoxFactory();
+	public boolean fetchMetadata(MoovAtom moov, URI uri, MetaData m) {
+		MetaAtom meta = (MetaAtom)moov.getUdta().getFirstChild(MetaAtom.class);
+		if (meta == null)
+			return false;
+		IlstAtom ilst = (IlstAtom)meta.getFirstChild(IlstAtom.class);
+		if (ilst == null)
+			return false;
 		
-		public StreamBabyIsoFile(RandomAccessDataSource originalIso) {
-			super(originalIso);
-		}
-		public StreamBabyIsoFile(SBDataSource source) {
-			super(source);
-		}
-	  public void parse() throws IOException {
-		    IsoInputStream isoIn = new IsoInputStream(this.getOriginalIso());
-		    //List<Box> boxeList = new LinkedList<Box>();
-		    boolean done = false;
-		    while (!done) {
-		      try {
-		        long sp = isoIn.getStreamPosition();
-		        Box box = sbBoxFactory.parseBox(isoIn, this);
-		        if (box != null) {
-		          //boxeList.add(box);
-		          addBox(box);
-		          //this.boxes = boxeList.toArray(new Box[boxeList.size()]);
-		          assert box.calculateOffset() == sp : "calculated offset differs from offset in file";
-		        } else {
-		          done = true;
-		        }
-		      } catch (EOFException e) {
-		        done = true;
-		      }
-		    }
-		  }
+		Map<String, String> metaMap = new HashMap<String, String>();
 
+		Iterator<Atom> it = ilst.getChildAtoms().iterator();
+		while(it.hasNext()) {
+			Atom box = it.next();
+			if (box instanceof DescAtom)
+				metaMap.put("name", ((DescAtom)box).getDescription());
+			else if (box instanceof CartAtom)
+				metaMap.put("artist", ((CartAtom)box).getArtist());
+			else if (box instanceof CalbAtom)
+				metaMap.put("album", ((CalbAtom)box).getAlbum());
+			else if (box instanceof CcmtAtom)
+				metaMap.put("comment", ((CcmtAtom)box).getComment());
+			else if (box instanceof CprtAtom)
+				metaMap.put("copyright", ((CprtAtom)box).getCopyright());
+			else if (box instanceof GnreAtom)
+				metaMap.put("genre", ((GnreAtom)box).getGenre());
+			else if (box instanceof CdayAtom) {
+				String year = ((CdayAtom)box).getYear();
+				if (year.length() > 4)
+					year = year.substring(0, 4);
+				metaMap.put("year", year);
+			}
+			/*
+			} else if (box instanceof AppleTrackNumberBox)
+				metaMap.put("tracknumber", Integer.toString(((AppleTrackNumberBox)box).getTrackNumber()));
+			*/												
+			else if (box instanceof CwrtAtom)
+				metaMap.put("trackauthor", ((CwrtAtom)box).getComposer());
+			else if (box instanceof CnamAtom)
+				metaMap.put("tracktitle", ((CnamAtom)box).getTitle());
+			/*
+			else if (box instanceof AppleTvEpisodeBox)
+				metaMap.put("tvepisodenumber", Integer.toString(((AppleTvEpisodeBox)box).getTvEpisode()));
+			else if (box instanceof AppleTvSeasonBox)
+				metaMap.put("tvseasonnumber", Integer.toString(((AppleTvSeasonBox)box).getTvSeason()));
+				*/
+			else if (box instanceof TvshAtom)
+				metaMap.put("tvshowname", ((TvshAtom)box).getShowName());
+			else if (box instanceof TvenAtom)
+				metaMap.put("tvepisodenumber", ((TvenAtom)box).getEpisodeNumber());			
+			else if (box instanceof CovrAtom) {
+				CovrAtom covr = (CovrAtom)box;
+				DataAtom data = covr.getDataAtom();
+				String ext = null;
+				if (data.getFlag()[2] == 13)
+					ext = ".jpg";
+				else if (data.getFlag()[2] == 14)
+					ext = ".gif";
+				if (ext != null) {
+					String filename = writeArtwork(uri, data.getMetadata(), ext);
+					if (filename != null) {
+						try {
+							metaMap.put("artwork", new File(filename).toURL().toExternalForm());
+						} catch (MalformedURLException e) {
+						}
+					}
+				}
+			}
+		}
+		if (metaMap != null && metaMap.size() >0) {
+			StringBuffer data = new StringBuffer();
+			data.append("<meta>\n");
+			for (Map.Entry<String, String> e : metaMap.entrySet()) {
+				data.append("<" + e.getKey() + ">");
+				data.append("<![CDATA[");
+				data.append(e.getValue());
+				data.append("]]>");
+				data.append("</" + e.getKey() + ">");			
+			}
+			data.append("</meta>");
+			
+			if (metaMap.get("name") != null)
+				m.setTitle(metaMap.get("name"));
+			else if (metaMap.get("tracktitle") != null)
+					m.setTitle(metaMap.get("tracktitle"));
+
+			SAXSource source = new SAXSource(new InputSource(new StringReader(data.toString())));
+			return transform(m, source, StreamBabyConfig.cfgMetaXsl.getValue(), null);		
+		}
+		return false;
+		
 	}
-
-	protected boolean parseIsoBoxes(URI uri, File f, MetaData m) throws IOException {
-		Map<String, String> metaMap = null;
-		SBDataSource isosource = new SBDataSource(f);				
-		IsoFile iso = null;
+	public boolean parseIsoBoxes(URI uri, File f, MetaData m) {
+		DataInputStream mp4file = null;
 		try {
-			iso = new StreamBabyIsoFile(isosource);		
-			iso.parse();
-			MovieBox[] moov = iso.getBoxes(MovieBox.class);
-			if (moov == null || moov.length != 1)
-				return false;
-			UserDataBox udtaBoxes[] = moov[0].getBoxes(UserDataBox.class);
-			for (UserDataBox udta : udtaBoxes) {
-				MetaBox[] metaBoxes = udta.getBoxes(MetaBox.class);
-				for (MetaBox metaBox : metaBoxes) {
-					AppleItemListBox[] listBoxes = metaBox.getBoxes(AppleItemListBox.class);
-					for (AppleItemListBox listBox : listBoxes) {
-						Box[] appleItems = listBox.getBoxes();
-						if (appleItems.length > 0 && metaMap == null)
-							metaMap = new HashMap<String, String>();
+			mp4file = new DataInputStream(new RandomAccessFileInputStream(f));
+			Mp4Parser parser = new Mp4Parser(mp4file);
+			parser.parseMp4();
+			mp4file.close();
+			return fetchMetadata(parser.getMoov(), uri, m);
+		} catch (IOException e) {
+			return false;
+		} catch (AtomException e) {
+			return false;
+		} finally {
+			if (mp4file != null) {
+				try {
+					mp4file.close();
+				} catch(IOException ee) { }
+			}
+		}
+	}
+		
+	/*
 						for (Box box : appleItems) {
 							if (box instanceof AppleNameBox)
 								metaMap.put("name", ((AppleNameBox)box).getName());
@@ -313,21 +218,7 @@ public class MP4MetadataModule extends BaseMetadataModule {
 										String filename = writeArtwork(uri, dataBox.getContent(), ext);
 										if (filename != null)
 											metaMap.put("artwork", new File(filename).toURL().toExternalForm());
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		finally {
-				if (iso != null)
-					try {
-						iso.getOriginalIso().close();
-					} catch(Exception e) { } 			
-		}
-		if (metaMap != null && metaMap.size() >0) {
+				if (metaMap != null && metaMap.size() >0) {
 			StringBuffer data = new StringBuffer();
 			data.append("<meta>\n");
 			for (Map.Entry<String, String> e : metaMap.entrySet()) {
@@ -343,19 +234,7 @@ public class MP4MetadataModule extends BaseMetadataModule {
 				m.setTitle(metaMap.get("name"));
 			else if (metaMap.get("tracktitle") != null)
 					m.setTitle(metaMap.get("tracktitle"));
-
-			SAXSource source = new SAXSource(new InputSource(new StringReader(data.toString())));
-			return transform(m, source, StreamBabyConfig.cfgMetaXsl.getValue(), null);		
-		}
-		return false;
-	}
-	
-	//setMetadataItem(vidinfo, "name", formatCtx.title);
-	//setMetadataItem(vidinfo, "artist", formatCtx.author);
-	////setMetadataItem(vidinfo, "copyright", formatCtx.copyright);
-	//setMetadataItem(vidinfo, "comment", formatCtx.comment);
-	//setMetadataItem(vidinfo, "album", formatCtx.album);
-	//setMetadataItem(vidinfo, "genre", formatCtx.genre);
+	*/
 
 	public boolean setMetadata(MetaData m, URI uri, VideoInformation vi) {
 		if (!Utils.isFile(uri))
@@ -366,8 +245,6 @@ public class MP4MetadataModule extends BaseMetadataModule {
 			try {
 				m.setReference(f);
 				return parseIsoBoxes(uri, f, m);
-			} catch (FileNotFoundException e) {
-			} catch (IOException e) {
 			} catch (Exception e) {
 				Log.error("Error parsing mp4 information");
 				Log.printStackTrace(e);
@@ -376,67 +253,4 @@ public class MP4MetadataModule extends BaseMetadataModule {
 		return false;
 	}
 	
-	public static class SBDataSource extends RandomAccessDataSource {
-
-		RandomAccessFileInputStream ras;
-		
-		public SBDataSource(File f) throws FileNotFoundException {
-			 ras = new RandomAccessFileInputStream(f);
-		}
-		
-		public RandomAccessFileInputStream getInputStream() {
-			return ras;
-		}
-		@Override
-		public void seek(long pos) throws IOException {
-			ras.seek(pos);
-			
-		}
-
-		@Override
-		public int read() throws IOException {
-			return ras.read();
-		}
-		@Override
-		public long length() throws IOException {
-			return ras.length();
-		}
-		
-		@Override
-		public int read(byte[] b) throws IOException {
-			return ras.read(b);
-		}
-
-		@Override
-		public int read(byte[] b, int off, int len) throws IOException {
-			return ras.read(b, off, len);
-		}
-		
-		@Override
-		public long skip(long n) throws IOException {
-			return ras.skip(n);
-		}
-		
-		@Override
-		public void mark(int n) {
-			ras.mark(n);
-		}
-		
-		@Override
-		public boolean markSupported() {
-			return ras.markSupported();
-		}
-		
-		@Override
-		public void reset() throws IOException {
-			ras.reset();
-		}
-		
-		@Override
-		public void close() throws IOException {
-			ras.close();
-		}
-
-	}
-
 }

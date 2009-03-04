@@ -12,14 +12,9 @@ import java.util.Iterator;
 
 import mp4.util.atom.Atom;
 import mp4.util.atom.AtomException;
-import mp4.util.atom.ContainerAtom;
-import mp4.util.atom.DefaultAtomVisitor;
-import mp4.util.atom.FtypAtom;
-import mp4.util.atom.LeafAtom;
 import mp4.util.atom.MdatAtom;
 import mp4.util.atom.MoovAtom;
 import mp4.util.atom.TrakAtom;
-import mp4.util.atom.UnknownAtom;
 
 
 /**
@@ -34,9 +29,7 @@ import mp4.util.atom.UnknownAtom;
  * Splitting the mpeg4 file requires rewritting the stbl atom container
  * with new data and cutting off the mdat section.
  */
-public class Mp4Split extends DefaultAtomVisitor {
-  // the input mp4 file
-  protected DataInputStream mp4file;
+public class Mp4Split extends Mp4Parser {
   
   //public static String inputFile;
   //public static String outputFile;
@@ -45,106 +38,18 @@ public class Mp4Split extends DefaultAtomVisitor {
 	public String outputFile;
 	public boolean writeMdat = true;
 	public static float time;
-	protected FtypAtom ftyp;
-	protected MoovAtom moov;
-	protected MdatAtom mdat;
 	protected MoovAtom cutMoov;
 	protected MdatAtom cutMdat;
 	Mp4InterleaveWriter iwriter = null;
-	boolean lastAtom = false;
   
-  @Override
-  protected void defaultAction(Atom atom) throws AtomException {
-    if (atom.isContainer()) {
-      long bytesRead = 0;
-      long bytesToRead = atom.dataSize();
-      while (bytesRead < bytesToRead) {
-        Atom child = parseAtom();
-        ((ContainerAtom)atom).addChild(child);
-        bytesRead += child.size();
-      }
-    }
-    else {
-      // the default action for a leaf is to read the data in to a buffer
-      ((LeafAtom)atom).readData(mp4file);
-    }
+  public Mp4Split(DataInputStream mp4file) {
+		super(mp4file);
   }
 
-  /**
-   * Don't the the mdat atom since that's the biggest segment of the 
-   * file.  It contains the video and sound data.  Plus, we'll just
-   * skip over the beginning when we cut the movie.
-   */
-  @Override
-  public void visit(MdatAtom atom) throws AtomException {
-    atom.setInputStream(mp4file);
-    try {
-    	if (atom.dataSize() != 0 && mp4file.markSupported())
-    		mp4file.skip(atom.dataSize());
-    	else
-    		lastAtom = true;
-    } catch(IOException e) {
-    	throw new AtomException(e.getMessage());
-    }
+  public Mp4Split() {
+	  
   }
-  
-	/**
-	 * Parse an atom from the mpeg4 file.
-	 * 
-	 * @return the number of bytes read
-	 * @throws AtomException
-	 */
-	private Atom parseAtom() throws AtomException {
-		// get the atom size
-		if (lastAtom)
-			throw new AtomException("Already parsed last atom!");
-		byte[] word = new byte[Atom.ATOM_WORD];
-		int num;
-		try {
-			num = mp4file.read(word);
-		} catch (IOException e1) {
-			throw new AtomException("IOException while reading file");
-		}
-		// check for end of file
-		if (num == -1) {
-			return null;
-		}
-		if (num != Atom.ATOM_WORD) {
-			throw new AtomException("Unable to read enough bytes for atom");
-		}
-		long size = Atom.byteArrayToUnsignedInt(word, 0);
-		// get the atom type
-		try {
-			num = mp4file.read(word);
-		} catch (IOException e1) {
-			throw new AtomException("IOException while reading file");
-		}
-		if (num != Atom.ATOM_WORD) {
-			throw new AtomException("Unable to read enough bytes for atom");
-		}
-		try {
-			Atom atom;
-			try {
-				Class<?> cls = Class.forName(Atom.typeToClassName(word));
-				atom = (Atom) cls.newInstance();
-			} catch (ClassNotFoundException e) {
-				MP4Log.log("UnknownAtom: " + Atom.typeToClassName(word));
-				//if (word[2] == 'h' && word[3] == 'd')
-					//atom = new UnkHdAtom(word);
-				//else
-					atom = new UnknownAtom(word);
-			}
 
-			atom.setSize(size);
-			atom.accept(this);
-			return atom;
-		} catch (InstantiationException e) {
-			throw new AtomException("Unable to instantiate atom");
-		} catch (IllegalAccessException e) {
-			throw new AtomException("Unabel to access atom object");
-		}
-	}
-	
 
   /**
    * Constructor for the Mpeg-4 file splitter.  It opens the 
@@ -178,25 +83,11 @@ public class Mp4Split extends DefaultAtomVisitor {
 	public void calcSplitMp4() throws IOException {
 		calcSplitMp4(false);
 	}
+	
 	public void calcSplitMp4(boolean reinterleave) throws IOException {
 		long mdatOffset = 0;
 		try {
-			long offset = 0;
-			while (ftyp == null || moov == null || mdat == null) {
-				Atom atom = parseAtom();
-				if (atom == null) {
-					throw new IOException("Couldn't find all required MP4 atoms");
-				}
-				if (atom instanceof FtypAtom)
-					ftyp = (FtypAtom) atom;
-				else if (atom instanceof MoovAtom)
-					moov = (MoovAtom) atom;
-				else if (atom instanceof MdatAtom) {
-					mdatOffset = offset;
-					mdat = (MdatAtom) atom;
-				}
-				offset += atom.size();
-			}
+			mdatOffset = parseMp4();
 			// ftyp = (FtypAtom) parseAtom();
 			// moov = (MoovAtom) parseAtom();
 			// mdat = (MdatAtom) parseAtom();

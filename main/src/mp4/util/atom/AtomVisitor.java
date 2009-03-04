@@ -38,4 +38,10 @@ public abstract class AtomVisitor {
   public abstract void visit(UdtaAtom atom) throws AtomException;
   public abstract void visit(VmhdAtom atom) throws AtomException;
   public abstract void visit(UnknownAtom atom) throws AtomException;
+  public abstract void visit(Avc1Atom atom) throws AtomException;
+  public abstract void visit(AvcCAtom atom) throws AtomException;
+  public abstract void visit(MetaAtom atom) throws AtomException;  
+  public abstract void visit(IlstAtom atom) throws AtomException;
+  public abstract void visit(AppleMetaAtom atom) throws AtomException;  
+  public abstract void visit(DataAtom atom) throws AtomException;  
 }

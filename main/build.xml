@@ -38,7 +38,6 @@
         <pathelement location="${STREAMBABY}/lib/Tidy.jar"/>
         <pathelement location="${STREAMBABY}/dlib/core-renderer.jar"/>
         <pathelement location="${STREAMBABY}/dlib/simulator.jar"/>
-        <pathelement location="${STREAMBABY}/lib/isoparser-137-SNAPSHOT.jar"/>
         <pathelement location="${ffmpegJavaModule.location}/bin"/>
     </path>
     <target name="init">
@@ -95,9 +94,9 @@
             <classpath refid="main.classpath"/>
         </java>
     </target>
-    <target name="StreamableMP4">
-        <java classname="com.unwiredappeal.mediastreams.MP4StreamingModule" failonerror="true" fork="yes">
-            <arg line="/home/keary/videos/hb2.mp4 /home/keary/videos/out.mp4 3000000"/>
+    <target name="MP4Split">
+        <java classname="mp4.util.Mp4Split" failonerror="true" fork="yes">
+            <arg line="-in /mnt/nas/media/videos/Oktapodi.mp4 -out /home/keary/videos/out.mp4 -time 0"/>
             <classpath refid="main.classpath"/>
         </java>
     </target>
@@ -110,19 +109,19 @@
     <target name="Streambaby - test">
         <java classname="com.unwiredappeal.tivo.streambaby.StreamBabyMain" dir="../" failonerror="true" fork="yes">
             <jvmarg line="-Dstreambaby.debug=1"/>
-            <arg line="--test mpegcopy /home/keary/videos/The_Phantom_Planet.mpeg /home/keary/videos/out.mpg  3000000"/>
-            <classpath refid="main.classpath"/>
-        </java>
-    </target>
-    <target name="StreamableMpeg">
-        <java classname="com.unwiredappeal.mediastreams.MpegStreamingModule" failonerror="true" fork="yes">
-            <arg line="/home/keary/videos/hb2.mpg /home/keary/videos/out.mpg 3000000"/>
+            <arg line="--test mp4copy /mnt/nas/media/videos/Oktapodi.mp4 /home/keary/videos/out.mp4 0"/>
             <classpath refid="main.classpath"/>
         </java>
     </target>
     <target name="Streambaby - genpreview">
         <java classname="com.unwiredappeal.tivo.streambaby.StreamBabyMain" dir="../" failonerror="true" fork="yes">
             <arg line="--cleancache"/>
+            <classpath refid="main.classpath"/>
+        </java>
+    </target>
+    <target name="Streambaby - standalone (open-jdk)">
+        <java classname="com.unwiredappeal.tivo.streambaby.StreamBabyMain" dir="../" failonerror="true" fork="yes">
+            <jvmarg line="-Dstreambaby.debug=1 -Djava.awt.headless=true"/>
             <classpath refid="main.classpath"/>
         </java>
     </target>

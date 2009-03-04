@@ -6,6 +6,7 @@ package mp4.util.atom;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -71,4 +72,59 @@ public abstract class ContainerAtom extends Atom {
     writeHeader(out);
     writeUnknownChildren(out);
   }
+  
+  /**
+   * Return the size of the data part of the atom
+   * @return the size of the atom's data part
+   */
+  public long pureDataSize() {
+    return 0;
+  }
+  
+  public boolean typeEquals(byte[] t1, byte[] t2) {
+	  return Arrays.equals(t1, t2);
+  }
+  
+  public Atom getFirstChild(byte[] typ) {
+	  List<Atom> aList = getChildAtoms(typ);
+	  if (aList == null || aList.size() == 0)
+		  return null;
+	  return aList.get(0);
+  }
+  
+  public List<Atom> getChildAtoms(byte[] typ) {
+	  List<Atom> atomList = new ArrayList<Atom>();
+	  for (Atom a : unkChildren) {
+		  if (typeEquals(typ, a.type)) {
+			  atomList.add(a);
+		  }
+	  }
+		  
+	  return atomList;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public Atom getFirstChild(Class atomClass) {
+	  List<Atom> aList = getChildAtoms(atomClass);
+	  if (aList == null || aList.size() == 0)
+		  return null;
+	  return aList.get(0);
+  }
+  
+  @SuppressWarnings("unchecked")
+  public List<Atom> getChildAtoms(Class atomClass) {
+	  List<Atom> atomList = new ArrayList<Atom>();
+	  for (Atom a : unkChildren) {
+		  if (atomClass.isInstance(a)) {
+			  atomList.add(a);
+		  }
+	  }
+		  
+	  return atomList;
+  }
+  
+  public List<Atom> getChildAtoms() {
+	  return unkChildren;
+  }
+
 }

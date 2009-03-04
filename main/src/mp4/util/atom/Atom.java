@@ -1,5 +1,6 @@
 package mp4.util.atom;
 
+import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
 
@@ -14,6 +15,10 @@ import java.io.IOException;
  * In the ISO spec, an Atom is a Box.  We use the QuickTime name, Atom.
  */
 public abstract class Atom {
+	
+  // the raw mpeg4 data for the atom
+  protected ByteStream data;
+
   // the size of the atom, an unsigned int so we use a long
   protected long size;
   // the type, represented using the characters in the byte stream
@@ -23,6 +28,8 @@ public abstract class Atom {
   public static final int ATOM_WORD = 4;
   // The canonical atom size, which includes the type and the size
   public static final int ATOM_HEADER_SIZE = 8;
+  
+  public static final byte COPYRIGHT_BYTE_VALUE = -87;
   
   /**
    * Create an atom with the specified size and type
@@ -74,6 +81,10 @@ public abstract class Atom {
   public long dataSize() {
     return size - Atom.ATOM_HEADER_SIZE;
   }
+  
+  public long pureDataSize() {
+	  return dataSize();
+  }
 
  /**
    * Return the atom's type as an integer
@@ -94,12 +105,6 @@ public abstract class Atom {
    */
   public abstract void accept(AtomVisitor v) throws AtomException;
   
-  /**
-   * Write the atom to the specified output
-   * @param out where the output goes
-   * @throws IOException if there is an error when writing the data
-   */
-  public abstract void writeData(DataOutput out) throws IOException;
   
   /**
    * Write the atom header data to the output stream.  The header data
@@ -180,8 +185,58 @@ public abstract class Atom {
    */
   public static String typeToClassName(byte[] typ) {
     String str = new String(typ);
-    String clsName = str.substring(0, 1).toUpperCase() + str.substring(1);
+    // \u00a9
+    Character firstChar = str.substring(0, 1).charAt(0);
+    String firstStr;
+    if (typ[0] == COPYRIGHT_BYTE_VALUE) // (c) copyright sign
+    	firstStr = "C";
+    else if (Character.isLetter(firstChar))
+    	firstStr= Character.toString(Character.toUpperCase(firstChar));
+    else if (Character.isDigit(firstChar))
+    	firstStr = "N" + firstChar;
+    else
+    	firstStr = "X";
+    String clsName = firstStr + str.substring(1);
     return "mp4.util.atom." + new String(clsName) + "Atom";
   }
+  
+  /**
+   * Write the byte stream to the specified output.
+   * @param out where the output goes
+   * @throws IOException if there is a problem writing the data
+   */
+  public void writeData(DataOutput out) throws IOException {
+    writeHeader(out);
+    if (data != null && data.length() > 0)
+    	data.writeData(out);
+  }
+  
+  /**
+   * Read the data from the input stream in to the atom.
+   * @param in the input stream
+   * @throws AtomException
+   */
+  public void readData(DataInputStream in) throws AtomException {
+	  data = new ByteStream(pureDataSize());
+	  if (pureDataSize() > 0) {
+	    try {
+	      data.read(in);
+	    } catch (IOException e) {
+	      throw new AtomException("IOException while reading mp4 file");
+	    }
+	}
+  }
+  
+  /**
+   * Allocate space for the data needed by the atom.
+   * @param size the size of data in bytes
+   */
+  public void allocateData(long size) {
+    assert data == null;
+    data = new ByteStream(size);
+    data.reserveSpace(size);
+    setSize(size + ATOM_HEADER_SIZE);
+  }
+  
   
 }
