@@ -445,7 +445,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgUseAltMp4 = new ConfigEntry(
 			"java.mp4split",
-			"false",
+			"true",
 			"Use cahoon's java based MP4 splitter/streamer"
 			);
 	// This always be last

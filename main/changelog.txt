@@ -1,3 +1,11 @@
+===SVN==
+ * Adjusted size of HD selection screen so CHANNEL_DOWN moves to last entry on current page (usual TiVo behavior)
+ * Integrated Cahoon's MP4 splitting code
+ * Added interleaving to java-based MP4 splitting code
+ * Added itunes metadata support to Cahoon's mp4 parsing
+ * Removed iso-parser MP4 parsing library from libs, and changed MP4 metadata code to use the new mp4 parsing code
+ * New config option.  java.mp4slit (default=true) to use Cahoon's java based MP4splitter vs old C-port of mp4 splitter
+ 
 ===V0.25===
  * Force transcoding of MP4's if profile > High or Level > 41 
  * Internal reorg--  Get icon for display from parsed file type (folder, video, dvd, etc)
