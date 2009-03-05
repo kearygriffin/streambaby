@@ -28,6 +28,7 @@ import com.sun.jna.ptr.PointerByReference;
  */
 public class AVCodecSample implements Main
 {
+	public static int SAVE_FRAMES = 150;
 	public static void main(String[] args) throws Exception
 	{
 		FFmpegMgr.initLibrary();
@@ -144,7 +145,7 @@ public class AVCodecSample implements Main
 	                    codecCtx.height);
 
 	                // Save the frame to disk
-	                if(++i<=5)
+	                if(++i<=SAVE_FRAMES)
 	                    SaveFrame(frameRGB, codecCtx.width, codecCtx.height, 
 	                        i);
 	            }

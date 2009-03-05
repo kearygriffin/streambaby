@@ -13,7 +13,7 @@ public class Mp4InterleaveWriter {
 	MoovAtom newMoov;
 	MdatAtom mdat;
 	long firstChunkOffset;
-	public static final float interleaveTime = .2f;
+	public static final float interleaveTime = .4f;
 	public Mp4InterleaveWriter(MoovAtom moov,
 			MdatAtom mdat, long firstChunkOffset) {
 		this.moov = moov;
@@ -34,7 +34,7 @@ public class Mp4InterleaveWriter {
 		for (int i=0;i<numTraks;i++) {
 			sampleNumber[i] = 1;
 			sampleCount[i] = moov.getTrack(i).getMdia().getMinf().getStbl().getStts().getTotalSampleCount();
-			if (moov.getTrack(i).getMdia().getHdlr().isVideo())
+			if (moov.getTrack(i).getMdia().getHdlr().isSound())
 				curTrak = i;
 		}
 		long total = 0;

@@ -193,6 +193,7 @@ public class MoovAtom extends ContainerAtom {
     long movieTimeScale = mvhd.getTimeScale();
     long duration = mvhd.getDuration();
     
+    time = findAdjustedTime(time);
     MP4Log.log("DBG: Movie time " + (duration/movieTimeScale) + " sec, cut at " + time + "sec");
     MP4Log.log("\tDBG: ts " + movieTimeScale + " cut at " + (time * movieTimeScale));
     
@@ -205,6 +206,8 @@ public class MoovAtom extends ContainerAtom {
       cutMoov.setUdta(udta.cut());
     }
     long minDuration = Long.MAX_VALUE;
+    
+    /*
     // Make sure traks with stss atom go first
     List<TrakAtom> noStssTrakList = new ArrayList<TrakAtom>();
     List<TrakAtom> trakList = new ArrayList<TrakAtom>();
@@ -216,9 +219,12 @@ public class MoovAtom extends ContainerAtom {
     		noStssTrakList.add(a);
     }
     trakList.addAll(noStssTrakList);
+    Iterator<TrakAtom> trakIterator = trakList.iterator();
 
+	*/
+    Iterator<TrakAtom> trakIterator = getTracks();
     // iterate over each track and cut the track
-    for (Iterator<TrakAtom> i = trakList.iterator(); i.hasNext(); ) {
+    for (Iterator<TrakAtom> i = trakIterator; i.hasNext(); ) {
       TrakAtom cutTrak = i.next().cut(time, movieTimeScale);
       cutMoov.addTrack(cutTrak);
       // need to convert the media time-scale to the movie time-scale
@@ -231,7 +237,7 @@ public class MoovAtom extends ContainerAtom {
       if (cutDuration < minDuration) {
         minDuration = cutDuration;
       }
-      time = (duration - cutDuration) / (float) movieTimeScale;
+      //time = (duration - cutDuration) / (float) movieTimeScale;
       MP4Log.log("DBG: new time " + time);
     }
     // check if any edits need to be added 

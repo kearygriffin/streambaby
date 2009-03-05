@@ -98,7 +98,7 @@ public class JavaMP4Splitter extends MP4Streamer {
 			TrakAtom trak = findAvc1Trak();
 			if (trak == null)
 				return 0;
-			int p = 0; // trak.getMdia().getMinf().getStbl().getStsd().getProfileLevel();
+			int p = trak.getMdia().getMinf().getStbl().getStsd().getAvc1().getAvcc().getProfileLevel();
 			return p;
 		}
 
@@ -106,7 +106,7 @@ public class JavaMP4Splitter extends MP4Streamer {
 			TrakAtom trak = findAvc1Trak();
 			if (trak == null)
 				return 0;
-			int p = 0; // trak.getMdia().getMinf().getStbl().getStsd().getProfile();
+			int p = trak.getMdia().getMinf().getStbl().getStsd().getAvc1().getAvcc().getProfile();
 			return p;
 		}
 
@@ -144,11 +144,13 @@ public class JavaMP4Splitter extends MP4Streamer {
 	public JavaMP4Splitter(File f, long startPos, boolean reinterleave)
 			throws IOException {
 		this(new Splitter(f, startPos, reinterleave));
+		/*
 		getWidth();
 		getHeight();
 		getProfileLevel();
 		getProfile();
 		getFormats();
+		*/
 		// mp4 = (StreamableMP4)this.in;
 	}
 

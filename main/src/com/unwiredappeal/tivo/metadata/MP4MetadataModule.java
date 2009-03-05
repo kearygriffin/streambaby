@@ -64,7 +64,11 @@ public class MP4MetadataModule extends BaseMetadataModule {
 	
 
 	public boolean fetchMetadata(MoovAtom moov, URI uri, MetaData m) {
-		MetaAtom meta = (MetaAtom)moov.getUdta().getFirstChild(MetaAtom.class);
+		UdtaAtom udta = moov.getUdta();
+		MetaAtom meta  = null;
+		if (udta != null) {
+			meta = (MetaAtom)moov.getUdta().getFirstChild(MetaAtom.class);
+		}
 		if (meta == null)
 			return false;
 		IlstAtom ilst = (IlstAtom)meta.getFirstChild(IlstAtom.class);

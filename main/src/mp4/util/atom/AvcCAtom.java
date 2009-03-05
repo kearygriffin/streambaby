@@ -1,6 +1,8 @@
 package mp4.util.atom;
 
 public class AvcCAtom extends LeafAtom {
+	  protected static final int PROFILE_OFFSET = 1;
+	  protected static final int PROFILE_LEVEL_OFFSET = 3;
 
 
 	  /**
@@ -23,5 +25,12 @@ public class AvcCAtom extends LeafAtom {
 		v.visit(this);
 	}
 	
+	public int getProfile() {
+		return ((int)data.getData(PROFILE_OFFSET))&0xff;
+	}
+	
+	public int getProfileLevel() {
+		return ((int)data.getData(PROFILE_LEVEL_OFFSET))&0xff;
+	}
 
 }

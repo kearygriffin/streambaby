@@ -17,38 +17,38 @@ public abstract class HybridAtom extends ContainerAtom {
 		data = new ByteStream(old.data);		
 	}
 
-	  /**
-	   * Return the version value for the atom. Currently, we support only 0, which
-	   * means 
-	   * @return
-	   */
-	  public byte getVersion() {
-	    return data.getData(VERSION_OFFSET);
-	  }
-	  
-	  /**
-	   * Set the version value for the atom.
-	   * @param version the atom's version
-	   */
-	  public void setVersion(byte version) {
-	    data.addData(VERSION_OFFSET, version);
-	  }
-	  
-	  /**
-	   * Return the flag data from the atom as a byte array
-	   * @return the flag data from the atom as a byte array
-	   */
-	  public byte[] getFlag() {
-	    return data.getData(FLAG_OFFSET, FLAG_SIZE);
-	  }
-	  
-	  /**
-	   * Add the flag data to the byte stream
-	   * @param flag the flag info
-	   */
-	  public void setFlag(byte[] flag) {
-	    data.addData(FLAG_OFFSET, flag);
-	  }
+//	  /**
+//	   * Return the version value for the atom. Currently, we support only 0, which
+//	   * means 
+//	   * @return
+//	   */
+//	  public byte getVersion() {
+//	    return data.getData(VERSION_OFFSET);
+//	  }
+//	  
+//	  /**
+//	   * Set the version value for the atom.
+//	   * @param version the atom's version
+//	   */
+//	  public void setVersion(byte version) {
+//	    data.addData(VERSION_OFFSET, version);
+//	  }
+//	  
+//	  /**
+//	   * Return the flag data from the atom as a byte array
+//	   * @return the flag data from the atom as a byte array
+//	   */
+//	  public byte[] getFlag() {
+//	    return data.getData(FLAG_OFFSET, FLAG_SIZE);
+//	  }
+//	  
+//	  /**
+//	   * Add the flag data to the byte stream
+//	   * @param flag the flag info
+//	   */
+//	  public void setFlag(byte[] flag) {
+//	    data.addData(FLAG_OFFSET, flag);
+//	  }
 	  	  
 	  /**
 	   * Write the byte stream to the specified output.

@@ -171,7 +171,7 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		String dst = argv[1];
 		long pos = Long.parseLong(argv[2]);
 		System.err.println("In: " + src + ", out: " + dst + ", pos: " + pos);
-		MP4Streamer mp4 = MP4StreamFactory.getInstance(new File(src).getAbsoluteFile(), pos, true);
+		MP4Streamer mp4 = MP4StreamFactory.getInstance(new File(src).getAbsoluteFile(), pos, StreamBabyConfig.cfgMp4Interleave.getBool());
 		System.err.println("SubDur: " + mp4.getSubDuration()/1000.0);
 		OutputStream os = new FileOutputStream(new File(dst));
 		final int IO_BUFFER_SIZE = 4 * 1024;

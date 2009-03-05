@@ -75,7 +75,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
       float stretchy = .98f;
       int safeY = -5;
       if (this.getBApp().getCurrentResolution().getHeight() == 720) {
-    	  stretchy = .95f;
+    	  stretchy = .963f;
     	  safeY = -5;
       }
       layout = lm.relativeY(layout, true);
