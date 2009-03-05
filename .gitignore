@@ -10,4 +10,5 @@ scripts/first-run.bsh
 scripts/first-run.bsh.ran
 ffmpeg-dist.tar.bz2
 .gcpasswd
-.svn/*
+.svn
+.metadata
