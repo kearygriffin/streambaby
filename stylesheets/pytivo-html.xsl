@@ -54,8 +54,13 @@
   </xsl:choose>
 </h1>
 <p><xsl:value-of select="pytivo/description"/></p>
+
+   <xsl:if test="1 != 0"> 
     <p><xsl:apply-templates select="pytivo/vActor[position() &lt; 4]"/></p>
+   </xsl:if>
+   <xsl:if test="1 != 0"> 
     <p class="genre"><xsl:apply-templates select="pytivo/vProgramGenre"/></p>
+   </xsl:if>
 </div>
 </body>
 </html>
@@ -67,7 +72,7 @@
       <xsl:value-of select="."/>
       <xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
     </xsl:for-each>
-      <xsl:if test="position() != last()"><xsl:text>, </xsl:text></xsl:if>
+      <xsl:if test="position() != last() and position() &lt; 3"><xsl:text>, </xsl:text></xsl:if>
 </xsl:template>
 <xsl:template match="pytivo/vProgramGenre">
 	<xsl:value-of select="."/>

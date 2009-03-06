@@ -2,52 +2,58 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
      version="1.0">
 <xsl:output method="xml" indent="no"/>
+
+<xsl:template match="originalAirDate|episodeTitle|title|time|movieYear|seriesTitle|description|isEpisode|seriesId|episodeNumber|displayMajorNumber|callsign|displayMinorNumber|startTime|stopTime|partCount|partIndex">
+  <xsl:variable name="name" select="name()"/>
+  <xsl:element name="{$name}">
+	<xsl:value-of select="."/>
+  </xsl:element>
+</xsl:template>
+
+<xsl:template match="tvRating|starRating">
+  <xsl:variable name="name" select="name()"/>
+  <xsl:element name="{$name}">
+	0<xsl:value-of select="@value"/>
+  </xsl:element>
+</xsl:template>
+
+<xsl:template match="mpaaRating">
+  <xsl:variable name="name" select="name()"/>
+  <xsl:element name="{$name}">
+    <xsl:value-of select="substring(. , 1, 1)"/>
+    <xsl:value-of select="@value"/>
+   </xsl:element>
+</xsl:template>
+
+<xsl:template match="vActor|vGuestStar|vDirector|vExecProducer|vProducer|vWriter|vChoreographer|vProgramGenre|vSeriesGenre">
+  <xsl:for-each select="element">
+    <xsl:variable name="name">
+    <xsl:for-each select="parent::*">
+      <xsl:if test="not(@id)">
+	<xsl:value-of select="name()"/>
+      </xsl:if>
+      <xsl:value-of select="./@id"/>
+    </xsl:for-each>
+    </xsl:variable>
+     <xsl:element name="{$name}">
+	<xsl:value-of select="."/>
+     </xsl:element>
+  </xsl:for-each>
+</xsl:template>
+
+<xsl:template match="showing">
+</xsl:template>
+
+<xsl:template match="*">
+<xsl:apply-templates />
+</xsl:template>
+
+<xsl:template match="text()">
+</xsl:template>
+
 <xsl:template match="/">
 <pytivo>
-	<xsl:apply-templates select="//showing/program"/>
+	<xsl:apply-templates/>
 </pytivo>
-</xsl:template>
-
-<xsl:template match="program">
-	<xsl:apply-templates select="title"/>
-	<xsl:apply-templates select="isEpisode"/>
-	<xsl:apply-templates select="series/seriesTitle"/>
-	<xsl:apply-templates select="episodeTitle"/>
-	<xsl:apply-templates select="description"/>
-	<xsl:apply-templates select="vActor"/>
-	<xsl:apply-templates select="vProgramGenre"/>
-	<xsl:apply-templates select="vSeriesGenre"/>
-</xsl:template>
-<xsl:template match="title">
-	<title><xsl:value-of select="."/></title>
-</xsl:template>
-<xsl:template match="episodeTitle">
-	<episodeTitle><xsl:value-of select="."/></episodeTitle>
-</xsl:template>
-<xsl:template match="isEpisode">
-	<isEpisode><xsl:value-of select="."/></isEpisode>
-</xsl:template>
-
-<xsl:template match="seriesTitle">
-<seriesTitle><xsl:value-of select="."/></seriesTitle>
-</xsl:template>
-<xsl:template match="description">
-	<description><xsl:value-of select="."/></description>
-</xsl:template>
-<xsl:template match="vActor">
-	<xsl:apply-templates select="element"/>
-</xsl:template>
-<xsl:template match="vProgramGenre">
-	<xsl:apply-templates select="element"/>
-</xsl:template>
-<xsl:template match="vSeriesGenre">
-	<xsl:apply-templates select="element"/>
-</xsl:template>
-
-<xsl:template match="element">
-	<xsl:variable name="parent" select="name(..)"/>
-	<xsl:element name="{$parent}">
-		<xsl:value-of select="."/>
-	</xsl:element>
 </xsl:template>
 </xsl:stylesheet>

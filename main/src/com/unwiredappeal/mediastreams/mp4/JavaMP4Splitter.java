@@ -35,6 +35,11 @@ public class JavaMP4Splitter extends MP4Streamer {
 			mp4file = new DataInputStream(new RandomAccessFileInputStream(f, bufSize));
 			try {
 				calcSplitMp4(reinterleave);
+				/*
+				TrakAtom trak = findAvc1Trak();
+				if (trak != null)
+					trak.getMdia().getMinf().getStbl().getStsd().getAvc1().getAvcc().setProfileCompatability(0);
+				*/
 				pi = new PipedInputStream();
 				// startPos == Long.MAX_VALUE is used to signal parsing only
 				if (startPos < Long.MAX_VALUE) {
