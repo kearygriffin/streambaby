@@ -55,10 +55,10 @@
 </h1>
 <p><xsl:value-of select="pytivo/description"/></p>
 
-   <xsl:if test="1 != 0"> 
+   <xsl:if test="count(pytivo/vActor)"> 
     <p><xsl:apply-templates select="pytivo/vActor[position() &lt; 4]"/></p>
    </xsl:if>
-   <xsl:if test="1 != 0"> 
+   <xsl:if test="count(pytivo/vProgramGenre)"> 
     <p class="genre"><xsl:apply-templates select="pytivo/vProgramGenre"/></p>
    </xsl:if>
 </div>
