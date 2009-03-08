@@ -55,6 +55,30 @@
 </h1>
 <p><xsl:value-of select="pytivo/description"/></p>
 
+   <p>
+   <xsl:if test="count(pytivo/time)"> 
+    <xsl:apply-templates select="pytivo/time"/><xsl:text> </xsl:text>
+   </xsl:if>
+   <xsl:if test="count(pytivo/displayMajorNumber)"> 
+    <xsl:apply-templates select="pytivo/displayMajorNumber"/><xsl:text> </xsl:text>
+   </xsl:if>
+   <xsl:if test="count(pytivo/callsign)"> 
+    <xsl:apply-templates select="pytivo/callsign"/>
+   </xsl:if>
+   
+   <xsl:if test="count(pytivo/originalAirDate)">
+    <br/>Original Air Date: <xsl:apply-templates select="pytivo/originalAirDate"/>
+   </xsl:if>
+   
+   <xsl:if test="count(pytivo/duration)">
+    <br/>Duration: <xsl:apply-templates select="pytivo/duration"/>
+   </xsl:if>
+   
+   <xsl:if test="count(pytivo/episodeNumber)">
+    <br/>Episode #: <xsl:apply-templates select="pytivo/episodeNumber"/>
+   </xsl:if>
+   </p>
+   
    <xsl:if test="count(pytivo/vActor)"> 
     <p><xsl:apply-templates select="pytivo/vActor[position() &lt; 4]"/></p>
    </xsl:if>
@@ -77,5 +101,20 @@
 <xsl:template match="pytivo/vProgramGenre">
 	<xsl:value-of select="."/>
 	<xsl:if test="position() != last()">, </xsl:if> 
+</xsl:template>
+<xsl:template match="pytivo/time">
+    <xsl:variable name="time" select="format-dateTime(adjust-dateTime-to-timezone(text()), '[F,*-3] [M]/[D] [h,2]:[m,2] [Pn,*-2]')"/>
+    <xsl:value-of select="$time"/>
+</xsl:template>
+<xsl:template match="pytivo/originalAirDate">
+    <xsl:variable name="time" select="format-dateTime(text(), '[M,2]/[D,2]/[Y,4]')"/>
+    <xsl:value-of select="$time"/>
+</xsl:template>
+<xsl:template match="pytivo/duration">
+    <xsl:variable name="hours" select="hours-from-duration(text())"/>
+    <xsl:variable name="mins" select="minutes-from-duration(text())"/>
+    <xsl:value-of select="$hours"/>
+    <xsl:text>:</xsl:text>
+    <xsl:value-of select="format-number($mins, '00')"/>
 </xsl:template>
 </xsl:stylesheet>
