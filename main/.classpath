@@ -2,23 +2,24 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/bananas.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/bananas-plus-0.1.1-streambabyr1.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/bcel-5.2.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/bsh-2.0b4.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/cobra.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/hme.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/hme-host-sb.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/jmdns.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/jna.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/js.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/saxon9.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/saxon9-dom.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/simple-log.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/tarbz.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/Tidy.jar"/>
-	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/dlib/simulator.jar"/>
-	<classpathentry kind="lib" path="/ffmpegJavaModule/bin"/>
-	<classpathentry kind="lib" path="/ffmpeg-java/build/classes"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ffmpeg-java"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/bananas.jar" sourcepath="/TOOLS/bananas_1.3/src"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/bananas-plus-0.1.1-streambabyr1.jar" sourcepath="/TOOLS/bananas-plus-read-only/src/java"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/bcel-5.2.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/bsh-2.0b4.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/cobra.jar" sourcepath="/TOOLS/cobra-0.98.4/src"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/hme.jar" sourcepath="/TOOLS/hme_sdk_1.4/src"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/hme-host-sb.jar" sourcepath="/TOOLS/hme_sdk_1.4"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/jmdns.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/jna.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/js.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/saxon9.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/saxon9-dom.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/simple-log.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/tarbz.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/Tidy.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/dlib/core-renderer.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/dlib/simulator.jar"/>
+	<classpathentry kind="lib" path="/ffmpegJavaModule/bin" sourcepath="/ffmpegJavaModule/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
