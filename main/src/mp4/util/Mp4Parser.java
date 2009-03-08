@@ -18,6 +18,7 @@ public class Mp4Parser extends DefaultAtomVisitor {
 	protected MdatAtom mdat;
 	protected DataInputStream mp4file;
 	boolean lastAtom = false;
+	private long lastAtomOffset = 0;
 
 	protected Mp4Parser() {
 		
@@ -96,17 +97,20 @@ public class Mp4Parser extends DefaultAtomVisitor {
 			}
 			try {
 				Atom atom;
+				MP4Log.log("Reading atom at offset: " + lastAtomOffset);
 				try {
 					Class<?> cls = Class.forName(Atom.typeToClassName(word));
 					atom = (Atom) cls.newInstance();
+					MP4Log.log("AtomClass: " + cls + " (size:" + size + ")");
 				} catch (ClassNotFoundException e) {
-					MP4Log.log("UnknownAtom: " + Atom.typeToClassName(word));
+					MP4Log.log("UnknownAtom(" + ((int)word[0]&0xff) + "," + ((int)word[1]&0xff) + "," + ((int)word[2]&0xff) + "," + ((int)word[3]&0xff) + "): " + Atom.typeToClassName(word) +  " (size:" + size + ")");
 					//if (word[2] == 'h' && word[3] == 'd')
 						//atom = new UnkHdAtom(word);
 					//else
 						atom = new UnknownAtom(word);
 				}
-
+				lastAtomOffset += size;
+				
 				atom.setSize(size);
 				atom.accept(this);
 				return atom;

@@ -1,12 +1,12 @@
 package mp4.util.atom;
 
-public class CgenAtom extends AppleMetaAtom {
+public class CprtgenAtom extends AppleMetaAtom {
 
-	public CgenAtom(CgenAtom old) {
+	public CprtgenAtom(CprtgenAtom old) {
 		super(old);
 	}
 
-	public CgenAtom() {
+	public CprtgenAtom() {
 		super(new byte[] { Atom.COPYRIGHT_BYTE_VALUE, 'g', 'e', 'n' } );
 		
 		}

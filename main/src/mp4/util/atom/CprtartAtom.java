@@ -1,12 +1,12 @@
 package mp4.util.atom;
 
-public class CartAtom extends AppleMetaAtom {
+public class CprtartAtom extends AppleMetaAtom {
 
-	public CartAtom(CartAtom old) {
+	public CprtartAtom(CprtartAtom old) {
 		super(old);
 	}
 
-	public CartAtom() {
+	public CprtartAtom() {
 		super(new byte[] { Atom.COPYRIGHT_BYTE_VALUE, 'a', 'r', 't' } );
 	}
 	

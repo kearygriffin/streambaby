@@ -1,12 +1,12 @@
 package mp4.util.atom;
 
-public class CalbAtom extends AppleMetaAtom {
+public class CprtalbAtom extends AppleMetaAtom {
 
-	public CalbAtom(CalbAtom old) {
+	public CprtalbAtom(CprtalbAtom old) {
 		super(old);
 	}
 
-	public CalbAtom() {
+	public CprtalbAtom() {
 		super(new byte[] { Atom.COPYRIGHT_BYTE_VALUE, 'a', 'l', 'b' } );
 	}
 	

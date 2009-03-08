@@ -1,12 +1,12 @@
 package mp4.util.atom;
 
-public class CdayAtom extends AppleMetaAtom {
+public class CprtdayAtom extends AppleMetaAtom {
 
-	public CdayAtom(CdayAtom old) {
+	public CprtdayAtom(CprtdayAtom old) {
 		super(old);
 	}
 
-	public CdayAtom() {
+	public CprtdayAtom() {
 		super(new byte[] { Atom.COPYRIGHT_BYTE_VALUE, 'd', 'a', 'y' } );
 	}
 	

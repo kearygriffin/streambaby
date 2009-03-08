@@ -82,18 +82,18 @@ public class MP4MetadataModule extends BaseMetadataModule {
 			Atom box = it.next();
 			if (box instanceof DescAtom)
 				metaMap.put("name", ((DescAtom)box).getDescription());
-			else if (box instanceof CartAtom)
-				metaMap.put("artist", ((CartAtom)box).getArtist());
-			else if (box instanceof CalbAtom)
-				metaMap.put("album", ((CalbAtom)box).getAlbum());
-			else if (box instanceof CcmtAtom)
-				metaMap.put("comment", ((CcmtAtom)box).getComment());
+			else if (box instanceof CprtartAtom)
+				metaMap.put("artist", ((CprtartAtom)box).getArtist());
+			else if (box instanceof CprtalbAtom)
+				metaMap.put("album", ((CprtalbAtom)box).getAlbum());
+			else if (box instanceof CprtcmtAtom)
+				metaMap.put("comment", ((CprtcmtAtom)box).getComment());
 			else if (box instanceof CprtAtom)
 				metaMap.put("copyright", ((CprtAtom)box).getCopyright());
 			else if (box instanceof GnreAtom)
 				metaMap.put("genre", ((GnreAtom)box).getGenre());
-			else if (box instanceof CdayAtom) {
-				String year = ((CdayAtom)box).getYear();
+			else if (box instanceof CprtdayAtom) {
+				String year = ((CprtdayAtom)box).getYear();
 				if (year.length() > 4)
 					year = year.substring(0, 4);
 				metaMap.put("year", year);
@@ -102,10 +102,10 @@ public class MP4MetadataModule extends BaseMetadataModule {
 			} else if (box instanceof AppleTrackNumberBox)
 				metaMap.put("tracknumber", Integer.toString(((AppleTrackNumberBox)box).getTrackNumber()));
 			*/												
-			else if (box instanceof CwrtAtom)
-				metaMap.put("trackauthor", ((CwrtAtom)box).getComposer());
-			else if (box instanceof CnamAtom)
-				metaMap.put("tracktitle", ((CnamAtom)box).getTitle());
+			else if (box instanceof CprtwrtAtom)
+				metaMap.put("trackauthor", ((CprtwrtAtom)box).getComposer());
+			else if (box instanceof CprtnamAtom)
+				metaMap.put("tracktitle", ((CprtnamAtom)box).getTitle());
 			/*
 			else if (box instanceof AppleTvEpisodeBox)
 				metaMap.put("tvepisodenumber", Integer.toString(((AppleTvEpisodeBox)box).getTvEpisode()));

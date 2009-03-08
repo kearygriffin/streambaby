@@ -186,17 +186,29 @@ public abstract class Atom {
   public static String typeToClassName(byte[] typ) {
     String str = new String(typ);
     // \u00a9
-    Character firstChar = str.substring(0, 1).charAt(0);
-    String firstStr;
-    if (typ[0] == COPYRIGHT_BYTE_VALUE) // (c) copyright sign
-    	firstStr = "C";
-    else if (Character.isLetter(firstChar))
-    	firstStr= Character.toString(Character.toUpperCase(firstChar));
-    else if (Character.isDigit(firstChar))
-    	firstStr = "N" + firstChar;
-    else
-    	firstStr = "X";
-    String clsName = firstStr + str.substring(1);
+    StringBuffer strBuffer = new StringBuffer();
+    for (int i=0;i<str.length();i++) {
+	    Character firstChar = str.charAt(i);
+	    String firstStr;
+	    if (typ[i] == COPYRIGHT_BYTE_VALUE) // (c) copyright sign
+	    	firstStr = "Cprt";
+	    else if (Character.isLetter(firstChar)) {
+	    	firstStr= Character.toString(firstChar);
+	    	if (i == 0)
+	    		firstStr = firstStr.toUpperCase();
+	    }
+	    else if (Character.isDigit(firstChar)) {
+	    	if (i == 0)
+	    		firstStr = "N" + firstChar;
+	    	else
+	    		firstStr = firstChar.toString();
+	    }
+	    else
+	    	firstStr = "X" + (((int)typ[i])&0xff);
+	    strBuffer.append(firstStr);
+	    
+    }
+    String clsName = strBuffer.toString();
     return "mp4.util.atom." + new String(clsName) + "Atom";
   }
   
