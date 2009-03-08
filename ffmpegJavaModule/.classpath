@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/main"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="STREAMBABY/lib/jna.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ffmpeg-java"/>
+	<classpathentry kind="lib" path="/home/keary/twork/sbw/streambaby/lib/jna.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
