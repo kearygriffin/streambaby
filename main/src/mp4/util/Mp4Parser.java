@@ -95,6 +95,22 @@ public class Mp4Parser extends DefaultAtomVisitor {
 			if (num != Atom.ATOM_WORD) {
 				throw new AtomException("Unable to read enough bytes for atom");
 			}
+			// handle 64-bit data
+			boolean isBig = false;
+			if (size == 1) {
+				isBig = true;
+				byte[] bigSize = new byte[Atom.LARGE_SIZE_SIZE];
+				try {
+					num = mp4file.read(bigSize);
+				} catch (IOException e1) {
+					throw new AtomException("IOException while reading file");
+				}
+				if (num != Atom.LARGE_SIZE_SIZE) {
+					throw new AtomException("Unable to read enough bytes for atom");
+				}				
+				size = Atom.byteArrayToLong(bigSize, 0);
+			}
+			
 			try {
 				Atom atom;
 				MP4Log.log("Reading atom at offset: " + lastAtomOffset);
@@ -109,8 +125,10 @@ public class Mp4Parser extends DefaultAtomVisitor {
 					//else
 						atom = new UnknownAtom(word);
 				}
+				if (isBig)
+					MP4Log.log("   Large size atom");
 				lastAtomOffset += size;
-				
+				atom.setLargeAtom(isBig);
 				atom.setSize(size);
 				atom.accept(this);
 				return atom;

@@ -14,7 +14,7 @@ USER=`head -n 1 .gcpasswd`
 PW=`tail -n 1 .gcpasswd`
 if [[ $RET == 0 ]]; then
 	echo "Compile succesful.  Uploading"
-#	$DIR/googlecode_upload.py --user $USER --password $PW -s streambaby-svn-$REV -p streambaby dist/streambaby-svn-$REV.zip 
+	$DIR/googlecode_upload.py --user $USER --password $PW -s streambaby-svn-$REV -p streambaby dist/streambaby-svn-$REV.zip 
 else
 	echo "Compile failed."
 fi

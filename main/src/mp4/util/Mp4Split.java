@@ -134,6 +134,8 @@ public class Mp4Split extends Mp4Parser {
 			// update stco segment by mdatSkip + difference in moov size
 			long newMdatOffset = ftyp.size() + cutMoov.size();
 			long updateAmount = mdatSkip + (mdatOffset - newMdatOffset);
+			if (mdat.isLargeAtom())
+				updateAmount += Atom.LARGE_SIZE_SIZE;
 			//long updateAmount = mdatSkip + (moov.size() - cutMoov.size());
 
 			MP4Log.log("DBG: updateAmount " + updateAmount);
@@ -154,6 +156,10 @@ public class Mp4Split extends Mp4Parser {
 			if (reinterleave) {
 				iwriter = new Mp4InterleaveWriter(cutMoov, cutMdat, ftyp.size() + cutMoov.size() + Atom.ATOM_HEADER_SIZE);
 				iwriter.calcInterleave();
+			} else {
+				// In any case, mdat is going to be at the end, and 0 is a legal size in MP4s
+				// meaning everything to the end of the file is part of the atom.  To simplify 64-bit handling, let's just do it.
+				cutMdat.setSize(0);
 			}
 
 

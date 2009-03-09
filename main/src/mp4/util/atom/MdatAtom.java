@@ -57,7 +57,7 @@ public class MdatAtom extends LeafAtom {
       if (hasMark) {
     	  in.reset();
       }
-      in.skipBytes((int)skip);
+      in.skip(skip);
       if (in.markSupported()) {
     	  in.mark(Integer.MAX_VALUE);
       }
@@ -79,8 +79,11 @@ public class MdatAtom extends LeafAtom {
     writeHeader(out);
     long numBytesToRead = dataSize();
     // read data in using 1 MB chunks
-    while (numBytesToRead > 0) {
+    boolean readToEof = (numBytesToRead == 0);
+    while (readToEof || numBytesToRead > 0) {
       int read = in.read(input);
+      if (read < 1)
+    	  break;
       out.write(input, 0, read);
       numBytesToRead -= read;
     }

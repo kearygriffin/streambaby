@@ -163,6 +163,7 @@ public class ByteStream {
     (long)(data[off+3] & 0xff);  
   }
   
+
   /**
    * Java doesn't have unsigned types, so we need to use the next
    * larger signed type.
@@ -172,6 +173,24 @@ public class ByteStream {
    */
   public final int getUnsignedShort(int off) {
     return ((data[off] & 0xff) << 8) | (data[off+1] & 0xff);  
+  }
+  
+  /**
+   * Java doesn't have unsigned types, so we need to use the next
+   * larger signed type.
+   * @param b the byte array
+   * @param off offset to start the conversion
+   * @return the unsigned integer value of the byte array
+   */
+  public final long getLong(int off) {
+    return ((long)(data[off] & 0xff) << 56) |
+    ((long)(data[off+1] & 0xff) << 48) |
+    ((long)(data[off+2] & 0xff) << 40) |
+    ((long)(data[off+3] & 0xff) << 32) |
+    ((long)(data[off+4] & 0xff) << 24) |
+    ((long)(data[off+5] & 0xff) << 16) |
+    ((long)(data[off+6] & 0xff) << 8) |    
+    (long)(data[off+7] & 0xff);  
   }
   
   /**
@@ -223,6 +242,26 @@ public class ByteStream {
     if (offset + 4 > used) {
       throw new AtomError("Not enough space allocated for the data");
     }
+    data[offset++] = (byte) ((val >> 24) & 0xff);
+    data[offset++] = (byte) ((val >> 16) & 0xff);
+    data[offset++] = (byte) ((val >> 8) & 0xff);
+    data[offset] = (byte) (val & 0xff);
+  }
+  /**
+   * Add along to byte stream at the specified offset.
+   * This method assumes the space has already been allocated by advancing
+   * the used pointer.
+   * @param offset the offset from the start of the byte stream
+   * @param val the integer value to add to the stream
+   */
+  public void addLong(int offset, long val) {
+    if (offset + 8 > used) {
+      throw new AtomError("Not enough space allocated for the data");
+    }
+    data[offset++] = (byte) ((val >> 56) & 0xff);
+    data[offset++] = (byte) ((val >> 48) & 0xff);
+    data[offset++] = (byte) ((val >> 40) & 0xff);
+    data[offset++] = (byte) ((val >> 32) & 0xff);    
     data[offset++] = (byte) ((val >> 24) & 0xff);
     data[offset++] = (byte) ((val >> 16) & 0xff);
     data[offset++] = (byte) ((val >> 8) & 0xff);

@@ -7,15 +7,23 @@ package mp4.util.atom;
  * The chunk offset table.
  */
 public class StcoAtom extends LeafAtom {
-  private static final int ENTRIES_OFFSET = 4;
-  private static final int TABLE_OFFSET = 8;
-  private static final int ENTRY_SIZE = 4;
+	protected static final int ENTRIES_OFFSET = 4;
+  protected static final int TABLE_OFFSET = 8;
+  protected static final int _ENTRY_SIZE = 4;
+  protected int entrySize = _ENTRY_SIZE;
   
   /**
    * Construct an empty atom
    */
   public StcoAtom() {
     super(new byte[]{'s','t','c','o'});
+  }
+
+  /**
+   * Construct an empty atom
+   */
+  public StcoAtom(byte[] atomType) {
+    super(atomType);
   }
   
   /**
@@ -38,7 +46,7 @@ public class StcoAtom extends LeafAtom {
    */
   @Override
   public void allocateData(long numEntries) {
-    long size = TABLE_OFFSET + (numEntries * ENTRY_SIZE);
+    long size = TABLE_OFFSET + (numEntries * entrySize);
     super.allocateData(size);
   }
 
@@ -68,7 +76,7 @@ public class StcoAtom extends LeafAtom {
     if (chunk > Integer.MAX_VALUE) {
       return 0;
     }
-    return data.getUnsignedInt(TABLE_OFFSET + ((int)(chunk - 1) * ENTRY_SIZE));
+    return data.getUnsignedInt(TABLE_OFFSET + ((int)(chunk - 1) * entrySize));
   }
   
   /**
@@ -77,7 +85,7 @@ public class StcoAtom extends LeafAtom {
    * @param chunk the chunk offset
    */
   public void setChunkOffset(int index, long chunk) {
-    data.addUnsignedInt(TABLE_OFFSET + (index * ENTRY_SIZE), chunk);
+    data.addUnsignedInt(TABLE_OFFSET + (index * entrySize), chunk);
   }
   
   /**

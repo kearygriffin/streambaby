@@ -26,10 +26,15 @@ public abstract class Atom {
   
   // The basic unit size of an atom, in bytes
   public static final int ATOM_WORD = 4;
+  // Number of bytes for 64-bit atom size
+  public static final int LARGE_SIZE_SIZE= 8;  
   // The canonical atom size, which includes the type and the size
   public static final int ATOM_HEADER_SIZE = 8;
-  
+
   public static final byte COPYRIGHT_BYTE_VALUE = -87;
+
+  protected int headerSize = ATOM_HEADER_SIZE;
+  protected boolean is64BitAtom = false;
   
   /**
    * Create an atom with the specified size and type
@@ -79,7 +84,9 @@ public abstract class Atom {
    * @return the size of the atom's data part
    */
   public long dataSize() {
-    return size - Atom.ATOM_HEADER_SIZE;
+	if (size == 0)
+		return 0;
+    return size - headerSize;
   }
   
   public long pureDataSize() {
@@ -151,6 +158,25 @@ public abstract class Atom {
     ((long)(b[off+1] & 0xff) << 16) |
     ((long)(b[off+2] & 0xff) << 8) |
     (long)(b[off+3] & 0xff);  
+  }
+  
+
+  /**
+   * Java doesn't have unsigned types, so we need to use the next
+   * larger signed type.
+   * @param b the byte array
+   * @param off offset to start the conversion
+   * @return the unsigned integer value of the byte array
+   */
+  public static final long byteArrayToLong(byte[] b, int off) {
+    return ((long)(b[off] & 0xff) << 56) |
+    ((long)(b[off+1] & 0xff) << 48) |
+    ((long)(b[off+2] & 0xff) << 40) |
+    ((long)(b[off+3] & 0xff) << 32) |
+    ((long)(b[off+4] & 0xff) << 24) |
+    ((long)(b[off+5] & 0xff) << 16) |
+    ((long)(b[off+6] & 0xff) << 8) |
+    (long)(b[off+7] & 0xff);  
   }
   
   /**
@@ -247,8 +273,19 @@ public abstract class Atom {
     assert data == null;
     data = new ByteStream(size);
     data.reserveSpace(size);
-    setSize(size + ATOM_HEADER_SIZE);
+    setSize(size + headerSize);
   }
   
+  public boolean isLargeAtom() {
+	  return is64BitAtom;
+  }
   
+  public void setLargeAtom(boolean big) {
+	   is64BitAtom = big;
+	  if (big)
+		  headerSize = ATOM_HEADER_SIZE + LARGE_SIZE_SIZE;
+	  else
+		  headerSize = ATOM_HEADER_SIZE;
+  }
+   
 }
