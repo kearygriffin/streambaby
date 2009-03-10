@@ -40,7 +40,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static String DEFAULT_VIDEO_DIR = "videos";
 	public static String DEFAULT_TITLE = "Stream, Baby, Stream";
 	public static String CONFIG_FILE = "streambaby.ini";
-	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,raw,3gp,mov";
+	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,raw,3gp,mov,flv";
 
 	
 	public static ConfigEntry cfgSocketStart = new ConfigEntry(

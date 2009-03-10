@@ -81,10 +81,6 @@ public abstract class ContainerAtom extends Atom {
     return 0;
   }
   
-  public boolean typeEquals(byte[] t1, byte[] t2) {
-	  return Arrays.equals(t1, t2);
-  }
-  
   public Atom getFirstChild(byte[] typ) {
 	  List<Atom> aList = getChildAtoms(typ);
 	  if (aList == null || aList.size() == 0)

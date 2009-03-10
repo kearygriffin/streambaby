@@ -5,6 +5,8 @@
  * Added itunes metadata support to Cahoon's mp4 parsing
  * Removed iso-parser MP4 parsing library from libs, and changed MP4 metadata code to use the new mp4 parsing code
  * New config option.  java.mp4slit (default=true) to use Cahoon's java based MP4splitter vs old C-port of mp4 splitter
+ * Added prelim support for 64-bit mp4's
+ * Changed MP4 handling of avc1&avcC atom.  No longer assume avc1 is a container, but do assume avcC is located immediately after avc1 data
  
 ===V0.25===
  * Force transcoding of MP4's if profile > High or Level > 41 

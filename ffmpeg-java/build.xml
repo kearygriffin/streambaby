@@ -64,4 +64,10 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
+    <target name="AVCodecSample">
+        <java classname="net.sf.ffmpeg_java.example.AVCodecSample" dir="../../../../../tmp" failonerror="true" fork="yes">
+            <arg line="/mnt/nas/media/videos/Oktapodi.mp4"/>
+            <classpath refid="ffmpeg-java.classpath"/>
+        </java>
+    </target>
 </project>

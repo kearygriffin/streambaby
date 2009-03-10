@@ -36,7 +36,6 @@
         <pathelement location="${STREAMBABY}/lib/simple-log.jar"/>
         <pathelement location="${STREAMBABY}/lib/tarbz.jar"/>
         <pathelement location="${STREAMBABY}/lib/Tidy.jar"/>
-        <pathelement location="${STREAMBABY}/dlib/core-renderer.jar"/>
         <pathelement location="${STREAMBABY}/dlib/simulator.jar"/>
         <pathelement location="${ffmpegJavaModule.location}/bin"/>
     </path>
@@ -109,7 +108,7 @@
     <target name="Streambaby - test">
         <java classname="com.unwiredappeal.tivo.streambaby.StreamBabyMain" dir="../" failonerror="true" fork="yes">
             <jvmarg line="-Dstreambaby.debug=1"/>
-            <arg line="--test mp4copy /mnt/nas/media/videos/Oktapodi.mp4 /home/keary/videos/out.mp4 0"/>
+            <arg line="--test mp4copy /home/keary/videos/big.mp4 /home/keary/videos/out.mp4 30000"/>
             <classpath refid="main.classpath"/>
         </java>
     </target>

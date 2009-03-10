@@ -3,6 +3,7 @@ package mp4.util.atom;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * This class represents an atom in the mpeg-4 file.  See the mpeg-4 file
@@ -287,5 +288,11 @@ public abstract class Atom {
 	  else
 		  headerSize = ATOM_HEADER_SIZE;
   }
+  
+  public static boolean typeEquals(byte[] t1, byte[] t2) {
+	  return Arrays.equals(t1, t2);
+  }
+  
+
    
 }
