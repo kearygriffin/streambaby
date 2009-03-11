@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
@@ -24,6 +26,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
+import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.Utils;
 
 public class ZipPreviewer implements PreviewGenerator {
@@ -72,6 +75,22 @@ public class ZipPreviewer implements PreviewGenerator {
 		if (add == null)
 			add = "";
 		File f = new File(StreamBabyConfig.cacheDir, file.getName() + "-" + file.length() + ".pvw" + add);
+		// If this file exists, use it.  Otherwise use new cache name scheme
+		if (f.exists())
+			return f;
+		StringBuffer hashBuffer = new StringBuffer();
+		try {
+			MessageDigest digest = MessageDigest.getInstance("MD5");
+			digest.digest(file.getAbsolutePath().getBytes());
+			byte[] db = digest.digest();
+			for (byte b : db) {
+				hashBuffer.append(Integer.toString( ( b & 0xff ) + 0x100, 16).substring( 1 ));
+			}
+		} catch (NoSuchAlgorithmException e) {
+			Log.warn("No MD5 alg avail.");
+			return f;
+		}
+		f = new File(StreamBabyConfig.cacheDir, file.getName() + "-" + file.length() + "-" + hashBuffer.toString() + ".pvw" + add);
 		return f;
 	}
 	private boolean _open(File file) {

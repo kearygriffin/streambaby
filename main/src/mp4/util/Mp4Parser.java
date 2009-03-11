@@ -36,9 +36,20 @@ public class Mp4Parser extends DefaultAtomVisitor {
 	      long bytesRead = 0;
 	      long bytesToRead = atom.dataSize() - atom.pureDataSize();
 	      while (bytesRead < bytesToRead) {
-	        Atom child = parseAtom();
-	        ((ContainerAtom)atom).addChild(child);
-	        bytesRead += child.size();
+	    	// If there is not enough room for a full atom, just skip extra data
+	    	// Some odd atoms are containers but terminate with 4 zero bytes.
+	    	// This should handle those cases
+	    	if (bytesToRead < Atom.ATOM_HEADER_SIZE) {
+	    		try {
+	    			mp4file.skipBytes((int)bytesToRead);
+	    		} catch(IOException e) {
+	    			throw new AtomException(e.getMessage());
+	    		}
+	    	} else {
+		        Atom child = parseAtom();
+		        ((ContainerAtom)atom).addChild(child);
+		        bytesRead += child.size();
+	    	}
 	      }
 	    }
 	  }

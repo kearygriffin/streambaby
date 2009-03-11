@@ -294,7 +294,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public static ConfigEntry cfgQualityLowestRes= new ConfigEntry(
 			"quality.lowres",
-			"400",
+			"300",
 			"lowest allowable height resolution for quality settings"
 			);
 	
