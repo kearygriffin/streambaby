@@ -145,6 +145,7 @@ public static PersistentHashTable createInstance(File file, boolean coldStart)
              ObjectInputStream oin = new ObjectInputStream(b);
 
              k2v = (PersistentHashTable) oin.readObject();
+             k2v.database = file;
              oin.close();
            }
        }

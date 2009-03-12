@@ -10,7 +10,7 @@
  * Added code to mp4 parsing to skip extra data in container atoms (so if remaining size < min atom size, just skip)
  * Changed hashing algorithm for cached previews (mostly so DVD VOB files don't conflict)  Should be backwards compatabile
   * Still will be hash collision problem if for DVD VOB's in same directory.  Example if all dvd's are mounted in /mnt/iso/VIDEO_TS/XXXX.VOB
- 
+ * Fixed problem with cache filename getting stored in cache file 
 ===V0.25===
  * Force transcoding of MP4's if profile > High or Level > 41 
  * Internal reorg--  Get icon for display from parsed file type (folder, video, dvd, etc)
