@@ -6,6 +6,7 @@ import static com.tivo.hme.bananas.IBananasPlus.H_BAR_TEXT_COLOR;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 import com.tivo.hme.bananas.BApplicationPlus;
 import com.tivo.hme.bananas.BButtonPlus;
@@ -28,6 +29,8 @@ import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.metadata.MetaData;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.modules.VideoModuleHelper;
+import com.unwiredappeal.tivo.pyTivo.pyTivo;
+import com.unwiredappeal.tivo.pyTivo.video;
 
 public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 
@@ -412,6 +415,141 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 
 	}
 
+	private class pyTivoButtonHandler extends ButtonHandler {
+		BButtonPlus<?> button;
+
+		int cur = 0;
+		List<String> entries = new ArrayList<String>();
+		video vid;
+		
+		public pyTivoButtonHandler(video vid) {
+			Stack<String> tivos = StreamBabyConfig.py.getTivos();
+			for (int i=0; i<tivos.size(); i++) {
+				entries.add(tivos.get(i));
+			}
+			this.vid = vid;
+		}
+		
+		public boolean left() {
+			if (cur == 0)
+				play("bonk.snd");
+			else {
+				cur--;
+				setValue();
+				play("updown.snd");
+			}
+			return true;
+		}
+		public boolean right() {
+			if (cur == (entries.size()-1))
+				play("bonk.snd");
+			else {
+				cur++;
+				setValue();
+				play("updown.snd");
+			}
+			return true;
+		}
+		public boolean select() {
+			if ( StreamBabyConfig.py.pushVideo(vid, bt.getValue()) ) {
+				Log.info("pyTivo push succeeded: " + de.fileName + "->" + bt.getValue());
+			} else {
+				StreamBabyConfig.py.handleErrors();
+			}
+			curButton = 0;
+			setButtonFocus();
+			return true;
+		}
+		
+		public void setDefault() {
+			cur = 0;
+			setValue();
+		}
+		public void setValue() {
+			bt.setValue(entries.get(cur));
+			setArrows();
+		}
+		public void setArrows() {
+			float leftTransparent = 0.0f;
+			float rightTransparent = 0.0f;
+			if (cur == 0)
+				leftTransparent = 1.0f;
+			if (cur == (entries.size()-1))
+				rightTransparent = 1.0f;
+			BView view = button.getHighlights().get(H_LEFT).getView();
+			if (view != null)
+				view.setTransparency(leftTransparent);
+			 view = button.getHighlights().get(H_RIGHT).getView();
+			if (view != null)
+				view.setTransparency(rightTransparent);
+		}
+		public void gainFocus() {
+			setArrows();
+		}
+		BTextPlus<String> bt;
+	}
+	
+	private BButtonPlus<ButtonHandler> addpyTivoButton(video vid) {
+		boolean lastButton = false;
+		pyTivoButtonHandler h = new pyTivoButtonHandler(vid);
+		BView v = new BView(this, layout.getBounds().x, layout.getBounds().y, layout.getBounds().width, buttonHeight);
+		//int barWidth = v.getWidth();
+		int qualityWidth = v.getWidth()/5;
+		BTextPlus<String> bt = new BTextPlus<String>(v, 10, 0, qualityWidth, v.getHeight());
+		bt.setFlags(RSRC_HALIGN_LEFT);
+		bt.setShadow(true);
+		bt.setValue("pyTivo push: ");
+		bt.setColor(getDefaultTextColor());
+		bt.setFont(getDefaultFont());
+		h.childViews.add(bt);
+		BButtonPlus<ButtonHandler> b = new BButtonPlus<ButtonHandler>(v,
+				qualityWidth, 0, (v.getWidth()-qualityWidth)-50, v.getHeight());
+//		buttonY += buttonHeight;
+
+		h.button = b;
+		BSkin skin = getBApp().getSkin();
+		BSkin.Element le = skin.get(H_LEFT);
+
+		bt = new BTextPlus<String>(b, 2*le.getWidth(), 0, b
+				.getWidth() - 50, b.getHeight());
+		bt.setFlags(RSRC_HALIGN_LEFT);
+		bt.setShadow(true);
+		bt.setColor(getDefaultTextColor());
+		bt.setFont(getDefaultFont());
+		h.bt = bt;
+		h.childViews.add(bt);
+		b.setValue(h);
+		b.setBarAndArrows(BAR_DEFAULT, BAR_DEFAULT, IBananasPlus.FLAG_VIS_TRUE,
+				H_LEFT, H_RIGHT, null, null, true);
+		b.getHighlights().get(H_BAR).getView().setTransparency(1.0f);
+		int safeTitleH = ((BApplicationPlus) getBApp())
+				.getSafeTitleHorizontal();
+		BRect rect = b.getHighlightBounds();
+
+		int originx = -rect.x;
+		BSkin.Element up = skin.get(H_UP);
+		BSkin.Element down = skin.get(H_DOWN);
+
+		int whi_up = originx + safeTitleH - up.getWidth();
+		int whi_down = originx + safeTitleH - down.getWidth();
+		String upAction = curButton == 0 ? null : H_UP;
+		String downAction = lastButton ? null : H_DOWN;
+		if (upAction != null)
+			b.getHighlights().setWhisperingArrow(H_UP, A_LEFT + whi_up,
+					A_TOP - up.getHeight(), upAction);
+		if (downAction != null)
+			b.getHighlights().setWhisperingArrow(H_DOWN, A_LEFT + whi_down,
+					A_BOTTOM + down.getHeight(), downAction);
+		
+		h.parentView = v;		
+		h.setDefault();
+
+		curButton++;
+		buttonsList.add(b);
+		// b.setBarAndArrows(null, "pop", true);
+		return b;
+
+	}
 	
 	private void setButtonFocus() {
 		getBApp().getRoot().setPainting(false);
@@ -463,7 +601,6 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 		buttonHeight = ViewUtils.getHeight(this, H_BAR);
 		//buttonY = layout.getBounds().y;
 
-
 		if (pos != 0) {
 			addSimpleTextButton("Resume playing"
 					, new ButtonHandler() {
@@ -511,6 +648,15 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 		canStream = VideoModuleHelper.inst.canStream(de);
 		if (StreamBabyConfig.cfgQualitySelection.getBool() && canTranscode)
 			addQualityButton(false);
+		
+		// If pyTivo running and this video found then add pyTivo push button
+		if (StreamBabyConfig.py != null) {
+			video vid = StreamBabyConfig.py.findVideo(de.getUri().toString());
+			if (vid != null) {
+				addpyTivoButton(vid);
+			}			
+		}
+		
 		addSimpleTextButton("Go back", new ButtonHandler() { 
 			public boolean left() {
 				popBack();
