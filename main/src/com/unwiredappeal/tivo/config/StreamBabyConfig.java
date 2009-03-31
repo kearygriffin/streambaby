@@ -14,6 +14,7 @@ import com.unwiredappeal.mediastreams.RawStreamingModule;
 import com.unwiredappeal.mediastreams.TivoStreamingModule;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.html.SBHtmlRendererFactory;
+import com.unwiredappeal.tivo.pyTivo.pyTivo;
 import com.unwiredappeal.tivo.streambaby.PreviewWindow;
 import com.unwiredappeal.tivo.streambaby.host.Listener;
 import com.unwiredappeal.tivo.utils.AvailableSocket;
@@ -30,6 +31,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static String streamBabyDir;
 	public static String cacheDir;
 	public static String nativeDir;
+	public static pyTivo py;
 	
 	static {
 		setupDefaultDirectories();
@@ -654,6 +656,8 @@ public class StreamBabyConfig extends ConfigurableObject {
 			RandomAccessFileInputStream.DEFAULT_BUFFER_SIZE= bsize;
 			Listener.READ_BUFFER_SIZE = bsize;
 		}
+		
+		pyTivoSetup();
 
 		processModules();
 	}
@@ -875,6 +879,16 @@ public class StreamBabyConfig extends ConfigurableObject {
 		}
 		return img;
 
+	}
+	
+	public static void pyTivoSetup() {
+		py = new pyTivo();
+		if (py.init()) {
+			Log.info("pyTivo detected");
+		} else {
+			py = null;
+		}
+			
 	}
 
 }
