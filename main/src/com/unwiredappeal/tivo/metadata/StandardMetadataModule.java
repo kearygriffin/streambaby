@@ -231,6 +231,9 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		if (!Utils.isFile(uri))
 			return false;
 		File f = new File(uri);
+		String metaTxt = readMeta(m, f.getParentFile(), f.getName(), ".txt");
+		if (metaTxt != null && handleTxtMetadata(metaTxt, m))
+			return true;
 		File metaHtml = findMeta(f.getParentFile(), f.getName(), ".html");
 		if (metaHtml != null && handleHtmlMetadata(metaHtml, m))
 			return true;
@@ -244,9 +247,6 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			return handleImage(img, m);
 		String metaXml = readMeta(m, f.getParentFile(), f.getName(), ".xml");
 		if (metaXml != null && handleXmlMetadata(metaXml, m))
-			return true;
-		String metaTxt = readMeta(m, f.getParentFile(), f.getName(), ".txt");
-		if (metaTxt != null && handleTxtMetadata(metaTxt, m))
 			return true;
 		
 		String metaUrl = readMeta(m, f.getParentFile(), f.getName(), ".url");

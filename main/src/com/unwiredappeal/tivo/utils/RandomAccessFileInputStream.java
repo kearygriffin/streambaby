@@ -113,9 +113,11 @@ public class RandomAccessFileInputStream extends RandomAccessInputStream {
 		long offset = pos - filePos;
 		fp.seek(pos);
 		filePos = pos;
-		bufp += offset;
-		if (bufp < 0)
+		long newbufp = bufp + offset;
+		if (newbufp < 0 || newbufp > buf.length)
 			resetBuffer();
+		else
+			bufp = (int)newbufp;
 	}
 	
 	/* (non-Javadoc)

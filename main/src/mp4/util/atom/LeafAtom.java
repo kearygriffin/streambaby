@@ -67,5 +67,13 @@ public abstract class LeafAtom extends Atom {
     return false;
   }
   
+  public int getFlagValue() {
+	  byte[] data = getFlag();
+	    return ((int)(data[0] & 0xff) << 16) |
+	    ((int)(data[1] & 0xff) << 8) |
+	    (int)(data[2] & 0xff);  
+  
+  }
+  
    
 }

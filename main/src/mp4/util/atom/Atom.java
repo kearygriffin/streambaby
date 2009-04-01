@@ -210,7 +210,9 @@ public abstract class Atom {
    * @param typ the type represented as a byte array
    * @return the class name for the type
    */
-  public static String typeToClassName(byte[] typ) {
+  public static String typeToClassName(byte[] typ, String prefix) {
+  if (prefix == null)
+	  prefix = "";
     String str = new String(typ);
     // \u00a9
     StringBuffer strBuffer = new StringBuffer();
@@ -236,7 +238,7 @@ public abstract class Atom {
 	    
     }
     String clsName = strBuffer.toString();
-    return "mp4.util.atom." + new String(clsName) + "Atom";
+    return "mp4.util.atom." + prefix + new String(clsName) + "Atom";
   }
   
   /**
@@ -292,6 +294,37 @@ public abstract class Atom {
   public static boolean typeEquals(byte[] t1, byte[] t2) {
 	  return Arrays.equals(t1, t2);
   }
+
+public static Atom typeToAtom(byte[] word, String classPrefix) throws AtomException {
+	classPrefix = classPrefix.toLowerCase();
+	try {
+		Atom atom = null;
+		String typeForClass = Atom.typeToClassName(word, classPrefix);
+		try {
+			Class<?> cls = Class.forName(typeForClass);
+			atom = (Atom) cls.newInstance();
+			//MP4Log.log(getPrefix() + "AtomClass: " + cls + " (size:" + size + ")");
+		} catch (ClassNotFoundException e) {
+			if (classPrefix != null && classPrefix.length() > 0) {
+				typeForClass = Atom.typeToClassName(word, null);
+				try {
+					Class<?> cls = Class.forName(typeForClass);
+					atom = (Atom) cls.newInstance();
+					//MP4Log.log(getPrefix() + "AtomClass: " + cls + " (size:" + size + ")");
+				} catch (ClassNotFoundException e1) {					
+				}
+			}
+			if (atom == null)
+				atom = new UnknownAtom(word);
+		}
+		return atom;
+	} catch (InstantiationException e) {
+		throw new AtomException("Unable to instantiate atom");
+	} catch (IllegalAccessException e) {
+		throw new AtomException("Unabel to access atom object");
+	}
+
+}
   
 
    

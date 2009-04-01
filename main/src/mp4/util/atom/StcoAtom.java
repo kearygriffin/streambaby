@@ -97,11 +97,28 @@ public class StcoAtom extends LeafAtom {
    * @param chunkNum the chunk where the atom should be split 
    * @param chunkOffset the delta into the firstChunk (in the case we are splitting a chunk)
    */
-  public StcoAtom cut(long chunkNum, long chunkOffset) {    
+  public StcoAtom cut(long chunkNum, long chunkOffset) {
+	  return cut(chunkNum, chunkOffset, false);
+  }
+  
+  public StcoAtom cut(long chunkNum, long chunkOffset, boolean force32) {    
     // create the new table
-    StcoAtom cutStco = new StcoAtom();
+	StcoAtom cutStco ;
+	if (this instanceof Co64Atom  && !force32)
+		cutStco = new Co64Atom();
+	else
+		cutStco = new StcoAtom();
     long numEntries = getNumEntries();
-    cutStco.allocateData(numEntries - chunkNum + 1);
+    if (force32) {
+    	for (long i=chunkNum;i<=numEntries;i++) {
+    		if (getChunkOffset(i) > 0xFFFFFFFFL) {
+    			numEntries = i-1;
+    			break;
+    		}
+    	}
+    }
+    
+    cutStco.allocateData(numEntries - chunkNum + 1);    
     cutStco.setNumEntries(numEntries - chunkNum + 1);
     int entryNumber = 0;
     for (long i = chunkNum; i <= numEntries; i++, entryNumber++) {
@@ -109,6 +126,12 @@ public class StcoAtom extends LeafAtom {
     }
     cutStco.setChunkOffset(0, cutStco.getChunkOffset(1) + chunkOffset);
     return cutStco;
+  }
+  
+  public StcoAtom copy32Bit() {
+	  if (!(this instanceof Co64Atom))
+		  return this;
+	  return cut(1, 0, true);
   }
   
   /**

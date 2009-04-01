@@ -3,6 +3,9 @@
  */
 package mp4.util.atom;
 
+import mp4.util.atom.moov.udta.MetaAtom;
+import mp4.util.atom.moov.udta.meta.IlstAtom;
+
 public abstract class AtomVisitor {
   public abstract void visit(FtypAtom atom) throws AtomException;
   public abstract void visit(FreeAtom atom) throws AtomException;

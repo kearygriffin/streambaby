@@ -12,6 +12,7 @@ import java.util.Iterator;
 
 import mp4.util.atom.Atom;
 import mp4.util.atom.AtomException;
+import mp4.util.atom.Co64Atom;
 import mp4.util.atom.MdatAtom;
 import mp4.util.atom.MoovAtom;
 import mp4.util.atom.TrakAtom;
@@ -41,6 +42,7 @@ public class Mp4Split extends Mp4Parser {
 	protected MoovAtom cutMoov;
 	protected MdatAtom cutMdat;
 	Mp4InterleaveWriter iwriter = null;
+	protected boolean force32bit = true;
   
   public Mp4Split(DataInputStream mp4file) {
 		super(mp4file);
@@ -102,6 +104,10 @@ public class Mp4Split extends Mp4Parser {
 			Iterator<TrakAtom> it = moov.getTracks();
 			while(it.hasNext()) {
 				TrakAtom trak = it.next();
+				if (!trak.isEnabled()) {
+					it.remove();
+					continue;
+				}
 				if (trak.getMdia().getHdlr().isVideo()) {
 					if (hasVideo)
 						it.remove();
@@ -140,6 +146,25 @@ public class Mp4Split extends Mp4Parser {
 
 			MP4Log.log("DBG: updateAmount " + updateAmount);
 			cutMoov.fixupOffsets(-updateAmount);
+			
+			if (force32bit) {
+				long origSize = cutMoov.size();
+				Iterator<TrakAtom> tit = cutMoov.getTracks();
+				while(tit.hasNext()) {
+					TrakAtom t = tit.next();
+					if (t.getMdia().getMinf().getStbl().getStco() instanceof Co64Atom) {
+						t.getMdia().getMinf().getStbl().setStco(t.getMdia().getMinf().getStbl().getStco().copy32Bit());					
+						t.getMdia().getMinf().getStbl().recomputeSize();
+						t.getMdia().getMinf().recomputeSize();
+						t.getMdia().recomputeSize();
+						t.recomputeSize();
+					}
+				}
+				cutMoov.recomputeSize();
+				long fixup = cutMoov.size() - origSize;
+				if (fixup != 0)
+					cutMoov.fixupOffsets(fixup);
+			}
 
 			MP4Log.log("DBG: movie skip " + mdatSkip);
 
@@ -159,7 +184,7 @@ public class Mp4Split extends Mp4Parser {
 			} else {
 				// In any case, mdat is going to be at the end, and 0 is a legal size in MP4s
 				// meaning everything to the end of the file is part of the atom.  To simplify 64-bit handling, let's just do it.
-				cutMdat.setSize(0);
+				//cutMdat.setSize(0);
 			}
 
 

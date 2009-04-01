@@ -32,7 +32,8 @@ public class JavaMP4Splitter extends MP4Streamer {
 			// There is a lot of seeking for interleaving, don't use a big buffer
 			if (reinterleave)
 				bufSize = 4096;
-			mp4file = new DataInputStream(new RandomAccessFileInputStream(f, bufSize));
+			InputStream is = new RandomAccessFileInputStream(f, bufSize);
+			mp4file = new DataInputStream(is);
 			try {
 				calcSplitMp4(reinterleave);
 				/*

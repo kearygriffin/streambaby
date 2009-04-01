@@ -6,6 +6,7 @@ package mp4.util.atom;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 
 
 /**
@@ -61,8 +62,10 @@ public class MdatAtom extends LeafAtom {
       if (in.markSupported()) {
     	  in.mark(Integer.MAX_VALUE);
       }
-      long newSize = dataSize() - skip;
-      setSize(ATOM_HEADER_SIZE + newSize);
+      if (dataSize() > 0) {
+	      long newSize = dataSize() - skip;
+	      setSize(ATOM_HEADER_SIZE + newSize);
+      }
     } catch (IOException e) {
       throw new AtomError("Unable to cut the mdat atom");
     }
@@ -110,4 +113,15 @@ public class MdatAtom extends LeafAtom {
   public void accept(AtomVisitor v) throws AtomException {
     v.visit(this); 
   }
+  
+  @Override
+  public void writeHeader(DataOutput out) throws IOException {
+    byte[] sizeData = new byte[ATOM_WORD];
+    //unsignedIntToByteArray(sizeData, 0, size);
+    // size 0 means to-the-end-of-file
+    Arrays.fill(sizeData, (byte)0);
+    out.write(sizeData);
+    out.write(type);
+  }
+  
  }

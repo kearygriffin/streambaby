@@ -306,7 +306,7 @@ public class Mp4Dump extends DefaultAtomVisitor {
       throw new AtomException("Unable to read enough bytes for atom");  
     }
     try {
-      Class<?> cls = Class.forName(Atom.typeToClassName(word));
+      Class<?> cls = Class.forName(Atom.typeToClassName(word, null));
       Atom atom = (Atom) cls.newInstance();
       atom.setSize(size);
       atom.accept(this);

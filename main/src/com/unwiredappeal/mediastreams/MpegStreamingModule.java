@@ -44,7 +44,7 @@ public class MpegStreamingModule extends BaseVideoHandlerModule implements Strea
 	
 	public static ConfigEntry cfgStreamableFormats = new ConfigEntry(
 			"mpegmod.streamformats",
-			"default",
+			"mpeg,mp2v,mp2;mpeg,mp2v,ac3;mpeg,mp1v,mp2;mpeg,mp1v,ac3",
 			"list of formats mpegmodule should attempt to stream"
 			);
 	

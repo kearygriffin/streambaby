@@ -22,8 +22,6 @@ import mp4.util.Mp4Parser;
 import mp4.util.Mp4Split;
 import mp4.util.atom.Atom;
 import mp4.util.atom.AtomException;
-import mp4.util.atom.IlstAtom;
-import mp4.util.atom.MetaAtom;
 import mp4.util.atom.MoovAtom;
 
 import org.xml.sax.InputSource;
@@ -37,6 +35,20 @@ import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.RandomAccessFileInputStream;
 import com.unwiredappeal.tivo.utils.Utils;
 import mp4.util.atom.*;
+import mp4.util.atom.moov.udta.MetaAtom;
+import mp4.util.atom.moov.udta.meta.IlstAtom;
+import mp4.util.atom.moov.udta.meta.ilst.CovrAtom;
+import mp4.util.atom.moov.udta.meta.ilst.CprtAtom;
+import mp4.util.atom.moov.udta.meta.ilst.CprtalbAtom;
+import mp4.util.atom.moov.udta.meta.ilst.CprtartAtom;
+import mp4.util.atom.moov.udta.meta.ilst.CprtcmtAtom;
+import mp4.util.atom.moov.udta.meta.ilst.CprtdayAtom;
+import mp4.util.atom.moov.udta.meta.ilst.CprtnamAtom;
+import mp4.util.atom.moov.udta.meta.ilst.CprtwrtAtom;
+import mp4.util.atom.moov.udta.meta.ilst.DescAtom;
+import mp4.util.atom.moov.udta.meta.ilst.GnreAtom;
+import mp4.util.atom.moov.udta.meta.ilst.TvenAtom;
+import mp4.util.atom.moov.udta.meta.ilst.TvshAtom;
 
 public class MP4MetadataModule extends BaseMetadataModule {
 

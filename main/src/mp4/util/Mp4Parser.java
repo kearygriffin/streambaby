@@ -19,7 +19,8 @@ public class Mp4Parser extends DefaultAtomVisitor {
 	protected DataInputStream mp4file;
 	boolean lastAtom = false;
 	private long lastAtomOffset = 0;
-
+	private int indent = 0;
+	private String classPrefix = "";
 	protected Mp4Parser() {
 		
 	}
@@ -32,7 +33,12 @@ public class Mp4Parser extends DefaultAtomVisitor {
 	    
 		// Even some (hybrid) containers have data, so read it
 		atom.readData(mp4file);
+		lastAtomOffset += atom.pureDataSize();
 		if (atom.isContainer()) {
+		  indent++;
+		  String oldClassPrefix = classPrefix;
+		  String cname = atom.getClass().getCanonicalName();
+		  classPrefix = classPrefix + cname.substring(cname.lastIndexOf('.')+1, cname.length() - 4) + ".";
 	      //long bytesRead = 0;
 	      long bytesToRead = atom.dataSize() - atom.pureDataSize();
 	      while (bytesToRead >= Atom.ATOM_HEADER_SIZE) {
@@ -48,10 +54,13 @@ public class Mp4Parser extends DefaultAtomVisitor {
 	    	  MP4Log.log("Skipping extra container bytes: " + bytesToRead);
 			try {
 				mp4file.skipBytes((int)bytesToRead);
+				lastAtomOffset += bytesToRead;
 			} catch(IOException e) {
 				throw new AtomException(e.getMessage());
 			}
 	      }
+	      indent--;
+	      classPrefix = oldClassPrefix;
 		}
 	  }
 
@@ -71,8 +80,17 @@ public class Mp4Parser extends DefaultAtomVisitor {
 	    } catch(IOException e) {
 	    	throw new AtomException(e.getMessage());
 	    }
+		lastAtomOffset += atom.dataSize();
 	  }
 	  
+	  private String getPrefix() {
+		  //String ps = classPrefix.length() > 0 ? classPrefix.substring(0, classPrefix.length()-1) + ":"  : "";
+		  String ps = "";
+		  StringBuffer x = new StringBuffer(ps);
+		  for (int i=0;i<indent;i++)
+			  x.append(" ");
+		  return x.toString();
+	  }
 		/**
 		 * Parse an atom from the mpeg4 file.
 		 * 
@@ -83,6 +101,8 @@ public class Mp4Parser extends DefaultAtomVisitor {
 			// get the atom size
 			if (lastAtom)
 				throw new AtomException("Already parsed last atom!");
+			long aoff = lastAtomOffset;
+			//MP4Log.log("Reading atom at offset: " + lastAtomOffset);
 			byte[] word = new byte[Atom.ATOM_WORD];
 			int num;
 			try {
@@ -107,6 +127,7 @@ public class Mp4Parser extends DefaultAtomVisitor {
 			if (num != Atom.ATOM_WORD) {
 				throw new AtomException("Unable to read enough bytes for atom");
 			}
+			lastAtomOffset += Atom.ATOM_HEADER_SIZE;
 			// handle 64-bit data
 			boolean isBig = false;
 			if (size == 1) {
@@ -121,34 +142,28 @@ public class Mp4Parser extends DefaultAtomVisitor {
 					throw new AtomException("Unable to read enough bytes for atom");
 				}				
 				size = Atom.byteArrayToLong(bigSize, 0);
+				lastAtomOffset += Atom.LARGE_SIZE_SIZE;
 			}
 			
-			try {
-				Atom atom;
-				MP4Log.log("Reading atom at offset: " + lastAtomOffset);
-				try {
-					Class<?> cls = Class.forName(Atom.typeToClassName(word));
-					atom = (Atom) cls.newInstance();
-					MP4Log.log("AtomClass: " + cls + " (size:" + size + ")");
-				} catch (ClassNotFoundException e) {
-					MP4Log.log("UnknownAtom(" + ((int)word[0]&0xff) + "," + ((int)word[1]&0xff) + "," + ((int)word[2]&0xff) + "," + ((int)word[3]&0xff) + "): " + Atom.typeToClassName(word) +  " (size:" + size + ")");
-					//if (word[2] == 'h' && word[3] == 'd')
-						//atom = new UnkHdAtom(word);
-					//else
-						atom = new UnknownAtom(word);
-				}
-				if (isBig)
-					MP4Log.log("   Large size atom");
-				lastAtomOffset += size;
-				atom.setLargeAtom(isBig);
-				atom.setSize(size);
-				atom.accept(this);
-				return atom;
-			} catch (InstantiationException e) {
-				throw new AtomException("Unable to instantiate atom");
-			} catch (IllegalAccessException e) {
-				throw new AtomException("Unabel to access atom object");
-			}
+			Atom atom;
+			atom = Atom.typeToAtom(word, classPrefix);
+			/*
+			if (isBig)
+				MP4Log.log(getPrefix() + "^Large size atom");
+			*/
+			String atomName = atom.getClass().getCanonicalName();
+			String lgs = "";
+			if (isBig)
+				lgs = "(LRG)";
+			String typeForClass = Atom.typeToClassName(word, null);
+
+			MP4Log.log(getPrefix() + atomName + "(" + ((int)word[0]&0xff) + "," + ((int)word[1]&0xff) + "," + ((int)word[2]&0xff) + "," + ((int)word[3]&0xff) + "): " + typeForClass.substring(typeForClass.lastIndexOf('.')+1) +  " (offset: " + aoff + ", size" + lgs + ":" + size + ")");
+			//MP4Log.log(getPrefix() + "UnknownAtom(" + ((int)word[0]&0xff) + "," + ((int)word[1]&0xff) + "," + ((int)word[2]&0xff) + "," + ((int)word[3]&0xff) + "): " + Atom.typeToClassName(word) +  " (size:" + size + ")");
+
+			atom.setLargeAtom(isBig);
+			atom.setSize(size);
+			atom.accept(this);
+			return atom;
 		}
 		
 		public long parseMp4() throws AtomException, IOException {

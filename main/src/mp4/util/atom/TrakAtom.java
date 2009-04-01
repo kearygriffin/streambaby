@@ -163,7 +163,7 @@ public class TrakAtom extends ContainerAtom {
    * the contents change.
    */
   @Override
-  protected void recomputeSize() {
+public void recomputeSize() {
     long newSize = tkhd.size() + mdia.size();
     if (tref != null) {
       newSize += tref.size();
@@ -287,6 +287,12 @@ public class TrakAtom extends ContainerAtom {
     ElstAtom elst = new ElstAtom(1);
     elst.addEntry(1, tkhd.getDuration(), editTime, 1);
     setEdts(new EdtsAtom(elst));
+  }
+  
+  public boolean isEnabled() {
+	  if (tkhd == null)
+		  return false;
+	  return (tkhd.getFlagValue() & 1) == 1;
   }
   
 }

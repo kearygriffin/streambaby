@@ -77,6 +77,10 @@ public class StblAtom extends ContainerAtom {
   public StssAtom getStss() {
     return stss;
   }
+
+  public void setStco(StcoAtom stco) {
+	    this.stco = stco;
+	  }
   
   @Override
   public void addChild(Atom child) {
@@ -110,7 +114,7 @@ public class StblAtom extends ContainerAtom {
   /**
    * Compute the size for the stbl container atom.
    */
-  protected void recomputeSize() {
+  public void recomputeSize() {
     long newSize = stsd.size() + stts.size() + stsz.size() + stsc.size() + stco.size();
     if (ctts != null) {
       newSize += ctts.size();

@@ -1,5 +1,8 @@
 package mp4.util.atom;
 
+import mp4.util.atom.moov.udta.MetaAtom;
+import mp4.util.atom.moov.udta.meta.IlstAtom;
+
 public class DefaultAtomVisitor extends AtomVisitor {
 
   protected void defaultAction(Atom atom) throws AtomException {

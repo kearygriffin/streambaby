@@ -111,7 +111,7 @@ public class MinfAtom extends ContainerAtom {
    * any of the child atom sizes have changed.
    */
   @Override
-  protected void recomputeSize() {
+public void recomputeSize() {
     long newSize = mhd.size() + dinf.size() + stbl.size();
     newSize += unknownChildrenSize();
     setSize(ATOM_HEADER_SIZE + newSize);
