@@ -450,6 +450,19 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"true",
 			"Use cahoon's java based MP4 splitter/streamer"
 			);
+	
+	public static ConfigEntry cfgPytivoIp = new ConfigEntry(
+			"pytivo.ip",
+			"localhost",
+			"IP address of pytivo"
+			);
+	
+	public static ConfigEntry cfgPytivoPort = new ConfigEntry(
+			"pytivo.port",
+			"9032",
+			"port pytivo is running on"
+			);
+	
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",

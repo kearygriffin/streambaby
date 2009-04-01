@@ -9,20 +9,29 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Stack;
+
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.utils.Log;
 
 public class pyTivo {
-   public static String ip = "localhost";
-   public static String port = "9032";
+   //public static String ip = "localhost";
+   //public static String port = "9032";
    private static Stack<String> tivos = new Stack<String>();
    private static Stack<String> errors = new Stack<String>();
    private static Stack<container> containers = new Stack<container>();
    private static Stack<video> videos = new Stack<video>();
 
+   public static String getIp() {
+	   return StreamBabyConfig.cfgPytivoIp.getValue();
+   }
+   
+   public static String getPort() {
+	   return StreamBabyConfig.cfgPytivoPort.getValue();
+   }
    // Main pyTivo query - call before anything else
    public Boolean init () {
       errors.clear();
-      String urlString = "http://" + ip + ":" + port + "/TiVoConnect?Command=QueryContainer&Container=%2F";
+      String urlString = "http://" + getIp() + ":" + getPort() + "/TiVoConnect?Command=QueryContainer&Container=%2F";
       try 
       {
           URL url = new URL(urlString);
@@ -82,7 +91,7 @@ public class pyTivo {
    public Boolean pushVideo(video v, String tivo) {
       String s[] = v.Url.split("/");
       String container = s[1];
-      String urlString = "http://" + ip + ":" + port + "/TiVoConnect?Command=Push&Container=" + container + "&File=";
+      String urlString = "http://" + getIp() + ":" + getPort() + "/TiVoConnect?Command=Push&Container=" + container + "&File=";
       String separator = urlEncode(System.getProperty("file.separator"));
       for (int i=2; i<s.length; i++) {
          urlString = urlString + separator + s[i];
@@ -161,7 +170,7 @@ public class pyTivo {
    }
 
    public Boolean queryContainer(container c) {
-      String urlString = "http://" + ip + ":" + port + c.Url;
+      String urlString = "http://" + getIp() + ":" + getPort() + c.Url;
       try 
       {
           URL url = new URL(urlString);
@@ -279,7 +288,7 @@ public class pyTivo {
    // id="section-1.path" name="section-2.path" value="C:\home\dvd"
    public static Boolean getContainerPaths() {
       errors.clear();
-      String urlString = "http://" + ip + ":" + port + "/TiVoConnect?Command=Admin&Container=Admin";
+      String urlString = "http://" + getIp() + ":" + getPort() + "/TiVoConnect?Command=Admin&Container=Admin";
       try 
       {
           URL url = new URL(urlString);

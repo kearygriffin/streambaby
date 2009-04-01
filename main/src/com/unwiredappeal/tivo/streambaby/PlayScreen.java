@@ -424,7 +424,7 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 		
 		public pyTivoButtonHandler(video vid) {
 			Stack<String> tivos = StreamBabyConfig.py.getTivos();
-			for (int i=0; i<tivos.size(); i++) {
+			for (int i=tivos.size()-1; i>=0; i--) {
 				entries.add(tivos.get(i));
 			}
 			this.vid = vid;
