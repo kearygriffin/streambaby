@@ -83,8 +83,9 @@ public class pyTivo {
       String s[] = v.Url.split("/");
       String container = s[1];
       String urlString = "http://" + ip + ":" + port + "/TiVoConnect?Command=Push&Container=" + container + "&File=";
+      String separator = urlEncode(System.getProperty("file.separator"));
       for (int i=2; i<s.length; i++) {
-         urlString = urlString + "%5C" + s[i];
+         urlString = urlString + separator + s[i];
       }
       urlString = urlString + "&tsn=" + urlEncode(tivo);
       Log.info(urlString);
