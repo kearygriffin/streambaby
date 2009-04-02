@@ -42,7 +42,7 @@ public class Mp4Split extends Mp4Parser {
 	protected MoovAtom cutMoov;
 	protected MdatAtom cutMdat;
 	Mp4InterleaveWriter iwriter = null;
-	protected boolean force32bit = true;
+	protected boolean force32bit = false;
   
   public Mp4Split(DataInputStream mp4file) {
 		super(mp4file);

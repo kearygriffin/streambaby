@@ -1,11 +1,13 @@
 ===SVN==
+ * added -Dxxxxx to force java to use ipv4
+ * Pass-through 64bit co64 atoms
+ * Add support for co64 atoms
  * Adjusted size of HD selection screen so CHANNEL_DOWN moves to last entry on current page (usual TiVo behavior)
  * Integrated Cahoon's MP4 splitting code
  * Added interleaving to java-based MP4 splitting code
  * Added itunes metadata support to Cahoon's mp4 parsing
  * Removed iso-parser MP4 parsing library from libs, and changed MP4 metadata code to use the new mp4 parsing code
  * New config option.  java.mp4slit (default=true) to use Cahoon's java based MP4splitter vs old C-port of mp4 splitter
- * Added prelim support for 64-bit mp4's
  * Changed MP4 handling of avc1&avcC atom.  No longer assume avc1 is a container, but do assume avcC is located immediately after avc1 data
  * Added code to mp4 parsing to skip extra data in container atoms (so if remaining size < min atom size, just skip)
  * Changed hashing algorithm for cached previews (mostly so DVD VOB files don't conflict)  Should be backwards compatabile
