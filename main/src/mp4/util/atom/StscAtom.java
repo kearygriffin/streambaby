@@ -112,6 +112,9 @@ public class StscAtom extends LeafAtom {
     data.addUnsignedInt(TABLE_OFFSET + (index * ENTRY_SIZE) + DESCRIPTION_ID, id);
   }
   
+  int lowerBoundPos = 0;
+  int lowerBoundSampleNum = 1;
+
   /**
    * Given a sample return the chunk that the sample is located in.
    * @param sampleNum the sample number
@@ -122,14 +125,19 @@ public class StscAtom extends LeafAtom {
     if (entries == 0) {
       return 0;
     }
+    if (lowerBoundSampleNum > sampleNum) {
+        lowerBoundSampleNum = 1;
+        lowerBoundPos = 0;
+    	
+    }
     int i;
-    int lowerBoundSampleNum = 1;
-    for (i = 0; i < entries - 1; i++) {
+    for (i = lowerBoundPos; i < entries - 1; i++) {
       long maxSamplesInChunk = (getFirstChunk(i+1) - getFirstChunk(i)) * getSamplesPerChunk(i);
       if (sampleNum < lowerBoundSampleNum + maxSamplesInChunk) {
         break;
       }
       lowerBoundSampleNum += maxSamplesInChunk;
+      lowerBoundPos = i+1;
     }
     long chunkNum = ((sampleNum - lowerBoundSampleNum) / getSamplesPerChunk(i)) + getFirstChunk(i);
     return chunkNum;

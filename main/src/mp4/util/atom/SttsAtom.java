@@ -66,21 +66,29 @@ public class SttsAtom extends TimeToSampleAtom {
     v.visit(this); 
   }
 
+
+  long lowerBoundTime = 0;
+  long lowerBoundSample = 1;
+  int lowerBoundPos = 0;
   /**
    * Convert the sample number to a time, in media time-scale.
    * @param sampleNum the sample number
    * @return the time for the sample, in media time scale.
-   */
+   */  
   public long sampleToTime(long sampleNum) {
-    long lowerBoundTime = 0;
-    long lowerBoundSample = 1;
+	if (lowerBoundSample > sampleNum) {
+	    lowerBoundTime = 0;
+	    lowerBoundSample = 1;
+	    lowerBoundPos = 0;
+	}
     long numEntries = getNumEntries();
-    for (int i = 0; i < numEntries; i++ ) {
+    for (int i = lowerBoundPos; i < numEntries; i++ ) {
       long count = getSampleCount(i);
       long duration = getSampleDuration(i);
       if ((sampleNum - lowerBoundSample) < count) {
         return ((sampleNum - lowerBoundSample) * duration) + lowerBoundTime;
       }
+      lowerBoundPos = i+1;
       lowerBoundTime += count * duration;
       lowerBoundSample += count;
     }

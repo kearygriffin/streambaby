@@ -83,14 +83,17 @@ public class Mp4InterleaveWriter {
 	}
 	public void calcInterleave() throws IOException {
 		newMoov = moov.cut(0); 
+		long start;
+		start = System.currentTimeMillis();
+		MP4Log.log("Start reinterleave...");
 		computeChunkPositions(new InterleaveChunkHandler() {
 			long offset = firstChunkOffset;
 			public void addChunk(int trakNum, long chunkNum, long chunkSize) {
 				newMoov.getTrack(trakNum).getMdia().getMinf().getStbl().getStco().setChunkOffset((int)chunkNum-1, offset);
 				offset += chunkSize;
 			}
-			
 		});		
+		MP4Log.log("Finished reinterleave in: " + (System.currentTimeMillis() - start) / 1000.0 + "s");					
 	}
 
 	public void write(final DataOutputStream dos, boolean writeMdat) throws IOException {
