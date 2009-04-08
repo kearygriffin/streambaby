@@ -670,8 +670,6 @@ public class StreamBabyConfig extends ConfigurableObject {
 			Listener.READ_BUFFER_SIZE = bsize;
 		}
 		
-		pyTivoSetup();
-
 		processModules();
 	}
 
@@ -894,15 +892,5 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	}
 	
-	public static void pyTivoSetup() {
-		py = new pyTivo();
-		if (py.init()) {
-			Log.info("pyTivo detected");
-		} else {
-			py = null;
-		}
-			
-	}
-
 }
  
