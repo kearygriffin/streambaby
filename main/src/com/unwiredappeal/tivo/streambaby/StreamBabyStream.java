@@ -32,6 +32,7 @@ import com.unwiredappeal.tivo.utils.InfoCache;
 import com.unwiredappeal.tivo.utils.NamedStream;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.modules.VideoFormats;
+import com.unwiredappeal.tivo.pyTivo.pyTivo;
 
 public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	
@@ -118,7 +119,16 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	    	PasswordScreen ps = new PasswordScreen(this);
 	    	push(ps, TRANSITION_NONE, pw);
 //	    }
-
+	    pyTivoSetup();
+	}
+	
+	public void pyTivoSetup() {
+		StreamBabyConfig.py = new pyTivo();
+		if (StreamBabyConfig.py.init()) {
+			Log.info("pyTivo detected/refreshed");
+		} else {
+			StreamBabyConfig.py = null;
+		}			
 	}
 	
 	public void  setCurrentScreen(BView sc) {
