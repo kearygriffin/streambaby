@@ -8,12 +8,15 @@ package mp4.util.atom;
  */
 @SuppressWarnings("unused")
 public class MdhdAtom extends LeafAtom {
-  private static final int CREATION_TIME_OFFSET = 4;
-  private static final int MODIFICATION_TIME_OFFSET = 8;
-  private static final int TIMESCALE_OFFSET = 12;
-  private static final int DURATION_OFFSET = 16;
-  private static final int LANGUAGE_OFFSET = 20;
-  private static final int QUALITY_OFFSET = 22;
+  //private static final int CREATION_TIME_OFFSET = 4;
+  //private static final int MODIFICATION_TIME_OFFSET = 8;
+  private static final int V0_TIMESCALE_OFFSET = 12;
+  private static final int V1_TIMESCALE_OFFSET = 20;
+  
+  private static final int V0_DURATION_OFFSET = 16;
+  private static final int V1_DURATION_OFFSET = 16;
+  //private static final int LANGUAGE_OFFSET = 20;
+  //private static final int QUALITY_OFFSET = 22;
   
   /**
    * Construct and empty mdhd atom.
@@ -30,46 +33,49 @@ public class MdhdAtom extends LeafAtom {
     super(old);
   }
   
-  /**
-   * Return the creation time for the atom.  In seconds, from midnight January 1, 1904.
-   * @return the creation time for the atom.
-   */
-  public long getCreationTime() {
-    return data.getUnsignedInt(CREATION_TIME_OFFSET);
-  }
-  
-  /**
-   * Set the atom's creation time.
-   * @param ct the creation time.
-   */
-  public void setCreationTime(long ct) {
-    data.addUnsignedInt(CREATION_TIME_OFFSET, ct);
-  }
-  
-  /**
-   * Get the modification time for the atom.  In seconds, from midnight
-   * Jan 1, 1904.
-   * @return the modification time for the atom.
-   */
-  public long getModifactionTime() {
-    return data.getUnsignedInt(MODIFICATION_TIME_OFFSET);
-  }
-  
-  /**
-   * Set the modification time for the atom.  In seconds, from midnight January
-   * 1, 1904.
-   * @param mt the modification time
-   */
-  public void setModificationTime(long mt) {
-    data.addUnsignedInt(MODIFICATION_TIME_OFFSET, mt);
-  }
+//  /**
+//   * Return the creation time for the atom.  In seconds, from midnight January 1, 1904.
+//   * @return the creation time for the atom.
+//   */
+//  public long getCreationTime() {
+//    return data.getUnsignedInt(CREATION_TIME_OFFSET);
+//  }
+//  
+//  /**
+//   * Set the atom's creation time.
+//   * @param ct the creation time.
+//   */
+//  public void setCreationTime(long ct) {
+//    data.addUnsignedInt(CREATION_TIME_OFFSET, ct);
+//  }
+//  
+//  /**
+//   * Get the modification time for the atom.  In seconds, from midnight
+//   * Jan 1, 1904.
+//   * @return the modification time for the atom.
+//   */
+//  public long getModifactionTime() {
+//    return data.getUnsignedInt(MODIFICATION_TIME_OFFSET);
+//  }
+//  
+//  /**
+//   * Set the modification time for the atom.  In seconds, from midnight January
+//   * 1, 1904.
+//   * @param mt the modification time
+//   */
+//  public void setModificationTime(long mt) {
+//    data.addUnsignedInt(MODIFICATION_TIME_OFFSET, mt);
+//  }
   
   /**
    * Return the time scale for the mvhd atom
    * @return the time scale
    */
   public long getTimeScale() {
-    return data.getUnsignedInt(TIMESCALE_OFFSET);
+	if (getVersion() == 0)
+		return data.getUnsignedInt(V0_TIMESCALE_OFFSET);
+	else
+		return data.getUnsignedInt(V0_TIMESCALE_OFFSET);
   }
   
   /**
@@ -77,7 +83,10 @@ public class MdhdAtom extends LeafAtom {
    * @param timeScale the media's time scale
    */
   public void setTimeScale(long timeScale) {
-    data.addUnsignedInt(TIMESCALE_OFFSET, timeScale);
+	if (this.getVersion() == 0)
+		data.addUnsignedInt(V0_TIMESCALE_OFFSET, timeScale);
+	else
+		data.addUnsignedInt(V1_TIMESCALE_OFFSET, timeScale);
   }
   
   /**
@@ -85,7 +94,10 @@ public class MdhdAtom extends LeafAtom {
    * @return the duration
    */
   public long getDuration() {
-    return data.getUnsignedInt(DURATION_OFFSET);
+	if (getVersion() == 0)
+		return data.getUnsignedInt(V0_DURATION_OFFSET);
+	else
+		return data.getLong(V1_DURATION_OFFSET);
   }
   
   /**
@@ -93,7 +105,10 @@ public class MdhdAtom extends LeafAtom {
    * @param duration the duration value
    */
   public void setDuration(long duration) {
-    data.addUnsignedInt(DURATION_OFFSET, duration);
+    if (getVersion() == 0)
+    	data.addUnsignedInt(V0_DURATION_OFFSET, duration);
+    else
+    	data.addLong(V1_DURATION_OFFSET, duration);
   }
   
   /**
