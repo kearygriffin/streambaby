@@ -14,7 +14,7 @@ public class MdhdAtom extends LeafAtom {
   private static final int V1_TIMESCALE_OFFSET = 20;
   
   private static final int V0_DURATION_OFFSET = 16;
-  private static final int V1_DURATION_OFFSET = 16;
+  private static final int V1_DURATION_OFFSET = 24;
   //private static final int LANGUAGE_OFFSET = 20;
   //private static final int QUALITY_OFFSET = 22;
   
