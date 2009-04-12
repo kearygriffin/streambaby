@@ -75,7 +75,7 @@ public class MdhdAtom extends LeafAtom {
 	if (getVersion() == 0)
 		return data.getUnsignedInt(V0_TIMESCALE_OFFSET);
 	else
-		return data.getUnsignedInt(V0_TIMESCALE_OFFSET);
+		return data.getUnsignedInt(V1_TIMESCALE_OFFSET);
   }
   
   /**
