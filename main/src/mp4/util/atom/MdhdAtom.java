@@ -8,8 +8,8 @@ package mp4.util.atom;
  */
 @SuppressWarnings("unused")
 public class MdhdAtom extends LeafAtom {
-  //private static final int CREATION_TIME_OFFSET = 4;
-  //private static final int MODIFICATION_TIME_OFFSET = 8;
+  private static final int V0_CREATION_TIME_OFFSET = 4;
+  private static final int V0_MODIFICATION_TIME_OFFSET = 8;
   private static final int V0_TIMESCALE_OFFSET = 12;
   private static final int V1_TIMESCALE_OFFSET = 20;
   
@@ -136,4 +136,15 @@ public class MdhdAtom extends LeafAtom {
   public void accept(AtomVisitor v) throws AtomException {
     v.visit(this); 
   }
+  
+	public boolean force32BitTimes() {
+		if (getVersion() == 0)
+			return false;
+		data.collapse64To32(V0_CREATION_TIME_OFFSET);
+		data.collapse64To32(V0_MODIFICATION_TIME_OFFSET);
+		data.collapse64To32(V0_DURATION_OFFSET);
+		setVersion((byte)0);		
+		return true;
+	}
+  
 }

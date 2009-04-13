@@ -270,7 +270,7 @@ public class Mp4Dump extends DefaultAtomVisitor {
   @Override
   public void visit(TkhdAtom atom) throws AtomException {
     printLeafHeader(atom);
-    out.print(" track " + atom.getTrackId() + " " + atom.getDuration()); 
+    //out.print(" track " + atom.getTrackId() + " " + atom.getDuration()); 
     out.println();
   }
 

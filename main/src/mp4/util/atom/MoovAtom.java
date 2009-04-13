@@ -276,7 +276,13 @@ public class MoovAtom extends ContainerAtom {
       float realTime = (float)mediaTime / mediaTimeScale;
       if (realTime < adjustedTime)
     	  adjustedTime = realTime;
-      MP4Log.log("DBG: track " + trak.getTkhd().getTrackId() +
+      String tt = "Unk";
+      if (trak.getMdia().getHdlr().isVideo())
+    	  tt = "Vid";
+      else if (trak.getMdia().getHdlr().isSound())
+    	  tt = "Snd";
+      
+      MP4Log.log("DBG: trackType " + tt +
           " spec time " + (long)(time * mediaTimeScale) + " adj time " + mediaTime +
           " spec time sec " + (long)(time) + " adj time sec " + (mediaTime/mediaTimeScale));
     }

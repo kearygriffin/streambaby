@@ -13,6 +13,8 @@ import java.util.Iterator;
 import mp4.util.atom.Atom;
 import mp4.util.atom.AtomException;
 import mp4.util.atom.Co64Atom;
+import mp4.util.atom.EdtsAtom;
+import mp4.util.atom.ElstAtom;
 import mp4.util.atom.MdatAtom;
 import mp4.util.atom.MoovAtom;
 import mp4.util.atom.TrakAtom;
@@ -43,6 +45,7 @@ public class Mp4Split extends Mp4Parser {
 	protected MdatAtom cutMdat;
 	Mp4InterleaveWriter iwriter = null;
 	protected boolean force32bit = false;
+	protected boolean force32bit_times = false;
   
   public Mp4Split(DataInputStream mp4file) {
 		super(mp4file);
@@ -128,6 +131,76 @@ public class Mp4Split extends Mp4Parser {
 			// Remove the IODS atom
 			// because it may point to tracks we have already removed
 			cutMoov.setIods(null);
+			
+			
+//			if (force32bit) {
+//				long origSize = cutMoov.size();
+//				Iterator<TrakAtom> tit = cutMoov.getTracks();
+//				while(tit.hasNext()) {
+//					TrakAtom t = tit.next();
+//					if (t.getMdia().getMinf().getStbl().getStco() instanceof Co64Atom) {
+//						t.getMdia().getMinf().getStbl().setStco(t.getMdia().getMinf().getStbl().getStco().copy32Bit());					
+//						t.getMdia().getMinf().getStbl().recomputeSize();
+//						t.getMdia().getMinf().recomputeSize();
+//						t.getMdia().recomputeSize();
+//						t.recomputeSize();
+//					}
+//				}
+//				cutMoov.recomputeSize();
+//				long fixup = cutMoov.size() - origSize;
+//				if (fixup != 0)
+//					cutMoov.fixupOffsets(fixup);
+//			}
+			
+//			if (force32bit_times) {
+//				Iterator<TrakAtom> itr = cutMoov.getTracks();
+//				boolean has64bitTimes = cutMoov.getMvhd().getVersion() > 0;
+//				while(!has64bitTimes && itr.hasNext()) {
+//					TrakAtom trak = itr.next();
+//					if (trak.getTkhd().getVersion() > 0 || trak.getMdia().getMdhd().getVersion() > 0)
+//						has64bitTimes = true;
+//				}
+//				if (has64bitTimes) {
+//					// change the movie timescale
+//					long oldTimeScale = cutMoov.getMvhd().getTimeScale();
+//					long newTimeScale = 600; 
+//					float adjust = (float)newTimeScale / (float)oldTimeScale; 
+//					cutMoov.getMvhd().setTimeScale(newTimeScale);
+//					cutMoov.getMvhd().setDuration((long)(cutMoov.getMvhd().getDuration() * adjust));
+//					long origSize = cutMoov.size();
+//					boolean modified = cutMoov.getMvhd().force32BitTimes();					
+//					itr = cutMoov.getTracks();
+//					while(itr.hasNext()) {
+//						TrakAtom trak = itr.next();
+//						EdtsAtom edits = trak.getEdts();
+//						if (edits != null) {
+//							ElstAtom elst = edits.getElst();
+//							if (elst != null) {
+//								for (int i=0;i<elst.getNumEntries();i++) 
+//									elst.setDuration(i, (long)(elst.getDuration(i) * adjust));
+//							}
+//						}
+//						boolean trakHdModified = trak.getTkhd().force32BitTimes();
+//						boolean mdHdModified = trak.getMdia().getMdhd().force32BitTimes();
+//						if (mdHdModified) {
+//							trak.getMdia().recomputeSize();
+//						}
+//						if (trakHdModified || mdHdModified) {
+//							trak.recomputeSize();
+//							modified = true;
+//						}
+//					}
+//					/*
+//					modified = modified || cutMoov.getMvhd().force32BitTimes();
+//					cutMoov.recomputeSize();
+//					long fixup = cutMoov.size() - origSize;
+//					if (fixup != 0)
+//						cutMoov.fixupOffsets(fixup);
+//						*/
+//				}
+//
+//			}
+			
 			cutMoov.recomputeSize();
 			
 			MP4Log.log("DBG: moov chunk " + moov.firstDataByteOffset());
@@ -146,25 +219,7 @@ public class Mp4Split extends Mp4Parser {
 
 			MP4Log.log("DBG: updateAmount " + updateAmount);
 			cutMoov.fixupOffsets(-updateAmount);
-			
-			if (force32bit) {
-				long origSize = cutMoov.size();
-				Iterator<TrakAtom> tit = cutMoov.getTracks();
-				while(tit.hasNext()) {
-					TrakAtom t = tit.next();
-					if (t.getMdia().getMinf().getStbl().getStco() instanceof Co64Atom) {
-						t.getMdia().getMinf().getStbl().setStco(t.getMdia().getMinf().getStbl().getStco().copy32Bit());					
-						t.getMdia().getMinf().getStbl().recomputeSize();
-						t.getMdia().getMinf().recomputeSize();
-						t.getMdia().recomputeSize();
-						t.recomputeSize();
-					}
-				}
-				cutMoov.recomputeSize();
-				long fixup = cutMoov.size() - origSize;
-				if (fixup != 0)
-					cutMoov.fixupOffsets(fixup);
-			}
+
 
 			MP4Log.log("DBG: movie skip " + mdatSkip);
 

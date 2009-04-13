@@ -298,4 +298,9 @@ public class ByteStream {
     System.arraycopy(data, 0, newdata, 0, used);
     data = newdata;
   }
+  
+  public void collapse64To32(int offset) {
+	    System.arraycopy(data, offset+4, data, offset, used-(offset+4));
+	    used -= 4;
+  }
 }
