@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Stack;
 
@@ -245,33 +246,28 @@ public class pyTivo {
 
    public video findVideo(String sUrl) {
       sUrl = sUrl.replaceFirst("file:/", "");
-      // Java doesn't encode certain characters
-      sUrl = sUrl.replaceAll("\\(", "%28");
-      sUrl = sUrl.replaceAll("\\)", "%29");
-      sUrl = sUrl.replaceAll("!", "%21");
-      sUrl = sUrl.replaceAll("@", "%40");
-      sUrl = sUrl.replaceAll("\\$", "%24");
-      sUrl = sUrl.replaceAll("&", "%26");
-      sUrl = sUrl.replaceAll("\\+", "%2B");
-      sUrl = sUrl.replaceAll(",", "%2C");
-      sUrl = sUrl.replaceAll("'", "%27");
-      sUrl = sUrl.replaceAll(";", "%3B");
-      sUrl = sUrl.replaceAll("~", "%7E");
-      for (int i=0; i<videos.size(); i++) {
-         String pUrl = pathFromUrl(videos.get(i).Url);
-         if (matchFiles(sUrl, pUrl)) {
-            return(videos.get(i));
-         }
-      }
-      return null;
+      try {
+		  sUrl = URLDecoder.decode(sUrl, "UTF-8");
+	      for (int i=0; i<videos.size(); i++) {
+	         String pUrl = pathFromUrl(videos.get(i).Url);
+	         pUrl = URLDecoder.decode(pUrl, "UTF-8");
+	         if (matchFiles(sUrl, pUrl)) {
+	            return(videos.get(i));
+	         }
+	      }
+	      return(null);
+	  } catch (UnsupportedEncodingException e) {
+         e.printStackTrace();
+         return(null);
+	  }
    }
 	   
    public static boolean matchFiles(String f1, String f2) {
 	  // In Windows same volume number can be upper or lowercase so lowercase them before compare
-      if (f1.matches("^[A-Z].+")) {
+      if (f1.matches("^[A-Z]:.+")) {
          f1 = Character.toLowerCase(f1.charAt(0)) + f1.substring(1);
       }
-      if (f2.matches("^[A-Z].+")) {
+      if (f2.matches("^[A-Z]:.+")) {
          f2 = Character.toLowerCase(f2.charAt(0)) + f2.substring(1);
       }
       
