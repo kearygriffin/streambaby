@@ -245,6 +245,18 @@ public class pyTivo {
 
    public video findVideo(String sUrl) {
       sUrl = sUrl.replaceFirst("file:/", "");
+      // Java doesn't encode certain characters
+      sUrl = sUrl.replaceAll("\\(", "%28");
+      sUrl = sUrl.replaceAll("\\)", "%29");
+      sUrl = sUrl.replaceAll("!", "%21");
+      sUrl = sUrl.replaceAll("@", "%40");
+      sUrl = sUrl.replaceAll("\\$", "%24");
+      sUrl = sUrl.replaceAll("&", "%26");
+      sUrl = sUrl.replaceAll("\\+", "%2B");
+      sUrl = sUrl.replaceAll(",", "%2C");
+      sUrl = sUrl.replaceAll("'", "%27");
+      sUrl = sUrl.replaceAll(";", "%3B");
+      sUrl = sUrl.replaceAll("~", "%7E");
       for (int i=0; i<videos.size(); i++) {
          String pUrl = pathFromUrl(videos.get(i).Url);
          if (matchFiles(sUrl, pUrl)) {
@@ -256,10 +268,10 @@ public class pyTivo {
 	   
    public static boolean matchFiles(String f1, String f2) {
 	  // In Windows same volume number can be upper or lowercase so lowercase them before compare
-      if (f1.matches("^[A-Z]:.+")) {
+      if (f1.matches("^[A-Z].+")) {
          f1 = Character.toLowerCase(f1.charAt(0)) + f1.substring(1);
       }
-      if (f2.matches("^[A-Z]:.+")) {
+      if (f2.matches("^[A-Z].+")) {
          f2 = Character.toLowerCase(f2.charAt(0)) + f2.substring(1);
       }
       
@@ -306,20 +318,33 @@ public class pyTivo {
              if (line.matches("^.+value=\"section-[\\d]+\".*$")) {
                 name = line.replaceFirst("^.+name=\"([^\"]+)\".+$", "$1");
                 name = urlEncode(name);
+                Log.debug("name=" + name);
                 continue;                
              }
              
              if (line.matches("^.+name=\"section-[\\d]+[.]type.+$")) {
-                type = line.replaceFirst("^.+value=\"([^\"]+)\".+$", "$1");
+        	    if ( line.matches("^.+value=.+$") ) {
+        	    	type = line.replaceFirst("^.+value=\"([^\"]+)\".+$", "$1");
+        	    } else {
+        	    	line = in.readLine();
+        	    	type = line.replaceFirst("^.+value=\"([^\"]+)\".*$", "$1");
+        	    }
+                Log.debug("type=" + type);
                 continue;                
              }
              
              if (line.matches("^.+name=\"section-[\\d]+[.]path.+$")) {
-                path = line.replaceFirst("^.+value=\"([^\"]+)\".+$", "$1");
+        	    if ( line.matches("^.+value=.+$") ) {
+        	    	path = line.replaceFirst("^.+value=\"([^\"]+)\".+$", "$1");
+        	    } else {
+        	    	line = in.readLine();
+        	    	path = line.replaceFirst("^.+value=\"([^\"]+)\".*$", "$1");
+        	    }
                 path = new File(path).toURI().toString().replaceFirst("file:/", "");
                 if (path.endsWith("/")) {
                 	path = path.substring(0,path.length()-1);
                 }
+                Log.debug("path=" + path);
                 if (type.equals("video")) {
                    setContainerPath(name, path);
                 }
