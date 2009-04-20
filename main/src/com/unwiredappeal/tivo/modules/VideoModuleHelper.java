@@ -238,6 +238,49 @@ public class VideoModuleHelper {
 		return st;
 		
 	}
+	
+	public String getStreamableVideoMimeType(DirEntry de) {
+		URI uri = de.getUri();
+		VideoInformation vinfo = de.getVideoInformation();
+		String mt = null;
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new GetPriority() { 
+				public int getPriority(VideoHandlerModule m) 
+				{ return m.getPriorities().streamPriority; }
+			}
+		);
+		while(mt == null && it.hasNext()) {
+			VideoHandlerModule m = it.next();
+			if (m.canStream(uri, vinfo)) {
+					mt = m.getStreamableMimeType(uri, vinfo);
+			}
+				
+		}
+		return mt;
+		
+	}
+	public String getTranscodedVideoMimeType(DirEntry de, int qual) {
+		URI uri = de.getUri();
+		VideoInformation vinfo = de.getVideoInformation();
+		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
+		if (disableTranscode)
+			return null;
+		String  mt = null;
+		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new GetPriority() { 
+			public int getPriority(VideoHandlerModule m) 
+			{ return m.getPriorities().transcodePriority; }
+		}
+	);
+		while(mt == null && it.hasNext()) {
+			VideoHandlerModule m = it.next();
+			if (m.canTranscode(uri, vinfo)) {
+					mt = m.getTranscodeMimeType(uri, vinfo, qual);
+			}
+				
+		}
+		return mt;
+		
+	}
+	
 	public PreviewGenerator getPreviewHandler(DirEntry de, boolean realtime) {
 		URI uri = de.getUri();
 		VideoInformation vi = de.getVideoInformation();
@@ -337,4 +380,22 @@ public class VideoModuleHelper {
 			return vis;
 		return openTranscodedVideo(de, startPosition, qual);
 	}
+	
+	public String getVideoMimeType(DirEntry de, int qual) {
+		VideoInformation videoInformation = de.getVideoInformation();
+		if (qual == VideoFormats.QUALITY_AUTO) {
+			// openVideo should never be called with QUALITY_AUTO
+			Log.error("ERROR!: openVideo called with QUALITY_AUTO.  This should never happen. Assuming QUALITY_SAME");
+			qual = VideoFormats.QUALITY_SAME;
+		}
+		String mt = null;
+		if (qual == VideoFormats.QUALITY_SAME || videoInformation.getBitRate() <= getBitRateForQual(qual)) {
+			Log.debug("quality setting is above quality of video, streaming normally");
+			mt = getStreamableVideoMimeType(de);
+		}
+		if (mt != null)
+			return mt;
+		return getTranscodedVideoMimeType(de, qual);
+	}
+	
 }

@@ -14,7 +14,7 @@ import com.unwiredappeal.mediastreams.RawStreamingModule;
 import com.unwiredappeal.mediastreams.TivoStreamingModule;
 import com.unwiredappeal.tivo.dir.DirEntry;
 import com.unwiredappeal.tivo.html.SBHtmlRendererFactory;
-import com.unwiredappeal.tivo.pyTivo.pyTivo;
+import com.unwiredappeal.tivo.push.pytivo.pyTivo;
 import com.unwiredappeal.tivo.streambaby.PreviewWindow;
 import com.unwiredappeal.tivo.streambaby.host.Listener;
 import com.unwiredappeal.tivo.utils.AvailableSocket;
@@ -31,7 +31,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static String streamBabyDir;
 	public static String cacheDir;
 	public static String nativeDir;
-	public static pyTivo py;
+///	public static pyTivo py;
 	
 	static {
 		setupDefaultDirectories();
@@ -461,6 +461,18 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"pytivo.port",
 			"9032",
 			"port pytivo is running on"
+			);
+	
+	public static ConfigEntry cfgTivoUsername = new ConfigEntry(
+			"tivo.username",
+			"",
+			"tivo.com username for push"
+			);
+
+	public static ConfigEntry cfgTivoPassword= new ConfigEntry(
+			"tivo.password",
+			"",
+			"tivo.com password for push"
 			);
 	
 	// This always be last

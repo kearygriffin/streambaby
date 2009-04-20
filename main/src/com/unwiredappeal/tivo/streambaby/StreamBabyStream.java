@@ -32,7 +32,9 @@ import com.unwiredappeal.tivo.utils.InfoCache;
 import com.unwiredappeal.tivo.utils.NamedStream;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.modules.VideoFormats;
-import com.unwiredappeal.tivo.pyTivo.pyTivo;
+import com.unwiredappeal.tivo.push.InternalPush;
+import com.unwiredappeal.tivo.push.Push;
+import com.unwiredappeal.tivo.push.pytivo.pyTivo;
 
 public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	
@@ -73,6 +75,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 		Log.debug("height: " + x.getHeight());
 		Log.debug("aspect: " + x.getPixelAspectNumerator() + "/" + x.getPixelAspectDenominator());
 
+		InternalPush.getInstance().addTivoTsn(this.getContext().getReceiverGUID());
 		first();
 	}
 	
@@ -119,16 +122,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	    	PasswordScreen ps = new PasswordScreen(this);
 	    	push(ps, TRANSITION_NONE, pw);
 //	    }
-	    pyTivoSetup();
-	}
-	
-	public void pyTivoSetup() {
-		StreamBabyConfig.py = new pyTivo();
-		if (StreamBabyConfig.py.init()) {
-			Log.info("pyTivo detected/refreshed");
-		} else {
-			StreamBabyConfig.py = null;
-		}			
+	    Push.pushSetup();
 	}
 	
 	public void  setCurrentScreen(BView sc) {
@@ -204,11 +198,11 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	         }
 	         */
 	         if (uri.endsWith(NamedStream.NAMED_STREAM_EXT)) {
-	        	 NamedStream stream = NamedStream.getNamedStream(uri);
-	        	 if (stream == null)
+	        	 NamedStream nstream = NamedStream.getNamedStream(uri);
+	        	 if (nstream == null)
 	        		 throw new IOException("Stream Not Found");
 	        	 
-	        	 return stream;
+	        	 return nstream.open();
 	         } else {
 	        	 File f = new File(StreamBabyConfig.streamBabyDir + "/assets/" + uri);
 	        	 if (f.exists() && f.isFile())

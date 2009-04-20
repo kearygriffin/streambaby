@@ -62,4 +62,13 @@ public class TivoStreamingModule extends BaseVideoHandlerModule implements Strea
 			return null;
 	}
 
+	public String getStreamableMimeType(URI uri, VideoInformation vinfo) {
+		return null;
+	}
+
+	public String getTranscodeMimeType(URI uri, VideoInformation vinfo, int qual) {
+		return null;
+	}
+	
+
 }

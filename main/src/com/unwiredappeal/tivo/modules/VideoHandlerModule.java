@@ -14,6 +14,8 @@ public interface VideoHandlerModule {
 	public VideoInputStream openTranscodedVideo(URI uri, VideoInformation vi, long startPosition, int qual) throws IOException;
 	public PreviewGenerator getPreviewHandler(URI uri, VideoInformation vi, boolean realtime);
 	public boolean fillVideoInformation(URI uri, VideoInformation vidinfo);
+	public String getTranscodeMimeType(URI uri, VideoInformation vinfo, int qual);
+	public String getStreamableMimeType(URI uri, VideoInformation vinfo);
 	public boolean canStream(URI uri, VideoInformation vinfo);
 	public boolean canPreview(URI  uri, VideoInformation vinfo, boolean realtime);
 	public boolean canTranscode(URI uri, VideoInformation vinfo);

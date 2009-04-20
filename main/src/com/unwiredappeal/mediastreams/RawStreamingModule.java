@@ -87,4 +87,39 @@ public class RawStreamingModule extends BaseVideoHandlerModule implements Stream
 			return null;
 	}
 
+
+	public String getStreamableMimeType(URI uri, VideoInformation vinfo) {
+		if (isRawFile(uri)) {
+			String mimeType = "video/mpeg";
+			String contentType = "video/mpeg";
+			
+			File ffmt = new File(uri.getPath() + ".fmt");
+			if (ffmt.exists()) {
+				try {
+					BufferedReader br = new BufferedReader(new InputStreamReader(ffmt.toURL().openStream()));
+					if (br != null) {
+						String s = br.readLine();
+						if (s != null) {
+							if (s.equals("null"))
+								mimeType = null;
+							else 
+								mimeType = s;
+							contentType = s;
+							s = br.readLine();
+							if (s != null)
+								contentType = s;
+						}
+					}
+				} catch(IOException e) { }
+			}
+			return mimeType;
+		}
+		return null;	
+	}
+
+
+	public String getTranscodeMimeType(URI uri, VideoInformation vinfo, int qual) {
+		return null;
+	}
+
 }

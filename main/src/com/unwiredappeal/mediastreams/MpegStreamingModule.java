@@ -157,5 +157,11 @@ public class MpegStreamingModule extends BaseVideoHandlerModule implements Strea
 		is.close();
 		System.out.println("Done");
 	}
+	public String getStreamableMimeType(URI uri, VideoInformation vinfo) {
+		return "video/mpeg";
+	}
+	public String getTranscodeMimeType(URI uri, VideoInformation vinfo, int qual) {
+		return null;
+	}
 
 }

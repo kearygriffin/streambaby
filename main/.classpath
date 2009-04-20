@@ -18,7 +18,7 @@
 	<classpathentry kind="var" path="STREAMBABY/lib/simple-log.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/tarbz.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/Tidy.jar"/>
-	<classpathentry kind="var" path="STREAMBABY/dlib/simulator.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/dlib/simulator.jar" sourcepath="/TOOLS/hme_sdk_1.4/src.zip"/>
 	<classpathentry kind="lib" path="/ffmpegJavaModule/bin" sourcepath="/ffmpegJavaModule/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

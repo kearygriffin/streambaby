@@ -6,7 +6,6 @@ import static com.tivo.hme.bananas.IBananasPlus.H_BAR_TEXT_COLOR;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
 
 import com.tivo.hme.bananas.BApplicationPlus;
 import com.tivo.hme.bananas.BButtonPlus;
@@ -29,8 +28,8 @@ import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.metadata.MetaData;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.modules.VideoModuleHelper;
-import com.unwiredappeal.tivo.pyTivo.pyTivo;
-import com.unwiredappeal.tivo.pyTivo.video;
+import com.unwiredappeal.tivo.push.Push;
+import com.unwiredappeal.tivo.push.Tivo;
 
 public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 
@@ -46,7 +45,8 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 	boolean isReturn;
 
 	private BViewPlus pleaseWait;
-
+	private BApplicationPlus app;
+	
 	BView mview = null;
 	public abstract class ButtonHandler {
 
@@ -72,6 +72,7 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 	public PlayScreen(BApplicationPlus app, DirEntry de) {
 		super(app);
 		this.de = de;
+		this.app = app;
 
 	      LayoutManager lm = new LayoutManager(getNormal());
 	      layout = lm.safeTitle(this);
@@ -415,19 +416,20 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 
 	}
 
-	private class pyTivoButtonHandler extends ButtonHandler {
+	private class pushTivoButtonHandler extends ButtonHandler {
 		BButtonPlus<?> button;
 
 		int cur = 0;
-		List<String> entries = new ArrayList<String>();
-		video vid;
+		List<Tivo> entries = new ArrayList<Tivo>();
 		
-		public pyTivoButtonHandler(video vid) {
-			Stack<String> tivos = StreamBabyConfig.py.getTivos();
-			for (int i=tivos.size()-1; i>=0; i--) {
-				entries.add(tivos.get(i));
+		public pushTivoButtonHandler() {
+			for (Tivo tivo : Push.getInstance().getTivos()) {
+				Tivo nt = new Tivo(tivo);
+				if (tivo.getAuto() && tivo.getTsn().compareTo(app.getContext().getReceiverGUID()) == 0) {
+					nt.setName("This Tivo");
+				}
+				entries.add(nt);
 			}
-			this.vid = vid;
 		}
 		
 		public boolean left() {
@@ -451,10 +453,10 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 			return true;
 		}
 		public boolean select() {
-			if ( StreamBabyConfig.py.pushVideo(vid, bt.getValue()) ) {
-				Log.info("pyTivo push succeeded: " + de.fileName + "->" + bt.getValue());
+			if ( Push.getInstance().pushVideo(app.getContext().getBaseURI(), de, entries.get(cur), qual) ) {
+				Log.info("Push succeeded: " + de.getName() + "->" + entries.get(cur).getName());
 			} else {
-				StreamBabyConfig.py.handleErrors();
+				//StreamBabyConfig.py.handleErrors();
 			}
 			curButton = 0;
 			setButtonFocus();
@@ -489,16 +491,16 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 		BTextPlus<String> bt;
 	}
 	
-	private BButtonPlus<ButtonHandler> addpyTivoButton(video vid) {
+	private BButtonPlus<ButtonHandler> addPushTivoButton() {
 		boolean lastButton = false;
-		pyTivoButtonHandler h = new pyTivoButtonHandler(vid);
+		pushTivoButtonHandler h = new pushTivoButtonHandler();
 		BView v = new BView(this, layout.getBounds().x, layout.getBounds().y, layout.getBounds().width, buttonHeight);
 		//int barWidth = v.getWidth();
 		int qualityWidth = v.getWidth()/5;
 		BTextPlus<String> bt = new BTextPlus<String>(v, 10, 0, qualityWidth, v.getHeight());
 		bt.setFlags(RSRC_HALIGN_LEFT);
 		bt.setShadow(true);
-		bt.setValue("pyTivo push: ");
+		bt.setValue("Push video: ");
 		bt.setColor(getDefaultTextColor());
 		bt.setFont(getDefaultFont());
 		h.childViews.add(bt);
@@ -598,9 +600,10 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 		//totalButtons = pos > 0 ? 3 : 2;
 		curButton = 0;
 		layout = calcListLayout(1);
-		buttonHeight = ViewUtils.getHeight(this, H_BAR);
+		buttonHeight = (int)(ViewUtils.getHeight(this, H_BAR) * .75f);
 		//buttonY = layout.getBounds().y;
 
+		String playText = "Play";
 		if (pos != 0) {
 			addSimpleTextButton("Resume playing"
 					, new ButtonHandler() {
@@ -615,34 +618,21 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 					return beginPlay(false);
 				}
 			}, false);
-			addSimpleTextButton("Play from beginning", new ButtonHandler() { 
-				public boolean left() {
-					popBack();
-					return true;
-				}
-				public boolean right() {
-					return beginPlay(true);
-				}
-				public boolean select() {
-					return beginPlay(true);
-				}
-				
-			}, false);
-		} else {
-			addSimpleTextButton("Play", new ButtonHandler() { 
-				public boolean left() {
-					popBack();
-					return true;
-				}
-				public boolean right() {
-					return beginPlay(true);
-				}
-				public boolean select() {
-					return beginPlay(true);
-				}
-				
-			}, false);
+			playText = "Play from beginning";
 		}
+		addSimpleTextButton(playText, new ButtonHandler() { 
+			public boolean left() {
+				popBack();
+				return true;
+			}
+			public boolean right() {
+				return beginPlay(true);
+			}
+			public boolean select() {
+				return beginPlay(true);
+			}
+			
+		}, false);
 		// We can only adjust quality if we can transcode this puppy.
 		canTranscode = VideoModuleHelper.inst.canTranscode(de);
 		canStream = VideoModuleHelper.inst.canStream(de);
@@ -650,12 +640,9 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 			addQualityButton(false);
 		
 		// If pyTivo running and this video found then add pyTivo push button
-		if (StreamBabyConfig.py != null) {
-			video vid = StreamBabyConfig.py.findVideo(de.getUri().toString());
-			if (vid != null) {
-				addpyTivoButton(vid);
-			}			
-		}
+		if (Push.getInstance().canPush(de, VideoFormats.QUALITY_SAME))
+			addPushTivoButton();
+
 		
 		addSimpleTextButton("Go back", new ButtonHandler() { 
 			public boolean left() {

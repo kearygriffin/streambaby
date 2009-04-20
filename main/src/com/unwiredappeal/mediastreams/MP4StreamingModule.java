@@ -186,6 +186,14 @@ public class MP4StreamingModule extends BaseVideoHandlerModule implements Stream
 		System.out.println("Done");
 	}
 
+	public String getStreamableMimeType(URI uri, VideoInformation vinfo) {
+		return "video/mp4";
+	}
+
+	public String getTranscodeMimeType(URI uri, VideoInformation vinfo, int qual) {
+		return null;
+	}
+
 
 
 }

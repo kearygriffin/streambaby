@@ -713,5 +713,13 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 			return null;
 	}
 
+	public String getStreamableMimeType(URI uri, VideoInformation vinfo) {
+		return null;
+	}
+
+	public String getTranscodeMimeType(URI uri, VideoInformation vinfo, int qual) {
+		return cfgFFmpegTranscodeMime.getValue();
+	}
+
 
 }

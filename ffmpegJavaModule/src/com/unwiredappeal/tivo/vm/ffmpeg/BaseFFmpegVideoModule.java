@@ -12,7 +12,7 @@ import com.unwiredappeal.mediastreams.VideoInformation;
 import com.unwiredappeal.tivo.modules.BaseVideoHandlerModule;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 
-public class BaseFFmpegVideoModule extends BaseVideoHandlerModule {
+public abstract class BaseFFmpegVideoModule extends BaseVideoHandlerModule {
 
 	
 	public static final String containerFormatsArray[] = {"mp4" , "mpeg", "avi", "matroska", "asf", "mp3", "mpegvideo", "flv" };

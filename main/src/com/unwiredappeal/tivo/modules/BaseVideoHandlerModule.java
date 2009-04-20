@@ -119,6 +119,12 @@ public class BaseVideoHandlerModule extends ConfigurableObject implements VideoH
 	public int getSimplePriority() {
 		return StreamBabyModule.DEFAULT_PRIORITY;
 	}
+	public String getStreamableMimeType(URI uri, VideoInformation vinfo) {
+		return null;
+	}
+	public String getTranscodeMimeType(URI uri, VideoInformation vinfo, int qual) {
+		return null;
+	}
 	
 
 	
