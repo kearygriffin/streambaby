@@ -10,11 +10,21 @@ import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.SimpleCookieManager;
 
 public class Mind {
-   public String server = "mind.tivo.com:8181";
+   public String server;
+   
+   public static final String DEFAULT_MIND_SERVER = "mind.tivo.com:8181";
    private Stack<String> errors = new Stack<String>();
    //CookieManager manager = new CookieManager();   
    SimpleCookieManager cm = new SimpleCookieManager();
    
+   public Mind(String mindServer) {
+	   server = mindServer;
+   }
+
+   public Mind() {
+	   this(DEFAULT_MIND_SERVER);
+   }
+
    public Boolean login(String login, String password) {
       //manager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);  
       //CookieHandler.setDefault(manager);

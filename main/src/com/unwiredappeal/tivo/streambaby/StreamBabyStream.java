@@ -2,9 +2,11 @@ package com.unwiredappeal.tivo.streambaby;
 
 //import java.awt.Color;
 import java.awt.Rectangle;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,6 +22,7 @@ import com.tivo.hme.bananas.BView;
 import com.tivo.hme.interfaces.IApplication;
 import com.tivo.hme.interfaces.IArgumentList;
 import com.tivo.hme.interfaces.IHttpRequest;
+import com.tivo.hme.interfaces.ILogger;
 import com.tivo.hme.sdk.FactoryPlus;
 import com.tivo.hme.sdk.HmeEvent;
 import com.tivo.hme.sdk.ImageResource;
@@ -219,6 +222,34 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	    	  }
 	    	  super.removeApplication(app);
 	      }
+	      
+	  	/* (non-Javadoc)
+	  	 * @see com.tivo.hme.hosting.IFactory#fetchAsset(com.tivo.hme.hosting.IHttpRequest)
+	  	 */
+	    @Override
+	  	public InputStream fetchAsset(IHttpRequest http) {
+	        long offset = 0;
+	        String range = http.get("Range");
+	        if ((range != null) && range.startsWith("bytes=") && range.endsWith("-")) {
+	            try {
+	                offset = Long.parseLong(range.substring(6, range.length() - 1));
+	            } catch (NumberFormatException e) {
+	                // ignore
+	            }
+	        }
+	        if (offset != 0) {
+                try {
+					http.reply(206, "Partial Media follows");
+					http.addHeader("Connection", "close");
+					http.addHeader("Transfer-Encoding", "chunked");
+					return new ByteArrayInputStream("0\r\n".getBytes());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+	        }
+	  		return super.fetchAsset(http);
+	  	}	      
 	      @Override
 	      public void initFactory(String appClassName, ClassLoader loader, IArgumentList args) {
 	    	  super.initFactory(appClassName, loader, args);

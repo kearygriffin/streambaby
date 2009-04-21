@@ -474,6 +474,13 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"",
 			"tivo.com password for push"
 			);
+
+	
+	public static ConfigEntry cfgTivoMind = new ConfigEntry(
+			"tivo.mind",
+			"mind.tivo.com:8181",
+			"tivo.com mind server for push"
+			);
 	
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(

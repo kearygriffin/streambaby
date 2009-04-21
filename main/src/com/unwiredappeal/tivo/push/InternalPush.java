@@ -17,6 +17,9 @@ import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 import com.unwiredappeal.tivo.utils.Log;
 
 public class InternalPush extends ConfigurableObject implements PushHandler {
+	public static double EST_SIZE_FACTOR = 1.025;
+	public static int MAX_BITRATE = 16000;
+	
 	public static ConfigEntry cfgDirs = new ConfigEntry(
 			"tivo",
 			new tivoEntryHandler(),
@@ -45,7 +48,7 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		if (mimeType == null)
 			return false;
 		
-		Mind mind = new Mind();
+		Mind mind = new Mind(tivo.getMind());
 		if (!mind.login(tivo.getUsername(), tivo.getPassword())) {
 			Log.error("Failed to login to tivo-push-control: " + tivo.getUsername() + ", " + tivo.getPassword());
 			return false;
@@ -61,13 +64,25 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		videoInfo.put("mime", mimeType);
 		videoInfo.put("tsn", "tsn:" + tivo.getTsn());
 		videoInfo.put("duration", Long.toString(de.getVideoInformation().getDuration() / 1000));
-		int bitrate = de.getVideoInformation().getBitRate();
-		if (qual != VideoFormats.QUALITY_SAME) {
-			bitrate = VideoModuleHelper.inst.getBitRateForQual(qual);
+		
+		double estSize;
+
+		if (qual != VideoFormats.QUALITY_SAME || VideoModuleHelper.inst.canStream(de)) {
+			int bitrate;
+			if (qual == VideoFormats.QUALITY_SAME)
+				bitrate = de.getVideoInformation().getBitRate();
+			else
+				bitrate = VideoModuleHelper.inst.getBitRateForQual(qual);		
+			estSize = ((de.getVideoInformation().getDuration() / 1000.0) * (bitrate*1000))/8;
+		}
+		else { 
+			estSize = -1;
+			//int bitrate = MAX_BITRATE;		
+			//estSize = ((de.getVideoInformation().getDuration() / 1000.0) * (bitrate*1000))/8;
+
 		}
 		
-		long estSize = (long)(((de.getVideoInformation().getDuration() / 1000.0) * (bitrate*1000))/8);
-		videoInfo.put("size", Long.toString(estSize));
+		videoInfo.put("size", Long.toString((long)(estSize*EST_SIZE_FACTOR)));
 		MetaData meta = new MetaData();
 		de.getMetadata(meta);
 		if (meta.getTitle() != null) {
@@ -97,16 +112,17 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		// Not already there, add it using the default tivo username and password
 		String username = StreamBabyConfig.cfgTivoUsername.getValue();
 		String password = StreamBabyConfig.cfgTivoPassword.getValue();
+		String mind = StreamBabyConfig.cfgTivoMind.getValue();
 		if (username == null || password == null || username.length() == 0 || password.length() == 0)
 			return;
 		String tivoName = "Tivo-" + tsn.substring(tsn.length()-4);
-		Tivo tivo = new Tivo(tivoName, tsn, username, password);
+		Tivo tivo = new Tivo(tivoName, tsn, username, password, mind);
 		tivo.setAuto(true);
 		tivos.add(0, tivo);
 	}
 	
-	public void addTivo(String name, String tsn, String username, String password) {
-		tivos.add(new Tivo(name, tsn, username, password));
+	public void addTivo(String name, String tsn, String username, String password, String mind) {
+		tivos.add(new Tivo(name, tsn, username, password, mind));
 	}
 
 	public static InternalPush getInstance() {
@@ -129,7 +145,10 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 			String username = ConfigurationManager.inst.getStringProperty(key + ".username", null);
 			String password = ConfigurationManager.inst.getStringProperty(key + ".password", null);
 			String tsn = ConfigurationManager.inst.getStringProperty(key + ".tsn", null);
+			String mind = ConfigurationManager.inst.getStringProperty(key + ".mind", null);
 
+			if (mind == null || mind.length() == 0)
+				mind = StreamBabyConfig.cfgTivoMind.getValue();
 			if (username == null || username.length() == 0)
 				username = StreamBabyConfig.cfgTivoUsername.getValue();
 			if (password == null || password.length() == 0)
@@ -139,7 +158,7 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 				return;
 			}
 			
-			((InternalPush)te).addTivo(value, tsn, username, password);
+			((InternalPush)te).addTivo(value, tsn, username, password, mind);
 			Log.debug("Added tivo: " + value + ", tsn: " + tsn);
 			
 		}

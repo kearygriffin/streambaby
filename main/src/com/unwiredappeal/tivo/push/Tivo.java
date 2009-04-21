@@ -5,23 +5,30 @@ public class Tivo {
 	private String username;
 	private String password;
 	private String tsn;
+	private String mind;
+	
 	public boolean addedAutomatically = false;
 	
 	public Tivo(Tivo t) {
-		this(t.getName(), t.getTsn(), t.getUsername(), t.getPassword());
+		this(t.getName(), t.getTsn(), t.getUsername(), t.getPassword(), t.getMind());
 		this.addedAutomatically = t.addedAutomatically;
 	}
 	public Tivo(String s) {
 		setName(s);
 	}
 	
-	public Tivo(String tivoName, String tsn, String username, String password) {
+	public Tivo(String tivoName, String tsn, String username, String password, String mind) {
 		this.tivoName = tivoName;
 		this.tsn = tsn;
 		this.username = username;
 		this.password = password;
+		this.mind = mind;
 	}
 
+	public String getMind() {
+		return mind;
+	}
+	
 	public void setName(String n) {
 		tivoName = n;
 	}
