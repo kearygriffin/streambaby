@@ -38,8 +38,9 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		return mimeType != null;
 	}
 
-	public List<Tivo> getTivos() {
-		return tivos;
+	@SuppressWarnings("unchecked")
+	public synchronized List<Tivo> getTivos() {
+		return (List<Tivo>)tivos.clone();
 	}
 
 	public boolean pushVideo(URL baseUri, DirEntry de, Tivo tivo, int qual) {
@@ -104,7 +105,7 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		return true;
 	}
 	
-	public void addTivoTsn(String tsn) {
+	public synchronized void addTivoTsn(String tsn, String name) {
 		for (Tivo tivo : tivos) {
 			if (tivo.getTsn().compareTo(tsn) == 0)
 				return;
@@ -115,13 +116,15 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		String mind = StreamBabyConfig.cfgTivoMind.getValue();
 		if (username == null || password == null || username.length() == 0 || password.length() == 0)
 			return;
-		String tivoName = "Tivo-" + tsn.substring(tsn.length()-4);
+		String tivoName = name;
+		if (name == null)
+			tivoName = "Tivo-" + tsn.substring(tsn.length()-4);
 		Tivo tivo = new Tivo(tivoName, tsn, username, password, mind);
 		tivo.setAuto(true);
 		tivos.add(0, tivo);
 	}
 	
-	public void addTivo(String name, String tsn, String username, String password, String mind) {
+	public synchronized void addTivo(String name, String tsn, String username, String password, String mind) {
 		tivos.add(new Tivo(name, tsn, username, password, mind));
 	}
 

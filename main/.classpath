@@ -10,7 +10,7 @@
 	<classpathentry kind="var" path="STREAMBABY/lib/cobra.jar" sourcepath="/TOOLS/cobra-0.98.4/src"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/hme.jar" sourcepath="/TOOLS/hme_sdk_1.4/src"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/hme-host-sb.jar" sourcepath="/TOOLS/hme_sdk_1.4"/>
-	<classpathentry kind="var" path="STREAMBABY/lib/jmdns.jar"/>
+	<classpathentry kind="var" path="STREAMBABY/lib/jmdns.jar" sourcepath="/TOOLS/jmdns-2.1/src"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/jna.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/js.jar"/>
 	<classpathentry kind="var" path="STREAMBABY/lib/saxon9.jar"/>

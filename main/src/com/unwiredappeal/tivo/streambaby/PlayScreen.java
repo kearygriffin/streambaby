@@ -425,9 +425,11 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 		public pushTivoButtonHandler() {
 			for (Tivo tivo : Push.getInstance().getTivos()) {
 				Tivo nt = new Tivo(tivo);
+				/*
 				if (tivo.getAuto() && tivo.getTsn().compareTo(app.getContext().getReceiverGUID()) == 0) {
 					nt.setName("This Tivo");
 				}
+				*/
 				entries.add(nt);
 			}
 		}

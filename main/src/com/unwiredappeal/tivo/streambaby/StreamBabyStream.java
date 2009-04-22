@@ -78,7 +78,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 		Log.debug("height: " + x.getHeight());
 		Log.debug("aspect: " + x.getPixelAspectNumerator() + "/" + x.getPixelAspectDenominator());
 
-		InternalPush.getInstance().addTivoTsn(this.getContext().getReceiverGUID());
+		InternalPush.getInstance().addTivoTsn(this.getContext().getReceiverGUID(), null);
 		first();
 	}
 	

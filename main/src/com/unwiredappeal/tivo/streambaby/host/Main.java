@@ -22,7 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
+import javax.jmdns.ServiceListener;
 
 import com.tivo.hme.host.util.ArgumentList;
 import com.tivo.hme.host.util.Config;
@@ -31,6 +33,7 @@ import com.tivo.hme.interfaces.IArgumentList;
 import com.tivo.hme.interfaces.IFactory;
 import com.tivo.hme.interfaces.IHmeConstants;
 import com.tivo.hme.interfaces.ILogger;
+import com.unwiredappeal.tivo.push.InternalPush;
 import com.unwiredappeal.tivo.utils.Log;
 
 /**
@@ -156,6 +159,7 @@ public class Main implements ILogger
 	            for (int i = 0; i < interfaces.length; ++i) {
 	                //rv[i] = new JmDNS(InetAddress.getByName(interfaces[i]));
 	            	rv[i] = JmDNS.create(InetAddress.getByName(interfaces[i]));
+	            	new TiVoListener(rv[i]);
 	            	// and hack away to remove the shutdown hook
 	            	removeBadJmdnsShutdownHook(rv[i]);
 	            }
@@ -319,4 +323,5 @@ public class Main implements ILogger
 	public List getFactories() {
 		return factories;
 	}
+
 }
