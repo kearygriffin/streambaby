@@ -89,6 +89,9 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		if (meta.getTitle() != null) {
 			videoInfo.put("title", meta.getTitle());
 		}
+		if (meta.getTextDescription() != null)
+			videoInfo.put("description", meta.getTextDescription());
+		videoInfo.put("source", "Streambaby");
 		try {
 			boolean b = mind.pushVideo(videoInfo);
 			if (!b) {
@@ -119,13 +122,13 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		String tivoName = name;
 		if (name == null)
 			tivoName = "Tivo-" + tsn.substring(tsn.length()-4);
-		Tivo tivo = new Tivo(tivoName, tsn, username, password, mind);
+		Tivo tivo = new Tivo(tivoName, tsn, username, password, mind, false);
 		tivo.setAuto(true);
 		tivos.add(0, tivo);
 	}
 	
-	public synchronized void addTivo(String name, String tsn, String username, String password, String mind) {
-		tivos.add(new Tivo(name, tsn, username, password, mind));
+	public synchronized void addTivo(String name, String tsn, String username, String password, String mind, boolean isExternal) {
+		tivos.add(new Tivo(name, tsn, username, password, mind, isExternal));
 	}
 
 	public static InternalPush getInstance() {
@@ -149,6 +152,7 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 			String password = ConfigurationManager.inst.getStringProperty(key + ".password", null);
 			String tsn = ConfigurationManager.inst.getStringProperty(key + ".tsn", null);
 			String mind = ConfigurationManager.inst.getStringProperty(key + ".mind", null);
+			boolean isExternal = ConfigurationManager.inst.getBooleanProperty(key + ".external", false);
 
 			if (mind == null || mind.length() == 0)
 				mind = StreamBabyConfig.cfgTivoMind.getValue();
@@ -161,7 +165,7 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 				return;
 			}
 			
-			((InternalPush)te).addTivo(value, tsn, username, password, mind);
+			((InternalPush)te).addTivo(value, tsn, username, password, mind, isExternal);
 			Log.debug("Added tivo: " + value + ", tsn: " + tsn);
 			
 		}

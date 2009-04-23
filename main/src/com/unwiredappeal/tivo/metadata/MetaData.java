@@ -32,7 +32,7 @@ public class MetaData implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	public static final int METADATA_URL = 1;
 	public static final int METADATA_STRING = 2;
 	public static final int METADATA_HTML = 3;
@@ -46,6 +46,7 @@ public class MetaData implements Serializable {
 	String title = null;
 	public long refModDate = -1;
 	public String refFile;
+	String desc;
 	
 	public void setReference(File f) {
 		this.refFile = f.getAbsolutePath();
@@ -60,6 +61,7 @@ public class MetaData implements Serializable {
 		copy.title = title;
 		copy.refFile = refFile;
 		copy.refModDate = refModDate;
+		copy.desc = desc;
 	}
 	
 	public String getUrl() {
@@ -273,5 +275,17 @@ public class MetaData implements Serializable {
 	
 	public boolean hasTitle() {
 		return title != null;
+	}
+	
+	public void setTextDescription(String t) {
+		desc = t;
+	}
+	
+	public String getTextDescription() {
+		return desc;
+	}
+	
+	public boolean hasTextDescription() {
+		return desc != null;
 	}
 }

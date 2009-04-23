@@ -3,6 +3,8 @@ package com.unwiredappeal.tivo.streambaby;
 import static com.tivo.hme.bananas.IBananasPlus.H_BAR_FONT;
 import static com.tivo.hme.bananas.IBananasPlus.H_BAR_TEXT_COLOR;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,74 +33,24 @@ import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 import com.unwiredappeal.tivo.push.Push;
 import com.unwiredappeal.tivo.push.Tivo;
 
-public class PlayScreen extends ScreenTemplate implements Ticker.Client {
+public class PlayScreen extends ButtonScreen implements Ticker.Client {
 
 	private DirEntry de;
-	int buttonHeight;
-	//int buttonY;
-	Layout layout;
-	int totalButtons;
-	int curButton;
 	int qual;
 	boolean canStream;
 	boolean canTranscode;
 	boolean isReturn;
 
-	private BViewPlus pleaseWait;
-	private BApplicationPlus app;
-	
 	BView mview = null;
-	public abstract class ButtonHandler {
-
-		@SuppressWarnings("unchecked")
-		public BView parentView;
-		public List<BView> childViews = new ArrayList<BView>();
-		public String toString() {
-			return null;
-		}
-
-		public abstract boolean left();
-
-		public abstract boolean right();
-
-		public abstract boolean select();
-		
-		public void gainFocus() { };
-	}
-
-	BButtonPlus<ButtonHandler> curFocusButton = null;
-	List<BButtonPlus<ButtonHandler>> buttonsList = new ArrayList<BButtonPlus<ButtonHandler>>();
 
 	public PlayScreen(BApplicationPlus app, DirEntry de) {
 		super(app);
 		this.de = de;
-		this.app = app;
-
-	      LayoutManager lm = new LayoutManager(getNormal());
-	      layout = lm.safeTitle(this);
-
-	      Element e = getBApp().getSkin().get(IBananasPlus.H_PLEASE_WAIT);
-	      layout = lm.size(layout, e.getWidth(), e.getHeight());
-	      layout = lm.align(layout, A_CENTER, A_CENTER);
-
-	      pleaseWait = new BViewPlus(this, layout);
-	      pleaseWait.setResource(e.getResource());
-	      pleaseWait.setVisible(true);
-	      
-		  //title = de.getStrippedFilename();
-		  resetTitle();
 
 	}
 	
-	public synchronized long tick(long tm, Object arg) {
-		
-		render();
-		flush();
-		return 0;
-	}
 
 	public void render() {
-		this.setPainting(false);
 		qual = StreamBabyConfig.inst.getDefaultQuality();
 		MetaDataViewer mv = new MetaDataViewer();
 		MetaData meta = new MetaData();
@@ -123,8 +75,9 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 			layout = lm.stretchHeight(layout, stretchy);
 			layout = lm.indentY(layout, 60);
 
-			int bottom = calcListLayout(4).getBounds().y;
+			int bottom = calcListLayout(5).getBounds().y;
 			int height = bottom - layout.getBounds().y;
+			height -= 20;
 			mview = mv.getView(meta, this.getNormal(), layout.getBounds().x, layout.getBounds().y, layout.getBounds().width+50, height);
 		}
 
@@ -140,114 +93,10 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 		 */
 		resetTitle();
 
-		setupList(isReturn);
-
-		pleaseWait.setVisible(false);
-		this.setPainting(true);		
-	}
-	public Layout calcListLayout(int rows) {
-
-		LayoutManager lm = new LayoutManager(getNormal());
-		Layout safeTitle = lm.safeTitle(this);
-		Layout layout = safeTitle;
-
-	      float stretchy = .98f;
-	      int safeY = 25;
-	      if (this.getBApp().getCurrentResolution().getHeight() == 720) {
-	    	  stretchy = 1.04f;
-	    	  safeY = 35;
-	      }
-
-		layout = lm.relativeY(layout, false);
-		// layout = lm.stretchWidth(layout, 0.9f);
-		layout = lm.safeAction(layout, this, -20, safeY);
-		layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
-		layout = lm.stretchHeight(layout, stretchy);
-		layout = lm.indentY(layout, 65);
-		int height =  Math.min(45, ViewUtils.getHeight(this, H_BAR));
-		//layout = lm.valign(layout, ((int)(.62 * getHeight())) - (rows * height));
-		int y = (int)(.62 * getHeight());
-		y = (int)(y * stretchy);
-		layout = lm.valign(layout, y - (rows * height));
-		return layout;
-	}
-
-	public boolean handleEnter(Object arg, boolean isReturn) {
-		((StreamBabyStream)getBApp()).setCurrentScreen(this);
-		this.isReturn = isReturn;
-		if (isReturn)
-			render();
-		else
-	      Ticker.master.add(this, System.currentTimeMillis()+200, null);
-		return true;
-	}
-
-	public Resource getDefaultTextColor() {
-		BSkin skin = getBApp().getSkin();
-		BSkin.Element e = skin.get(H_BAR_TEXT_COLOR);
-		if (e != null) {
-			return e.getResource();
-		} else {
-			return null;
-		}
-	}
-
-	public Resource getDefaultFont() {
-		BSkin skin = getBApp().getSkin();
-		BSkin.Element e = skin.get(H_BAR_FONT);
-		if (e != null) {
-			return e.getResource();
-		} else {
-			return null;
-		}
-	}
-
-	private BButtonPlus<ButtonHandler> addSimpleTextButton(String text, ButtonHandler h, boolean lastButton) {
-		BView v = new BView(this, layout.getBounds().x, layout.getBounds().y, layout.getBounds().width, buttonHeight);
-		BButtonPlus<ButtonHandler> b = new BButtonPlus<ButtonHandler>(v,
-				0, 0, v.getWidth(), v.getHeight());
-//		buttonY += buttonHeight;
-
-		BTextPlus<String> bt = new BTextPlus<String>(b, 10, 0, b
-				.getWidth() - 50, b.getHeight());
-		bt.setFlags(RSRC_HALIGN_LEFT);
-		bt.setShadow(true);
-		bt.setValue(text);
-		bt.setColor(getDefaultTextColor());
-		bt.setFont(getDefaultFont());
-		h.childViews.add(bt);
-		b.setValue(h);
-		b.setBarAndArrows(BAR_HANG, BAR_DEFAULT, IBananasPlus.FLAG_VIS_TRUE,
-				"pop", H_RIGHT, null, null, true);
-		b.getHighlights().get(H_BAR).getView().setTransparency(1.0f);
-		int safeTitleH = ((BApplicationPlus) getBApp())
-				.getSafeTitleHorizontal();
-		BRect rect = b.getHighlightBounds();
-
-		int originx = -rect.x;
-		BSkin skin = getBApp().getSkin();
-		BSkin.Element up = skin.get(H_UP);
-		BSkin.Element down = skin.get(H_DOWN);
-
-		int whi_up = originx + safeTitleH - up.getWidth();
-		int whi_down = originx + safeTitleH - down.getWidth();
-		String upAction = curButton == 0 ? null : H_UP;
-		String downAction = lastButton ? null : H_DOWN;
-		if (upAction != null)
-			b.getHighlights().setWhisperingArrow(H_UP, A_LEFT + whi_up,
-					A_TOP - up.getHeight(), upAction);
-		if (downAction != null)
-			b.getHighlights().setWhisperingArrow(H_DOWN, A_LEFT + whi_down,
-					A_BOTTOM + down.getHeight(), downAction);
-		
-		h.parentView = v;		
-		curButton++;
-		buttonsList.add(b);
-		// b.setBarAndArrows(null, "pop", true);
-		return b;
+		setupButtons(isReturn);
 
 	}
-
+	
 	private class QualityButtonHandler extends ButtonHandler {
 		private static final String KBPS = " kb/s";
 		int bitrate;
@@ -455,13 +304,55 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 			return true;
 		}
 		public boolean select() {
-			if ( Push.getInstance().pushVideo(app.getContext().getBaseURI(), de, entries.get(cur), qual) ) {
+			/*
+			boolean success = Push.getInstance().pushVideo(app.getContext().getBaseURI(), de, entries.get(cur), qual);
+			if (success) {
 				Log.info("Push succeeded: " + de.getName() + "->" + entries.get(cur).getName());
 			} else {
 				//StreamBabyConfig.py.handleErrors();
 			}
 			curButton = 0;
 			setButtonFocus();
+			*/
+			final URL baseUri;
+			Tivo tivo = entries.get(cur);
+			if (tivo.getIsExternal()) {
+				String ext = StreamBabyConfig.cfgExternalUrl.getValue();
+				if (ext == null) {
+					baseUri = app.getContext().getBaseURI();
+				} else {
+					try {
+						baseUri = new URL(ext);
+					} catch(MalformedURLException e) {
+						Log.error("Malformed url: " + ext);
+						return true;
+					}
+				}
+			}
+			else {
+				baseUri = app.getContext().getBaseURI();
+			}
+			SingleActionScreen.Action action = new SingleActionScreen.Action() {
+
+				public final URL pbaseUri = baseUri;
+				public final DirEntry pushDe = de;
+				public final Tivo tivo = entries.get(cur);
+				public final int pqual = qual;
+				public String go() {
+					boolean success = Push.getInstance().pushVideo(pbaseUri, pushDe, tivo, pqual);
+					if (success) {
+						Log.info("Push succeeded: " + pushDe.getName() + "->" + tivo.getName());
+						return "Push Succeeded.";
+					} else {
+						Log.info("Push Failed: " + pushDe.getName() + "->" + tivo.getName());						
+						return "Push Failed!";
+					}
+
+				}
+				
+			};
+			
+			getBApp().push(new SingleActionScreen(app, action, de.getStrippedFilename()), TRANSITION_LEFT);
 			return true;
 		}
 		
@@ -555,55 +446,11 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 
 	}
 	
-	private void setButtonFocus() {
-		getBApp().getRoot().setPainting(false);
-		if (curFocusButton != null)
-			curFocusButton.getHighlights().get(H_BAR).getView()
-					.setTransparency(1.0f);
-		if (curButton >= 0) {
-			BButtonPlus<ButtonHandler> b = buttonsList.get(curButton);
-			b.getHighlights().get(H_BAR).getView().setTransparency(0.0f);
-			curFocusButton = b;
-			setFocus(b);
-			b.getValue().gainFocus();
 
-		} else
-			curFocusButton = null;
-		getBApp().getRoot().setPainting(true);		
-	}
-	
-	private void finishButtons() {
-		totalButtons = buttonsList.size();
-		for (int i=0;i<totalButtons;i++) {
-			Layout layout = calcListLayout(totalButtons-i);
-			BView v = buttonsList.get(i).getValue().parentView;
-			v.setBounds(v.getBounds().x, layout.getBounds().y, v.getBounds().width, v.getBounds().height);
-		}
-	}
-
-	private void setupList(boolean isReturn) {
-		curButton = -1;
-		setButtonFocus();
-		setFocus(null);
-		for (int i = 0; i < buttonsList.size(); i++) {
-			BButtonPlus<ButtonHandler> b = buttonsList.get(i);
-			for (int j=0;j<b.getValue().childViews.size();j++)
-				b.getValue().childViews.get(j).remove(null);
-			b.remove(null);
-			b.getValue().parentView.remove(null);
-		}
-		buttonsList.clear();
+	protected int setupButtons(boolean isReturn) {
 		long pos = ViewScreen.getResetSavedPosition(
 				(StreamBabyStream) getBApp(), de.getUri(), de
 						.getVideoInformation().getDuration());
-		
-		getBApp().getRoot().setPainting(false);
-
-		//totalButtons = pos > 0 ? 3 : 2;
-		curButton = 0;
-		layout = calcListLayout(1);
-		buttonHeight = (int)(ViewUtils.getHeight(this, H_BAR) * .75f);
-		//buttonY = layout.getBounds().y;
 
 		String playText = "Play";
 		if (pos != 0) {
@@ -658,45 +505,11 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 				return popBack();
 			}			
 		}, true);
+
+		return 0;
 		
-		curButton = 0;
-		finishButtons();
-		getBApp().getRoot().setPainting(true);
-		setButtonFocus();
 	}
 
-	public boolean moveCursor(int dir) {
-		curButton += dir;
-		if (curButton < 0) {
-			curButton = 0;
-			play("bonk.snd");
-			return true;
-		} else if (curButton >= totalButtons) {
-			curButton = totalButtons - 1;
-			play("bonk.snd");
-			return true;
-		}
-		setButtonFocus();
-		return true;
-	}
-
-	public boolean handleAction(BView view, Object action) {
-		Log.debug("action=" + action);
-		// if (action.equals("push")) {
-		if (action.equals("right")) {
-			BButtonPlus<ButtonHandler> b = buttonsList.get(curButton);
-			return b.getValue().right();
-		}
-		if (action.equals("pop") || action.equals("left")) {
-			BButtonPlus<ButtonHandler> b = buttonsList.get(curButton);
-			return b.getValue().left();
-		}
-		if (action.equals("up"))
-			return moveCursor(-1);
-		else if (action.equals("down"))
-			return moveCursor(1);
-		return super.handleAction(view, action);
-	}
 
 	private boolean beginPlay(boolean reset) {
 		if (reset == true) {
@@ -711,12 +524,10 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 		return true;
 	}
 
-	public boolean popBack() {
-		getBApp().pop();
-		return true;
-	}
 
 	public boolean handleKeyPress(int code, long rawcode) {
+		if (super.handleKeyPress(code, rawcode))
+			return true;
 		Log.debug("code=" + code + " rawcode=" + rawcode);
 		switch (code) {
 		case KEY_CHANNELUP:
@@ -724,20 +535,12 @@ public class PlayScreen extends ScreenTemplate implements Ticker.Client {
 			if (mview != null)
 				return mview.handleKeyPress(code, rawcode);
 			break;
-		case KEY_SELECT:
-			BButtonPlus<ButtonHandler> b = buttonsList.get(curButton);
-			return b.getValue().select();
-			
 		// case KEY_LEFT:
 		// moveLeft();
 		// break;
 		}
 
 		return super.handleKeyPress(code, rawcode);
-	}
-
-	public void resetTitle() {
-		setTitle(this.toString());
 	}
 
 	public String toString() {

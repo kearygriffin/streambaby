@@ -1,6 +1,8 @@
 ===SVN==
  * abstracted push interface
  * Added internal push based on moyekj's port of mind.py
+ * new ini parameters for push: tivo.username, tivo.password, tivo.1=,tivo.1.tsn=,tivo.1.username=,tivo.1.password=,tivo.1.external=(true/false)
+ * new ini external.url= Used for pushes to external tivos.  Should look like http://192.168.1.2:7290/streambaby/
  * Small optimization to mp4 code. Exponential speed increase in reinterleaving
  * added -Dxxxxx to force java to use ipv4
  * Pass-through 64bit co64 atoms

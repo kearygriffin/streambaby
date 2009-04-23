@@ -482,6 +482,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"tivo.com mind server for push"
 			);
 	
+	public static ConfigEntry cfgExternalUrl = new ConfigEntry(
+			"external.url",
+			"",
+			"external url to use for external pushes"
+			);
+	
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",

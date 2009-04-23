@@ -66,6 +66,7 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		String t = getMetaTitle(title, episodeTitle, seriesTitle, isEpisodic);
 		if (t != null)
 			meta.setTitle(t);
+		meta.setTextDescription(p.elementMap.get("description"));
 	}
 	
 	public boolean initialize(StreamBabyModule parent) {
@@ -114,7 +115,7 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			String seriesTitle  = getFirstText(doc, "seriesTitle");
 			String isEpisodic = getFirstText(doc, "isEpisode");
 			String t = getMetaTitle(title, episodeTitle, seriesTitle, isEpisodic);
-			
+			m.setTextDescription(getFirstText(doc, "description"));
 			int index = root.lastIndexOf(':');
 			if (index >= 0) {
 				root = root.substring(index + 1);
@@ -159,6 +160,7 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		if (isPyTivo(data))
 			return handlePyTivo(data, m);
 		else {
+			m.setTextDescription(data);
 			TxtParser parser = new TxtParser();
 			InputSource inputSource = new InputSource(new StringReader(data));
 			SAXSource source = new SAXSource(parser, inputSource);
