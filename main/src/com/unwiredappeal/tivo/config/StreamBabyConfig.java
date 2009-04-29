@@ -706,7 +706,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 		return de.getDirEntry();
 	}
 
-	private boolean _readConfiguration(String configFile) {
+	private boolean _readConfiguration(String configFile, boolean specified) {
 		// first, if a config is specified try it
 
 		configRead = true;
@@ -741,11 +741,14 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public boolean readConfiguration(String configFile) {
 		if (configRead)
 			return true;
-		if (configFile == null || configFile.length() == 0)
+		boolean specified = true;
+		if (configFile == null || configFile.length() == 0) {
+			specified = false;
 			configFile = CONFIG_FILE;
+		}
 
-		boolean ok = _readConfiguration(configFile); 
-		ok = ok | _readConfiguration(CONFIG_FILE_LOCAL);
+		boolean ok = _readConfiguration(configFile, specified); 
+		ok = ok | _readConfiguration(CONFIG_FILE_LOCAL, false);
 		processConfiguration();
 		return ok;
 	}
