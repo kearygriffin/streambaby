@@ -710,10 +710,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 		// first, if a config is specified try it
 
 		configRead = true;
-		if (configFile != null) {
-			if (ConfigurationManager.inst.attemptLoadProps(configFile))
-				return true;
-			return false;
+		if (specified) {
+			if (configFile != null) {
+				if (ConfigurationManager.inst.attemptLoadProps(configFile))
+					return true;
+				return false;
+			}
 		}
 		// Next, try user dir
 		if (ConfigurationManager.inst.attemptLoadProps(System.getProperty("user.home")
