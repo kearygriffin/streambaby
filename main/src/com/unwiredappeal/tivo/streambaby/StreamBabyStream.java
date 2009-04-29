@@ -37,6 +37,7 @@ import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.push.InternalPush;
 import com.unwiredappeal.tivo.push.Push;
+import com.unwiredappeal.tivo.push.PushNamedStream;
 import com.unwiredappeal.tivo.push.pytivo.pyTivo;
 
 public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
@@ -274,6 +275,8 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	      private void scheduleTasks() {
 	    	  InfoCache.getInstance().schedule(timer);
 	    	  AutoPreviewGenerationManager.inst.scheduleFirst(timer);
+	    	  PushNamedStream.schedule(timer);
+	    	  
 	    	  
 	      }
 	   }	

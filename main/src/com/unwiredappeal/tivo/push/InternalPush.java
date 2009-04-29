@@ -54,7 +54,7 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 			Log.error("Failed to login to tivo-push-control: " + tivo.getUsername() + ", " + tivo.getPassword());
 			return false;
 		}
-		PushNamedStream ps = new PushNamedStream(de, qual);
+		PushNamedStream ps = new PushNamedStream(de, qual, tivo.getTsn());
 		ps.setContentType(mimeType);		
 		Hashtable<String, String> videoInfo = new Hashtable<String, String>();		
 		// tsn, url, title, description, mime, duration

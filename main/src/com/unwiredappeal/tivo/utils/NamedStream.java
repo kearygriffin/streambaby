@@ -100,7 +100,7 @@ public class NamedStream /* extends FilterInputStream */ {
 	}
 
 
-	private static void deregisterStream(String streamName) {
+	public static void deregisterStream(String streamName) {
 		Log.debug("DeRegistering named stream: " + streamName);
 		streamMap.remove(streamName);
 	}

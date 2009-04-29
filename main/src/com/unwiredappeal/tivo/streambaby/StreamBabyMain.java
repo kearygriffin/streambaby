@@ -21,10 +21,10 @@ public class StreamBabyMain  {
    public static String FIRSTIME_SCRIPT = "scripts/first-run.bsh";
    public static void main(String argv[]) throws Exception
     {
-
-	  System.err.println("Initializing...");
-	  
 	  Version version = new Version();
+
+	  System.err.println("Initializing " + version.getVersionString() + "...");
+	  
 	  ArgumentList al = new ArgumentList(argv);
 	  boolean isVer = al.getBoolean("--version");
 	  if (isVer) {

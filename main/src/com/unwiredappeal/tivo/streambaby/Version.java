@@ -32,6 +32,9 @@ public class Version {
 		}
 	}
 	public String getVersionString() {
-		return appName + " " + "v" + version;
+		String v = "v";
+		if (version.length() > 0 && !Character.isDigit(version.charAt(0)))
+			v = "";
+		return appName + " " + v + version;
 	}
 }

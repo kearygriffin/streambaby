@@ -42,6 +42,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static String DEFAULT_VIDEO_DIR = "videos";
 	public static String DEFAULT_TITLE = "Stream, Baby, Stream";
 	public static String CONFIG_FILE = "streambaby.ini";
+	public static String CONFIG_FILE_LOCAL = "streambaby.local.ini";	
 	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,raw,3gp,mov,flv";
 
 	
@@ -453,7 +454,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgPytivoIp = new ConfigEntry(
 			"pytivo.ip",
-			"localhost",
+			"",
 			"IP address of pytivo"
 			);
 	
@@ -716,20 +717,20 @@ public class StreamBabyConfig extends ConfigurableObject {
 		}
 		// Next, try user dir
 		if (ConfigurationManager.inst.attemptLoadProps(System.getProperty("user.home")
-				+ File.separator + CONFIG_FILE))
+				+ File.separator + configFile))
 			return true;
 		
 		// Next, try user dir
 		if (ConfigurationManager.inst.attemptLoadProps(System.getProperty("user.home")
-				+ File.separator + ".streambaby" + File.separator + CONFIG_FILE))
+				+ File.separator + ".streambaby" + File.separator + configFile))
 			return true;
 
 		// and the current directory
-		if (ConfigurationManager.inst.attemptLoadProps(CONFIG_FILE))
+		if (ConfigurationManager.inst.attemptLoadProps(configFile))
 			return true;
 
 		// then 
-		if (ConfigurationManager.inst.attemptLoadProps(streamBabyDir + File.separator + CONFIG_FILE))
+		if (ConfigurationManager.inst.attemptLoadProps(streamBabyDir + File.separator + configFile))
 			return true;
 		
 		return false;
@@ -740,12 +741,13 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public boolean readConfiguration(String configFile) {
 		if (configRead)
 			return true;
-		if (_readConfiguration(configFile) == true) {
-			processConfiguration();
-			return true;
-		}
+		if (configFile == null || configFile.length() == 0)
+			configFile = CONFIG_FILE;
+
+		boolean ok = _readConfiguration(configFile); 
+		ok = ok | _readConfiguration(CONFIG_FILE_LOCAL);
 		processConfiguration();
-		return false;
+		return ok;
 	}
 	
 	public boolean readConfiguration(Map<String, String> props) {

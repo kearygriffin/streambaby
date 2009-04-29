@@ -1,4 +1,6 @@
 ===SVN==
+ * Added support for loading streambaby.local.ini in additiojn to streambaby.ini
+ * Default is disable pyTivo push (pytivo.ip=)
  * abstracted push interface
  * Added internal push based on moyekj's port of mind.py
  * new ini parameters for push: tivo.username, tivo.password, tivo.1=,tivo.1.tsn=,tivo.1.username=,tivo.1.password=,tivo.1.external=(true/false)
