@@ -2,8 +2,8 @@
 # ./streambaby --help for more configuration file options
 #
 
-#dir.1=/home/someone/videos
-#dir.1.name=Someones videos
+dir.1=/path/to/my/videos
+dir.1.name=My Videos
 #dir.2=/media/disk
 #dir.2.name=External Drive
 # Ip address to bind to

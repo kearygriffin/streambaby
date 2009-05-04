@@ -86,12 +86,15 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		videoInfo.put("size", Long.toString((long)(estSize*EST_SIZE_FACTOR)));
 		MetaData meta = new MetaData();
 		de.getMetadata(meta);
-		if (meta.getTitle() != null) {
-			videoInfo.put("title", meta.getTitle());
-		}
+		String title = de.getName();
+		if (meta.getTitle() != null)
+			title = meta.getTitle();
+			
+		videoInfo.put("title", title);
+		videoInfo.put("source", title);
+		
 		if (meta.getTextDescription() != null)
 			videoInfo.put("description", meta.getTextDescription());
-		videoInfo.put("source", "Streambaby");
 		try {
 			boolean b = mind.pushVideo(videoInfo);
 			if (!b) {
