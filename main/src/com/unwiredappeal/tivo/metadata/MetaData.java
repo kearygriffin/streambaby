@@ -32,7 +32,7 @@ public class MetaData implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 	public static final int METADATA_URL = 1;
 	public static final int METADATA_STRING = 2;
 	public static final int METADATA_HTML = 3;
@@ -44,6 +44,11 @@ public class MetaData implements Serializable {
 	int dataType = -1;
 	String urlStr = null;
 	String title = null;
+	String episodeTitle = null;
+	String seriesTitle = null;
+	boolean isSimpleMetadata = false;
+	boolean basicInfoOnly = false;
+	
 	public long refModDate = -1;
 	public String refFile;
 	String desc;
@@ -62,6 +67,9 @@ public class MetaData implements Serializable {
 		copy.refFile = refFile;
 		copy.refModDate = refModDate;
 		copy.desc = desc;
+		copy.episodeTitle = episodeTitle;
+		copy.seriesTitle = seriesTitle;
+		copy.isSimpleMetadata = isSimpleMetadata;
 	}
 	
 	public String getUrl() {
@@ -288,4 +296,31 @@ public class MetaData implements Serializable {
 	public boolean hasTextDescription() {
 		return desc != null;
 	}
+	
+	public String getEpisodeTitle() {
+		return episodeTitle;
+	}
+	public void setEpisodeTitle(String episodeTitle) {
+		this.episodeTitle = episodeTitle;
+	}
+	public String getSeriesTitle() {
+		return seriesTitle;
+	}
+	public void setSeriesTitle(String seriesTitle) {
+		this.seriesTitle = seriesTitle;
+	}
+
+	public boolean isSimpleMetadata() {
+		return isSimpleMetadata;
+	}
+	public void setSimpleMetadata(boolean isSimpleMetadata) {
+		this.isSimpleMetadata = isSimpleMetadata;
+	}
+	public boolean isBasicInfoOnly() {
+		return basicInfoOnly;
+	}
+	public void setBasicInfoOnly(boolean basicInfoOnly) {
+		this.basicInfoOnly = basicInfoOnly;
+	}
+
 }

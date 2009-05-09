@@ -398,10 +398,16 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	public static ConfigEntry cfgUseTitleCachedOnly = new ConfigEntry(
 			"use.title.cachedonly",
-			"true",
+			"false",
 			"Only use cached titles in selection list"
 			);
 
+	public static ConfigEntry cfgPyTivoTitleOnly = new ConfigEntry(
+			"use.title.pyonly",
+			"true",
+			"Only use pyTivo metadata for generating selection screen"
+			);
+	
 	public static ConfigEntry cfgSortByFilename= new ConfigEntry(
 			"sort.filename",
 			"false",
@@ -489,6 +495,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"external url to use for external pushes"
 			);
 	
+	public static ConfigEntry cfgUsePushFolders = new ConfigEntry(
+			"push.folders",
+			"true",
+			"Push into folders for series"
+			);
+
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
@@ -740,21 +752,25 @@ public class StreamBabyConfig extends ConfigurableObject {
 
 	}
 
-	public boolean readConfiguration(String configFile) {
+	public boolean readConfiguration(String[] configFiles) {
 		if (configRead)
 			return true;
 		boolean specified = true;
-		if (configFile == null || configFile.length() == 0) {
+		if (configFiles == null || configFiles.length == 0) {
 			specified = false;
-			configFile = CONFIG_FILE;
+			configFiles = new String[] { CONFIG_FILE, CONFIG_FILE_LOCAL } ;
 		}
 
-		boolean ok = _readConfiguration(configFile, specified); 
-		ok = ok | _readConfiguration(CONFIG_FILE_LOCAL, false);
+		boolean ok = false;
+		for (String cf : configFiles) {
+			ok |= _readConfiguration(cf, specified);
+		}
+		//ok = ok | _readConfiguration(CONFIG_FILE_LOCAL, false);
 		processConfiguration();
 		return ok;
 	}
 	
+	/*
 	public boolean readConfiguration(Map<String, String> props) {
 		if (configRead)
 			return true;
@@ -762,6 +778,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 		processConfiguration();
 		return true;
 	}
+	*/
 
 	public String getConfigHelp() {
 		return ConfigurationManager.inst.getHelpString();

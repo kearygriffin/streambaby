@@ -256,7 +256,7 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 	    	  super.initFactory(appClassName, loader, args);
 	    	  
 	    	  String configFile = args.getValue("config", null);
-	    	  StreamBabyConfig.inst.readConfiguration(configFile);
+	    	  StreamBabyConfig.inst.readConfiguration(null);
 	    	  this.title = StreamBabyConfig.cfgTitle.value;
 	    	  scheduleTasks();
 	    	  //fillVidInfoCache();

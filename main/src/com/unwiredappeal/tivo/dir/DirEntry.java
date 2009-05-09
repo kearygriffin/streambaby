@@ -82,19 +82,32 @@ public class DirEntry implements Comparable<DirEntry> {
 	}
 	
 	public String getName() {
+		
 		if (name != null)
 			return name;
+			
 		if (!StreamBabyConfig.cfgUseTitle.getBool())
 			return getStrippedFilename();
 		String cachedTitle = TitleCacher.getInstance().getCachedTitle(uri);
 		if (cachedTitle != null)
 			return cachedTitle;
+		boolean foundMeta = false;
+		MetaData m = new MetaData();
 		if (!cachedMeta && !StreamBabyConfig.cfgUseTitleCachedOnly.getBool()) {
-			MetaData m = new MetaData();
-			getMetadata(m);
+			if (StreamBabyConfig.cfgPyTivoTitleOnly.getBool()) {
+				m.setBasicInfoOnly(true);
+				foundMeta = VideoModuleHelper.inst.setMetadata(m, this);
+				if (foundMeta) {
+					TitleCacher.getInstance().setCachedTitle(uri, m);
+				}
+			}
+			else {
+				getMetadata(m);
+				foundMeta = hasMeta;
+			}
 		}
-		if (hasMeta && meta.hasTitle() && meta.getTitle().length() > 0) {
-			return meta.getTitle();
+		if (foundMeta && (!StreamBabyConfig.cfgPyTivoTitleOnly.getBool() || m.isSimpleMetadata()) && m.hasTitle() && m.getTitle().length() > 0) {
+			return m.getTitle();
 		} else {
 			return getStrippedFilename();
 		}

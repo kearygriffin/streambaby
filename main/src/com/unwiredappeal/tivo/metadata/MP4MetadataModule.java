@@ -255,6 +255,8 @@ public class MP4MetadataModule extends BaseMetadataModule {
 	public boolean setMetadata(MetaData m, URI uri, VideoInformation vi) {
 		if (!Utils.isFile(uri))
 			return false;
+		if (m.isBasicInfoOnly())
+			return false;
 		File f = new File(uri);
 		String lowerCaseName = f.getName();
 		if (lowerCaseName.endsWith(".mp4") || lowerCaseName.endsWith(".mov") || lowerCaseName.endsWith(".m4a") || lowerCaseName.endsWith(".m4v")) {

@@ -90,8 +90,15 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		if (meta.getTitle() != null)
 			title = meta.getTitle();
 			
-		videoInfo.put("title", title);
-		videoInfo.put("source", title);
+		if (StreamBabyConfig.cfgUsePushFolders.getBool() && meta.getSeriesTitle() != null && meta.getEpisodeTitle() != null) {
+			videoInfo.put("title", meta.getSeriesTitle());
+			videoInfo.put("subtitle", meta.getEpisodeTitle());
+			videoInfo.put("source", meta.getSeriesTitle());			
+		} else {
+			videoInfo.put("title", title);
+			videoInfo.put("subtitle", title);
+			videoInfo.put("source", title);
+		}
 		
 		if (meta.getTextDescription() != null)
 			videoInfo.put("description", meta.getTextDescription());

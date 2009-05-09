@@ -67,6 +67,10 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		if (t != null)
 			meta.setTitle(t);
 		meta.setTextDescription(p.elementMap.get("description"));
+		if (isEpisodic != null && isEpisodic.equals("true") && seriesTitle != null && seriesTitle.length() > 0 && episodeTitle != null && episodeTitle.length() > 0) {
+			meta.setSeriesTitle(seriesTitle);
+			meta.setEpisodeTitle(episodeTitle);
+		}		
 	}
 	
 	public boolean initialize(StreamBabyModule parent) {
@@ -79,8 +83,10 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		SAXSource source = new SAXSource(parser, inputSource);
 		boolean b = transform(m, source, StreamBabyConfig.cfgPyTivoXsl.getValue(),
 				null);
-		if (b)
+		if (b) {
+			m.setSimpleMetadata(true);
 			setPyTivoTitle(parser, m);
+		}
 		return b;
 	}
 
@@ -116,6 +122,11 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			String isEpisodic = getFirstText(doc, "isEpisode");
 			String t = getMetaTitle(title, episodeTitle, seriesTitle, isEpisodic);
 			m.setTextDescription(getFirstText(doc, "description"));
+			if (isEpisodic != null && isEpisodic.equals("true") && seriesTitle != null && seriesTitle.length() > 0 && episodeTitle != null && episodeTitle.length() > 0) {
+				m.setSeriesTitle(seriesTitle);
+				m.setEpisodeTitle(episodeTitle);
+			}
+
 			int index = root.lastIndexOf(':');
 			if (index >= 0) {
 				root = root.substring(index + 1);
@@ -133,9 +144,12 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			}
 			boolean b = transform(m, new SAXSource(new InputSource(new StringReader(data))), xsl,
 					null);
-			if (b && t != null)
+			if (b && t != null) {
+				m.setSimpleMetadata(true);
 				m.setTitle(t);
+			}
 			return b;
+			
 
 		} catch (ParserConfigurationException e) {
 			Log.error("Error parsing xml: " + e);
@@ -236,6 +250,11 @@ public class StandardMetadataModule extends BaseMetadataModule {
 		String metaTxt = readMeta(m, f.getParentFile(), f.getName(), ".txt");
 		if (metaTxt != null && handleTxtMetadata(metaTxt, m))
 			return true;
+		String metaXml = readMeta(m, f.getParentFile(), f.getName(), ".xml");
+		if (metaXml != null && handleXmlMetadata(metaXml, m))
+			return true;
+		if (m.isBasicInfoOnly())
+			return false;
 		File metaHtml = findMeta(f.getParentFile(), f.getName(), ".html");
 		if (metaHtml != null && handleHtmlMetadata(metaHtml, m))
 			return true;
@@ -247,9 +266,6 @@ public class StandardMetadataModule extends BaseMetadataModule {
 			img = findMeta(f.getParentFile(), f.getName(), ".jpg");
 		if (img != null)
 			return handleImage(img, m);
-		String metaXml = readMeta(m, f.getParentFile(), f.getName(), ".xml");
-		if (metaXml != null && handleXmlMetadata(metaXml, m))
-			return true;
 		
 		String metaUrl = readMeta(m, f.getParentFile(), f.getName(), ".url");
 		if (metaUrl != null && handleUrlMetadata(metaUrl, m))

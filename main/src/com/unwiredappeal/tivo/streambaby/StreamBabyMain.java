@@ -2,6 +2,8 @@ package com.unwiredappeal.tivo.streambaby;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -58,8 +60,14 @@ public class StreamBabyMain  {
 		  System.exit(0);
 	  }
 
-	  String configFile = al.getValue("--config", null);
-	  boolean readConfig = StreamBabyConfig.inst.readConfiguration(configFile);
+	  List<String> configFiles = new ArrayList<String>();
+	  String configFile;
+	  do {
+		   configFile = al.getValue("--config", null);
+		   if (configFile != null)
+			   configFiles.add(configFile);
+	  } while(configFile != null);
+	  boolean readConfig = StreamBabyConfig.inst.readConfiguration(configFiles.toArray(new String[] {}));
 	  if (configFile != null && !readConfig) {
 		  System.err.println("Error loading config: " + configFile);
 		  return;

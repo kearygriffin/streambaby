@@ -79,13 +79,16 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 			defaultXsl = DEFAULT_XSL;
 		
 		List<File> xslFiles = new LinkedList<File>();
-		if (xsl != null) {
-			String[] xslSplit = xsl.split(",");
-			for (String fn : xslSplit) {
-				String xslFileName = StreamBabyConfig.convertRelativePath(fn, StreamBabyConfig.streamBabyDir + File.separator + "stylesheets");
-				File f = new File(xslFileName);
-				if (f.exists())
-					xslFiles.add(new File(xslFileName));
+		if (!m.isBasicInfoOnly()) {		
+			if (xsl != null) {
+				String[] xslSplit = xsl.split(",");
+				for (String fn : xslSplit) {
+					String xslFileName = StreamBabyConfig.convertRelativePath(fn, StreamBabyConfig.streamBabyDir + File.separator + "stylesheets");
+					File f = new File(xslFileName);
+					if (f.exists())
+						xslFiles.add(new File(xslFileName));
+				}
+				
 			}
 		}
 		if (xslFiles.isEmpty()) {
