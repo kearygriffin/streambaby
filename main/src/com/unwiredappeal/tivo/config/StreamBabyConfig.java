@@ -403,9 +403,9 @@ public class StreamBabyConfig extends ConfigurableObject {
 			);
 
 	public static ConfigEntry cfgPyTivoTitleOnly = new ConfigEntry(
-			"use.title.pyonly",
+			"use.title.simpleonly",
 			"true",
-			"Only use pyTivo metadata for generating selection screen"
+			"Only use xml/pyTivo metadata for generating selection screen"
 			);
 	
 	public static ConfigEntry cfgSortByFilename= new ConfigEntry(

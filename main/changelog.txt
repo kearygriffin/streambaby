@@ -1,6 +1,6 @@
 ===SVN==
  * Changed default of use.title.cachedonly=false
- * Added new parameter use.title.pyonly=true  to only use pytivo/xml metadata for selectionscreen
+ * Added new parameter use.title.simpleonly=true  to only use pytivo/xml metadata for selectionscreen
  * Added folder support for push
  * new config option push.folders=true to turn on pushing into folders
  * Support multiple --config options on command line
