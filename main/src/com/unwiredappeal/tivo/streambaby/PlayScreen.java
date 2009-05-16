@@ -39,7 +39,7 @@ public class PlayScreen extends ButtonScreen implements Ticker.Client {
 	int qual;
 	boolean canStream;
 	boolean canTranscode;
-	boolean isReturn;
+	//boolean isReturn;
 
 	BView mview = null;
 
@@ -51,34 +51,36 @@ public class PlayScreen extends ButtonScreen implements Ticker.Client {
 	
 
 	public void render() {
-		qual = StreamBabyConfig.inst.getDefaultQuality();
-		MetaDataViewer mv = new MetaDataViewer();
-		MetaData meta = new MetaData();
-		boolean hasMeta = de.getMetadata(meta);
-		if (hasMeta) {
-		      float stretchy = 1f;
-		      int safeY = 25;
-		      if (this.getBApp().getCurrentResolution().getHeight() == 720) {
-		    	  stretchy = 1.05f;
-		    	  safeY = 35;
-		      }
-
-			LayoutManager lm = new LayoutManager(getNormal());
-			Layout safeTitle = lm.safeTitle(this);
-			Layout layout = safeTitle;
-
-			layout = lm.relativeY(layout, false);		
-			
-			layout = lm.safeAction(layout, this, 0, safeY);
-			layout = lm.indentX(layout, -20);
-			layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
-			layout = lm.stretchHeight(layout, stretchy);
-			layout = lm.indentY(layout, 60);
-
-			int bottom = calcListLayout(5).getBounds().y;
-			int height = bottom - layout.getBounds().y;
-			height -= 20;
-			mview = mv.getView(meta, this.getNormal(), layout.getBounds().x, layout.getBounds().y, layout.getBounds().width+50, height);
+		if (!isReturn) {
+			qual = StreamBabyConfig.inst.getDefaultQuality();
+			MetaDataViewer mv = new MetaDataViewer();
+			MetaData meta = new MetaData();
+			boolean hasMeta = de.getMetadata(meta);
+			if (hasMeta) {
+			      float stretchy = 1f;
+			      int safeY = 25;
+			      if (this.getBApp().getCurrentResolution().getHeight() == 720) {
+			    	  stretchy = 1.05f;
+			    	  safeY = 35;
+			      }
+	
+				LayoutManager lm = new LayoutManager(getNormal());
+				Layout safeTitle = lm.safeTitle(this);
+				Layout layout = safeTitle;
+	
+				layout = lm.relativeY(layout, false);		
+				
+				layout = lm.safeAction(layout, this, 0, safeY);
+				layout = lm.indentX(layout, -20);
+				layout = lm.stretchWidth(layout, GLOBAL.SELECT_STRETCH);
+				layout = lm.stretchHeight(layout, stretchy);
+				layout = lm.indentY(layout, 60);
+	
+				int bottom = calcListLayout(5).getBounds().y;
+				int height = bottom - layout.getBounds().y;
+				height -= 20;
+				mview = mv.getView(meta, this.getNormal(), layout.getBounds().x, layout.getBounds().y, layout.getBounds().width+50, height);
+			}
 		}
 
 		/*

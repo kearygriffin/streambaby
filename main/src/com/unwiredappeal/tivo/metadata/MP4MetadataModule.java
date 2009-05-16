@@ -159,10 +159,10 @@ public class MP4MetadataModule extends BaseMetadataModule {
 			}
 			data.append("</meta>");
 			
-			if (metaMap.get("name") != null)
+			if (metaMap.get("tracktitle") != null)
+				m.setTitle(metaMap.get("tracktitle"));
+			else if (metaMap.get("name") != null)
 				m.setTitle(metaMap.get("name"));
-			else if (metaMap.get("tracktitle") != null)
-					m.setTitle(metaMap.get("tracktitle"));
 
 			SAXSource source = new SAXSource(new InputSource(new StringReader(data.toString())));
 			return transform(m, source, StreamBabyConfig.cfgMetaXsl.getValue(), null);		

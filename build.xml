@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project name="StreamBaby" basedir="." default="all">
-	<property name="rversion" value="0.25"/>
+	<property name="rversion" value="0.27"/>
 	<tstamp/>
 	<property name="bversion" value="${DSTAMP}-${TSTAMP}"/>
 	<property name="jbin" value="jbin"/>

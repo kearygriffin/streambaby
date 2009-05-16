@@ -1,4 +1,5 @@
-===SVN==
+===V0.27==
+ * fixed bug with overlapping metadata
  * Changed default of use.title.cachedonly=false
  * Added new parameter use.title.simpleonly=true  to only use pytivo/xml metadata for selectionscreen
  * Added folder support for push

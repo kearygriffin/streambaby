@@ -22,8 +22,8 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 </xsl:template>
 
 <xsl:template match="meta">
-	<xsl:apply-templates select="name"/>
 	<xsl:apply-templates select="tracktitle"/>
+	<xsl:apply-templates select="name"/>
 	<xsl:apply-templates select="artist"/>
 	<xsl:apply-templates select="album"/>
 	<xsl:apply-templates select="comment"/>
