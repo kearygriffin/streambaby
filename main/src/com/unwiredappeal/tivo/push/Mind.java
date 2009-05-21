@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import com.unwiredappeal.tivo.utils.EasySSLHelper;
 import com.unwiredappeal.tivo.utils.Log;
 import com.unwiredappeal.tivo.utils.SimpleCookieManager;
 
@@ -38,7 +41,7 @@ public class Mind {
          urlData = urlData + "&" + "cams_cb_password=" + encode(password);
          urlData = urlData + "&" + "cams_original_url=" + encode("/mind/mind7?type=infoGet");
          URL url = new URL(urlString);
-         URLConnection con = url.openConnection();
+         URLConnection con = EasySSLHelper.openEasySSLConnection(url);
          con.setDoOutput(true);
          OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
          out.write(urlData);
@@ -67,7 +70,8 @@ public class Mind {
          return false;
       }
    }
-   
+
+
    @SuppressWarnings("unchecked")
    public Stack<String> dict_request(String type, Hashtable data) {
       String urlString = "https://" + server + "/mind/mind7?type=" + type;
@@ -75,7 +79,7 @@ public class Mind {
          // Open connection and post data
          byte urlData[] = dictcode(data);
          URL url = new URL(urlString);
-         URLConnection con = url.openConnection();
+         URLConnection con = EasySSLHelper.openEasySSLConnection(url);
          cm.setCookies(con);
          con.setDoInput(true);
          con.setDoOutput(true);
@@ -345,7 +349,8 @@ public class Mind {
    
    public void printErrors() {
       for (int i=0; i<errors.size(); ++i)
-         System.out.println("ERROR: " + errors.get(i));
+         //System.out.println("ERROR: " + errors.get(i));
+    	 Log.error("ERROR: " + errors.get(i));
    }
    
    public void error(String error) {

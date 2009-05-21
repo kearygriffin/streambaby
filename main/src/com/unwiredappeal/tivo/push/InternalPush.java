@@ -51,6 +51,7 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		
 		Mind mind = new Mind(tivo.getMind());
 		if (!mind.login(tivo.getUsername(), tivo.getPassword())) {
+			mind.printErrors();
 			Log.error("Failed to login to tivo-push-control: " + tivo.getUsername() + ", " + tivo.getPassword());
 			return false;
 		}
@@ -105,6 +106,7 @@ public class InternalPush extends ConfigurableObject implements PushHandler {
 		try {
 			boolean b = mind.pushVideo(videoInfo);
 			if (!b) {
+				mind.printErrors();				
 				Log.error("failed to push video.");
 				ps.closeNamedStream();
 				return false;

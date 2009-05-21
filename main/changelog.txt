@@ -1,3 +1,6 @@
+===SVN===
+ * Added code to ignore self-signed certs for mind.tivo.com
+ 
 ===V0.27==
  * fixed bug with overlapping metadata
  * Changed default of use.title.cachedonly=false

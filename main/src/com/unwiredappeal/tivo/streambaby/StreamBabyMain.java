@@ -15,6 +15,7 @@ import com.unwiredappeal.tivo.config.ConfigurationManager;
 import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.streambaby.host.Main;
 import com.unwiredappeal.tivo.streambaby.tests.Tests;
+import com.unwiredappeal.tivo.utils.EasySSLHelper;
 import com.unwiredappeal.tivo.utils.Log;
 
 public class StreamBabyMain  {
@@ -130,6 +131,10 @@ public class StreamBabyMain  {
 
       if (StreamBabyConfig.cfgDeletePreviews.getBool() == true)
     	  PreviewCacheUtils.cleanup(true);
+      
+      // Allow all SSL certs
+      
+      //EasySSLHelper.install();      
       
       Main.defaultClassname = DEFAULT_CLASSNAME;
 	   Log.info("STARTING " + version.getVersionString() + "...");
