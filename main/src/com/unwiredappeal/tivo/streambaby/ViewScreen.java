@@ -682,7 +682,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			timeout_info = -1;
 		}
 		if (timeout_status > 0 && date >= timeout_status
-				&& stream.getSpeed() == 1 && isStatusBarVisible()) {
+				&& getLastSpeed() == 1 && isStatusBarVisible()) {
 			displayStatusBar(false);
 			timeout_status = -1;
 		}
@@ -857,7 +857,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 	      if (!CC) enabled = false;
 	      if (cc == null) enabled = false;
 	      if (stream == null) enabled = false;
-	      if (stream != null && stream.getSpeed() != 1) enabled = false;
+	      if (stream != null && getLastSpeed() != 1) enabled = false;
 	      if (_statusBar != null && _statusBar.visible) enabled = false;
 
 	      if (cc != null ) {
@@ -934,7 +934,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				return true;
 			case KEY_PAUSE:
 				// Toggle between pause and play modes
-				if (stream.isPaused()) {
+				if (getLastSpeed() == 0 /*stream.isPaused() */) {
 					stream.play();
 					stream_speed = 3;
 					changeSpeed(1);
@@ -947,7 +947,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				}
 				return true;
 			case KEY_PLAY:
-				if (isStatusBarVisible() && stream.getSpeed() == 1) {
+				if (isStatusBarVisible() && getLastSpeed() == 1) {
 					displayStatusBar(false);
 				} else {
 					stream_speed = 3;

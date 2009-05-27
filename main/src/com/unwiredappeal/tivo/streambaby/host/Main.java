@@ -105,11 +105,11 @@ public class Main implements ILogger
                  interfaceList += "," + str;
               }
            }
-           if ("true".equals(System.getProperty("hme.loopback"))) {
-              interfaceList += "," + "127.0.0.1";
-           }
-           config.put("http.interfaces", interfaceList);
         }
+        if ("true".equals(System.getProperty("hme.loopback"))) {
+            interfaceList += "," + "127.0.0.1";
+         }
+        config.put("http.interfaces", interfaceList);
 
         //
         // determine list of factories

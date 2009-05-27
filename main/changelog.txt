@@ -1,6 +1,8 @@
 ===SVN===
  * Added code to ignore self-signed certs for mind.tivo.com
- 
+ * Changed isPaused code in ViewScreen to use getLastSpeed() == 0, seems more reliable?
+ * Fixed code to bind to specific IP addresses -- Code that should be run all time was stuffed in incorrect if block
+   
 ===V0.27==
  * fixed bug with overlapping metadata
  * Changed default of use.title.cachedonly=false
