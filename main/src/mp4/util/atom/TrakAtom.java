@@ -182,13 +182,20 @@ public void recomputeSize() {
    * Cut the track atom at the specified time (seconds).  The time needs to be normalized
    * to the media's time-scale.
    * @param time the normalized time, in seconds, to cut the track 
+ * @param l 
    * @param movieTimeScale the time-scale for the movie
    * @return a new track atom that has been cut
    */
-  public TrakAtom cut(float time, long movieTimeScale) {
+  public TrakAtom cut(long pos, long scale) {
     TrakAtom cutTrak = new TrakAtom();
     long mediaTimeScale = mdia.getMdhd().getTimeScale();
-    long mediaTime = (long)(Math.rint(time * mediaTimeScale));
+    long mediaTime;
+    if (mediaTimeScale == scale) {
+    	mediaTime = pos;
+    } else {
+    	mediaTime = (long)(((float)pos/(float)scale) * mediaTimeScale);
+    }
+    //= (long)(Math.rint(time * mediaTimeScale));
     MP4Log.log("DBG: media time " + mediaTime);
 //    if (edts != null) {
 //      mediaTime = edts.editTime(time, mediaTimeScale, movieTimeScale);

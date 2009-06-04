@@ -184,6 +184,10 @@ public class MoovAtom extends ContainerAtom {
     setSize(ATOM_HEADER_SIZE + newSize);
   }
 
+  public static class TimePos {
+	  public long pos;
+	  public long scale;
+  }
   /**
    * Cut the movie atom at the specified time
    * @param time the time at which the cut is performed.  Must be converted to movie time.
@@ -193,7 +197,8 @@ public class MoovAtom extends ContainerAtom {
     long movieTimeScale = mvhd.getTimeScale();
     long duration = mvhd.getDuration();
     
-    time = findAdjustedTime(time);
+    TimePos tp = findAdjustedTime(time);
+    time = (float)tp.pos / (float)tp.scale;
     MP4Log.log("DBG: Movie time " + (duration/movieTimeScale) + " sec, cut at " + time + "sec");
     MP4Log.log("\tDBG: ts " + movieTimeScale + " cut at " + (time * movieTimeScale));
     
@@ -225,7 +230,7 @@ public class MoovAtom extends ContainerAtom {
     Iterator<TrakAtom> trakIterator = getTracks();
     // iterate over each track and cut the track
     for (Iterator<TrakAtom> i = trakIterator; i.hasNext(); ) {
-      TrakAtom cutTrak = i.next().cut(time, movieTimeScale);
+      TrakAtom cutTrak = i.next().cut(tp.pos, tp.scale);
       cutMoov.addTrack(cutTrak);
       // need to convert the media time-scale to the movie time-scale
       long cutDuration = cutTrak.convertDuration(movieTimeScale);
@@ -259,14 +264,17 @@ public class MoovAtom extends ContainerAtom {
 
   /**
    */
-  public float findAdjustedTime(float time) {
+  public TimePos findAdjustedTime(float time) {
     float adjustedTime = Float.MAX_VALUE;
+    TimePos tp = new TimePos();
+    boolean hasStts = false;
     for (Iterator<TrakAtom> i = getTracks(); i.hasNext(); ) {
       TrakAtom trak = i.next();
       StblAtom stbl = trak.getMdia().getMinf().getStbl();
       long mediaTimeScale = trak.getMdia().getMdhd().getTimeScale();
       long mediaTime = (long)(time * mediaTimeScale);
-      if (stbl.getStss() != null) {
+      boolean isStts = stbl.getStss() != null;
+      if (isStts) {
         long sampleNum = stbl.getStts().timeToSample(mediaTime);
         MP4Log.log("DBG: sampleNum " + sampleNum);
         sampleNum = stbl.getStss().getKeyFrame(sampleNum);
@@ -274,19 +282,23 @@ public class MoovAtom extends ContainerAtom {
         mediaTime = stbl.getStts().sampleToTime(sampleNum);
       }
       float realTime = (float)mediaTime / mediaTimeScale;
-      if (realTime < adjustedTime)
+      if ((realTime < adjustedTime && !hasStts) || isStts) {
+    	  tp.pos = mediaTime;
+    	  tp.scale = mediaTimeScale;
     	  adjustedTime = realTime;
+      }
+      hasStts = isStts;
       String tt = "Unk";
       if (trak.getMdia().getHdlr().isVideo())
     	  tt = "Vid";
       else if (trak.getMdia().getHdlr().isSound())
     	  tt = "Snd";
       
-      MP4Log.log("DBG: trackType " + tt +
-          " spec time " + (long)(time * mediaTimeScale) + " adj time " + mediaTime +
-          " spec time sec " + (long)(time) + " adj time sec " + (mediaTime/mediaTimeScale));
+      MP4Log.log("DBG: trackType " + tt + " " + (isStts ? "(stts) " : "") + "trackTime: " + realTime + " adjustTime: " + adjustedTime + " mediaTime(" + mediaTime + "/" + mediaTimeScale +") adjTimePos(" + tp.pos + "/" + tp.scale + ")"); 
+          //" spec time " + (long)(time * mediaTimeScale) + " adj time " + mediaTime +
+          //" spec time sec " + (long)(time) + " adj time sec " + (mediaTime/mediaTimeScale));
     }
-    return adjustedTime;
+    return tp;
   }
   
   /**

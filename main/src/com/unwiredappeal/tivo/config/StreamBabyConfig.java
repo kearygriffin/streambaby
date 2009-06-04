@@ -501,6 +501,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"Push into folders for series"
 			);
 
+	public static ConfigEntry cfgCCYOffset = new ConfigEntry(
+			"cc.yoff",
+			"24",
+			"Offset from bottom for CC"
+			);
+	
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",

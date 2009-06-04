@@ -2,6 +2,8 @@
  * Added code to ignore self-signed certs for mind.tivo.com
  * Changed isPaused code in ViewScreen to use getLastSpeed() == 0, seems more reliable?
  * Fixed code to bind to specific IP addresses -- Code that should be run all time was stuffed in incorrect if block
+ * Attempt to fix MP4 audio/video sync code
+ * Added new config cc.yoff=xxx (offset from bottom of screen for closed captions, default 24)
    
 ===V0.27==
  * fixed bug with overlapping metadata

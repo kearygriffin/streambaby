@@ -7,6 +7,7 @@ import com.tivo.hme.bananas.BText;
 import com.tivo.hme.bananas.BView;
 import com.tivo.hme.sdk.HmeEvent.FontInfo;
 import com.tivo.hme.sdk.Resource.FontResource;
+import com.unwiredappeal.tivo.config.StreamBabyConfig;
 import com.unwiredappeal.tivo.streambaby.StreamBabyStream;
 
 public class bgtext {
@@ -50,7 +51,7 @@ public class bgtext {
       w = stringLength(value);
       //w = value.length()*fontSize/2;
       x = (view.getScreen().getWidth() - w)/2;
-      y = view.getHeight() - (BScreen.SAFE_ACTION_V);
+      y = view.getHeight() - StreamBabyConfig.cfgCCYOffset.getInt();
       
       // Text background
       bg = new BView(view, x, y, w, h);
