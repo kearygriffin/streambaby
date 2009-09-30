@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -177,10 +178,18 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 		Log.debug("Desc: " + desc);
 		VText _infoText = new VText(infoView, infoView.getInnerBounds().x, infoView.getInnerBounds().y, 
 				rows, siz);		
-		_infoText.setFlags(RSRC_HALIGN_CENTER | RSRC_VALIGN_TOP
+		_infoText.setFlags(RSRC_HALIGN_LEFT | RSRC_VALIGN_TOP
 				| RSRC_TEXT_WRAP);
 		_infoText.setValue(desc);
 		infoView.addInner(_infoText);
+		
+		//show time on far right
+		VText _minfoText = new VText(infoView, infoView.getInnerBounds().x, infoView.getInnerBounds().y, 
+				rows, siz);		
+		_minfoText.setFlags(RSRC_HALIGN_RIGHT | RSRC_VALIGN_TOP);
+		_minfoText.setValue(new SimpleDateFormat("h:mm a   ").format(new Date()));
+		infoView.addInner(_minfoText);
+		
 		if (hasMeta) {
 			int y = infoView.getInnerBounds().y + _infoText.getHeight() + INFO_SPACE;
 			int h = infoView.getInnerBounds().height - (_infoText.getHeight() + INFO_SPACE);
@@ -1095,6 +1104,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 			case KEY_INFO:
 				// KJM added
 				// Display file name temporarily
+				updateInfoView(); //refresh time
 				if (timeout_info == -1) {
 					timeout_info = new Date().getTime() + 1000
 							* GLOBAL.timeout_info;

@@ -32,6 +32,7 @@ import com.unwiredappeal.tivo.modules.VideoFormats;
 import com.unwiredappeal.tivo.modules.VideoModuleHelper;
 import com.unwiredappeal.tivo.push.Push;
 import com.unwiredappeal.tivo.push.Tivo;
+import com.unwiredappeal.tivo.streambaby.DeleteScreen;
 
 public class PlayScreen extends ButtonScreen implements Ticker.Client {
 
@@ -494,6 +495,25 @@ public class PlayScreen extends ButtonScreen implements Ticker.Client {
 		if (Push.getInstance().canPush(de, VideoFormats.QUALITY_SAME))
 			addPushTivoButton();
 
+		if (StreamBabyConfig.cfgShowDelete.getBool() && de.isFile()){
+			addSimpleTextButton("Delete now", new ButtonHandler() { 
+				public boolean left() {
+					popBack();
+					return true;
+				}
+				public boolean right() {
+		        	DeleteScreen delScreen = new DeleteScreen(getBApp(), de);
+		            getBApp().push(delScreen, TRANSITION_LEFT);					
+					return true;
+					
+				}
+				public boolean select() {
+		        	DeleteScreen delScreen = new DeleteScreen(getBApp(), de);
+		            getBApp().push(delScreen, TRANSITION_LEFT);				
+					return true;
+				}			
+			}, false);
+		}
 		
 		addSimpleTextButton("Go back", new ButtonHandler() { 
 			public boolean left() {

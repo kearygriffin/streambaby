@@ -43,7 +43,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static String DEFAULT_TITLE = "Stream, Baby, Stream";
 	public static String CONFIG_FILE = "streambaby.ini";
 	public static String CONFIG_FILE_LOCAL = "streambaby.local.ini";	
-	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,raw,3gp,mov,flv,ts";
+	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,raw,3gp,mov,flv";
 
 	
 	public static ConfigEntry cfgSocketStart = new ConfigEntry(
@@ -148,9 +148,10 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static ConfigEntry cfgForceTranscode = new ConfigEntry(
 			"transcode.force",
 			"false",
-			"force transcoding for video streams"
+			"force transcoding of all video streams"
 			);
 
+	
 	public static ConfigEntry cfgTmpPath= new ConfigEntry(
 			"tmp.path",
 			System.getProperty("java.io.tmpdir"),
@@ -513,6 +514,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"Offset from bottom for CC"
 			);
 	
+	public static ConfigEntry cfgShowDelete = new ConfigEntry(
+			"streambaby.delete",
+			"false",
+			"show delete option"
+			);
+	
 	// This always be last
 	public static ConfigEntry cfgModules = new ConfigEntry(
 			"module",
@@ -817,9 +824,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 				Class<ConfigurationManager> c = ConfigurationManager.class;
 				if (c != null) {
 					URL url = c.getResource(c.getSimpleName() + ".class");
-					String urlString = null;
-					if (url != null)
-						urlString = url.toString();
+					String urlString = url.toString();
 					if (urlString != null) {
 						int i;
 						i = urlString.lastIndexOf("/jbin/");

@@ -2,6 +2,7 @@
 
 package com.unwiredappeal.tivo.streambaby;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -112,8 +113,7 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 	   setTitle(this.toString());
    }
    public synchronized boolean handleEnter(Object arg, boolean isReturn) {
-	   ((StreamBabyStream)getBApp()).setCurrentScreen(this);
-
+       ((StreamBabyStream)getBApp()).setCurrentScreen(this);
 	   this.setPainting(false);
 	   resetTitle();
 	      // Clear out old list
@@ -127,7 +127,13 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
 
        //if (!isReturn)
        	//focusOnDefault();
-       
+       	
+       if(isReturn)	   
+       {
+			//refresh on return
+			doRefresh();
+	   }
+	          
        return true;
        //return super.handleEnter(arg, isReturn);
    }
@@ -180,9 +186,22 @@ public class SelectionScreen extends ScreenTemplate implements Ticker.Client {
          list.clear();
       }
  
-  
+      int i = 0;
       if ( dirEntries.size() > 0 ) {
-         list.add(dirEntries.toArray());
+    	  //check if files still exist
+    	  for (i=0; i<dirEntries.size();i++)
+    	  {
+			  File f = new File(dirEntries.get(i).uri);
+			  if(!f.exists() && dirEntries.get(i).isFile())
+			  {
+				  //do nothing
+			  }
+			  else
+			  {
+				  list.add(dirEntries.get(i));
+			  }
+    	  }
+    	  //list.add(dirEntries.toArray());
       }
         
       // If there are no entries then show message
