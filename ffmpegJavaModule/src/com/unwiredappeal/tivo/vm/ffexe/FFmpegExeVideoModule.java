@@ -41,6 +41,13 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 			"path of ffmpeg"
 			);
 	
+	public static ConfigEntry cfgFFmpegThreads = new ConfigEntry(
+			"ffmpeg.threads",
+			"1",
+			"number of threads to use for ffmpeg."
+			);
+
+	
 	/*
 	public static ConfigEntry cfgFFmpegStreamArgs = new ConfigEntry(
 			"ffmpegexe.streamargs",
@@ -81,7 +88,7 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 	*/
 	public static ConfigEntry cfgFFmpegTranscodeArgs = new ConfigEntry(
 			"ffmpegexe.transcode",
-			"-acodec ac3 -vcodec mpeg2video -f vob -async 1 -r ${closest.mpeg.fps} -v 0",
+			"-acodec ac3 -vcodec mpeg2video -f vob -async 1 -r ${closest.mpeg.fps} -v 0 -threads ${threads}",
 			"Arguments to use when transcoding from ffmpeg"
 			);
 	
@@ -608,6 +615,7 @@ public class FFmpegExeVideoModule extends BaseFFmpegVideoModule implements Strea
 		pr.set("xres", xres);
 		pr.set("yres", yres);
 		pr.set("closest.mpeg.fps", getClosestMpegRate(vi.getFps()));
+		pr.set("threads", cfgFFmpegThreads.getInt());
 		if (addArgs.length() > 0)
 			addArgs = " " + addArgs;
 		
