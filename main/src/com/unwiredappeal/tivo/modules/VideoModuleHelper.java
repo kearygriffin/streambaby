@@ -86,10 +86,11 @@ public class VideoModuleHelper {
 		URI uri = de.getUri();
 		VideoInformation vinfo = de.getVideoInformation();
 		boolean disableTranscode = StreamBabyConfig.cfgDisableTranscode.getBool();
+		boolean forceTranscode = StreamBabyConfig.cfgForceTranscode.getBool();		
 		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new NullGetPriority());
 		while(it.hasNext()) {
 			VideoHandlerModule m = it.next();
-			if (m.canStream(uri, vinfo)) {
+			if (!forceTranscode && m.canStream(uri, vinfo)) {
 				return true;
 			}
 			if (!disableTranscode && m.canTranscode(uri, vinfo))
@@ -135,6 +136,9 @@ public class VideoModuleHelper {
 	}
 	
 	public boolean canStream(DirEntry de) {
+		boolean forceTranscode = StreamBabyConfig.cfgForceTranscode.getBool();		
+		if (forceTranscode)
+			return false;
 		URI uri = de.getUri();
 		VideoInformation vinfo = de.getVideoInformation();
 		Iterator<VideoHandlerModule> it = getVideoModulesIterator(de, new NullGetPriority());
@@ -240,6 +244,9 @@ public class VideoModuleHelper {
 	}
 	
 	public String getStreamableVideoMimeType(DirEntry de) {
+		boolean forceTranscode = StreamBabyConfig.cfgForceTranscode.getBool();		
+		if (forceTranscode)
+			return null;
 		URI uri = de.getUri();
 		VideoInformation vinfo = de.getVideoInformation();
 		String mt = null;
@@ -256,7 +263,6 @@ public class VideoModuleHelper {
 				
 		}
 		return mt;
-		
 	}
 	public String getTranscodedVideoMimeType(DirEntry de, int qual) {
 		URI uri = de.getUri();

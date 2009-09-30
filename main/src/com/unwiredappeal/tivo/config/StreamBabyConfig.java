@@ -43,7 +43,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	public static String DEFAULT_TITLE = "Stream, Baby, Stream";
 	public static String CONFIG_FILE = "streambaby.ini";
 	public static String CONFIG_FILE_LOCAL = "streambaby.local.ini";	
-	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,raw,3gp,mov,flv";
+	public static String CONFIG_DEFAULT_EXTS = "mp4,mpeg,vob,mpg,mpeg2,mp2,avi,wmv,asf,mkv,tivo,m4v,raw,3gp,mov,flv,ts";
 
 	
 	public static ConfigEntry cfgSocketStart = new ConfigEntry(
@@ -143,6 +143,12 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"transcode.disable",
 			"false",
 			"disable transcoding for incompatible video streams"
+			);
+
+	public static ConfigEntry cfgForceTranscode = new ConfigEntry(
+			"transcode.force",
+			"false",
+			"force transcoding for video streams"
 			);
 
 	public static ConfigEntry cfgTmpPath= new ConfigEntry(
@@ -811,7 +817,9 @@ public class StreamBabyConfig extends ConfigurableObject {
 				Class<ConfigurationManager> c = ConfigurationManager.class;
 				if (c != null) {
 					URL url = c.getResource(c.getSimpleName() + ".class");
-					String urlString = url.toString();
+					String urlString = null;
+					if (url != null)
+						urlString = url.toString();
 					if (urlString != null) {
 						int i;
 						i = urlString.lastIndexOf("/jbin/");

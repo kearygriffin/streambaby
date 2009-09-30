@@ -30,7 +30,7 @@ import com.unwiredappeal.tivo.utils.Utils;
 
 public class StandardMetadataModule extends BaseMetadataModule {
 
-	private static Pattern pyTivoPattern = Pattern.compile("^\\w+\\s+:\\s+.*");
+	private static Pattern pyTivoPattern = Pattern.compile("^\\w+\\s*:.*");
 	//private static Pattern pyTivoTitlePattern= Pattern.compile(".*^title\\s+:\\s+([^\n\r]+)$.*", Pattern.MULTILINE|Pattern.DOTALL);
 	private static Pattern urlSchemePattern = Pattern.compile("\\w+://.*");
 
