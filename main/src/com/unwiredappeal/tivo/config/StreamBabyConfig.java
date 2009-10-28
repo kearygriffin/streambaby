@@ -516,7 +516,7 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	public static ConfigEntry cfgShowDelete = new ConfigEntry(
 			"streambaby.delete",
-			"false",
+			"true",
 			"show delete option"
 			);
 	

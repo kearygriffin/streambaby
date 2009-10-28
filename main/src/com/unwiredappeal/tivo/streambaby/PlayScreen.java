@@ -39,6 +39,7 @@ public class PlayScreen extends ButtonScreen implements Ticker.Client {
 	private DirEntry de;
 	int qual;
 	boolean canStream;
+	boolean isMore = false;
 	boolean canTranscode;
 	//boolean isReturn;
 
@@ -495,6 +496,13 @@ public class PlayScreen extends ButtonScreen implements Ticker.Client {
 		if (Push.getInstance().canPush(de, VideoFormats.QUALITY_SAME))
 			addPushTivoButton();
 
+		isMore = false;
+
+		if (StreamBabyConfig.cfgShowDelete.getBool() && de.isFile()){
+			isMore = true;
+		}
+
+		/*
 		if (StreamBabyConfig.cfgShowDelete.getBool() && de.isFile()){
 			addSimpleTextButton("Delete now", new ButtonHandler() { 
 				public boolean left() {
@@ -502,36 +510,59 @@ public class PlayScreen extends ButtonScreen implements Ticker.Client {
 					return true;
 				}
 				public boolean right() {
-		        	DeleteScreen delScreen = new DeleteScreen(getBApp(), de);
-		            getBApp().push(delScreen, TRANSITION_LEFT);					
+					doDelete();
 					return true;
 					
 				}
 				public boolean select() {
-		        	DeleteScreen delScreen = new DeleteScreen(getBApp(), de);
-		            getBApp().push(delScreen, TRANSITION_LEFT);				
+					doDelete();
 					return true;
 				}			
 			}, false);
 		}
+		*/
 		
-		addSimpleTextButton("Go back", new ButtonHandler() { 
+		BButtonPlus<ButtonHandler > gbButton = addSimpleTextButton("Go back", new ButtonHandler() { 
 			public boolean left() {
 				popBack();
 				return true;
 			}
 			public boolean right() {
-				return popBack();
+				if (!isMore)
+					return popBack();
+				else
+				{
+			    	MoreScreen moreScreen = new MoreScreen(getBApp(), de);
+			        getBApp().push(moreScreen, TRANSITION_LEFT);					
+					return true;
+				}
 			}
 			public boolean select() {
 				return popBack();
 			}			
 		}, true);
+		
+
+		if (isMore) {
+			BTextPlus<String> bt = new BTextPlus<String>(gbButton, 10, 0, gbButton
+					.getWidth() - 50, gbButton.getHeight());
+			bt.setFlags(RSRC_HALIGN_RIGHT);
+			bt.setShadow(true);
+			bt.setValue("More        ");
+			bt.setColor(getDefaultTextColor());
+			bt.setFont(getDefaultFont());
+			ButtonHandler h = gbButton.getValue();
+			h.childViews.add(bt);
+		}
 
 		return 0;
 		
 	}
 
+	private void doDelete() {
+    	DeleteScreen delScreen = new DeleteScreen(getBApp(), de, 2);
+        getBApp().push(delScreen, TRANSITION_LEFT);					
+	}
 
 	private boolean beginPlay(boolean reset) {
 		if (reset == true) {
@@ -552,6 +583,12 @@ public class PlayScreen extends ButtonScreen implements Ticker.Client {
 			return true;
 		Log.debug("code=" + code + " rawcode=" + rawcode);
 		switch (code) {
+		case KEY_CLEAR:
+			if (StreamBabyConfig.cfgShowDelete.getBool() && de.isFile()){
+				play("right.snd");				
+				doDelete();
+				return true;
+			}			
 		case KEY_CHANNELUP:
 		case KEY_CHANNELDOWN:
 			if (mview != null)

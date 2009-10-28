@@ -10,10 +10,12 @@ public class DeleteScreen extends ButtonScreen {
 
 	public String screenTitle = "Delete";
 	private DirEntry de;
+	int pops = 1;
 	
 
-	public DeleteScreen(BApplicationPlus app, DirEntry de) {
+	public DeleteScreen(BApplicationPlus app, DirEntry de, int pops) {
 		super(app);
+		this.pops = pops;
 		this.de = de;
 	}
 	
@@ -63,8 +65,8 @@ public class DeleteScreen extends ButtonScreen {
 							}
 						}						
 					};					
-					popBack();
-					popBack();
+					for (int i=0;i<pops;i++)
+						popBack();
 					getBApp().push(new SingleActionScreen(app, action, de.getStrippedFilename()), TRANSITION_LEFT);
 					return true;
 				}
@@ -86,8 +88,8 @@ public class DeleteScreen extends ButtonScreen {
 							}
 						}						
 					};					
-					popBack();
-					popBack();
+					for (int i=0;i<pops;i++)
+						popBack();
 					getBApp().push(new SingleActionScreen(app, action, de.getStrippedFilename()), TRANSITION_LEFT);
 					return true;
 				}			
