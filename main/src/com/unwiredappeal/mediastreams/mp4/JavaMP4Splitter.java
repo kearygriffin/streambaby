@@ -61,6 +61,8 @@ public class JavaMP4Splitter extends MP4Streamer {
 							}
 						}
 					}).start();
+				} else {
+					mp4file.close();
 				}
 			} catch (IOException e) {
 				try {
