@@ -51,11 +51,13 @@ public class JavaMP4Splitter extends MP4Streamer {
 						public void run() {
 							try {
 								writeSplitMp4(new DataOutputStream(po));
+								mp4file.close();
 								po.close();
 							} catch (IOException e) {
 								Log.error("IOException: " + e);
 								try {
 									po.close();
+									mp4file.close();
 								} catch (IOException e1) {
 								}
 							}

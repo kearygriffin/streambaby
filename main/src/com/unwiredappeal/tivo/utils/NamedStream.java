@@ -16,6 +16,7 @@ public class NamedStream /* extends FilterInputStream */ {
 	//public InputStream is = null;
 	boolean isClosed = false;
 	private long dur = -1;
+	private long length = -1;
 	public String name;
 	public static final String NAMED_STREAM_EXT = ".stream";
 	private String contentType;
@@ -35,20 +36,21 @@ public class NamedStream /* extends FilterInputStream */ {
 		
 	}
 	public NamedStream(InputStream is) {
-		this(is, -1);
+		this(is, -1, -1);
 	}
 	
-	public NamedStream(InputStream is, long dur) {
-		this(is, UUID.randomUUID().toString(), dur);
+	public NamedStream(InputStream is, long dur, long length) {
+		this(is, UUID.randomUUID().toString(), dur, length);
 	}
 
 	public String getStreamName() {
 		return name + NAMED_STREAM_EXT;
 	}
 
-	public NamedStream(InputStream is, String name, long dur) {
+	public NamedStream(InputStream is, String name, long dur, long length) {
 		this(is, name);
 		setDuration(dur);
+		setLength(length);
 	}
 	
 	protected NamedStream(String name) {
@@ -72,6 +74,10 @@ public class NamedStream /* extends FilterInputStream */ {
 		dur = d;
 	}
 	
+	public void setLength(long l) {
+		length = l;
+	}
+	
 	public boolean isClosed() {
 		return isClosed;
 	}
@@ -85,6 +91,10 @@ public class NamedStream /* extends FilterInputStream */ {
 	
 	public InputStream open() throws IOException {
 		return this.is;
+	}
+	
+	public long getLength() {
+		return length;
 	}
 	
 	public static NamedStream getNamedStream(String streamName) {

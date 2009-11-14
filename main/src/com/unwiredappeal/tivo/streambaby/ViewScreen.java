@@ -536,7 +536,7 @@ public class ViewScreen extends ScreenTemplate implements Ticker.Client,
 				if (startPosition != 0)
 					startPosition = getVideoLength() - subDuration;
 				startMimeType = is.getMimeType();
-				namedStream = new NamedStream(is.getInputStream(), subDuration);
+				namedStream = new NamedStream(is.getInputStream(), subDuration, is.getLength());
 				namedStream.setContentType(is.getContentType());
 				queuedToPlay = true;
 				played = false;

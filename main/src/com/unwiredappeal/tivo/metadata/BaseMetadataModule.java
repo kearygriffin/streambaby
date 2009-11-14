@@ -127,9 +127,10 @@ public abstract class BaseMetadataModule extends ConfigurableObject implements S
 			}
 			resultStr = sw.toString();
 		}
-		if (resultStr != null)
+		if (resultStr != null && resultStr.length() > 0) {
 			m.setString(resultStr);
-		Log.debug(resultStr);
+			Log.debug(resultStr);
+		}
 		return resultStr != null;
 	}
 

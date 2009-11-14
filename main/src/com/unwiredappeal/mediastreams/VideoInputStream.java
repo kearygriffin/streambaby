@@ -10,4 +10,5 @@ public interface VideoInputStream {
 	public InputStream getInputStream();
 	public long getSubDuration();
 	public boolean canPosition();
+	public long getLength();
 }

@@ -11,6 +11,8 @@ public class VideoInputStreamWrapper extends FilterInputStream implements VideoI
 	public String mime;
 	public String contentType;
 	public long dur;
+	
+	private long length = -1;
 	public boolean canRandomPosition = true;
 	public VideoInputStreamWrapper(long dur, InputStream is, VideoInformation vi, String mime) {
 		super(new BufferedInputStream(is, BUFFER_SIZE));
@@ -43,6 +45,14 @@ public class VideoInputStreamWrapper extends FilterInputStream implements VideoI
 
 	public boolean canPosition() {
 		return canRandomPosition;
+	}
+	
+	public long getLength() {
+		return length;
+	}
+	
+	public void setLength(long length) {
+		this.length = length;
 	}
 
 }

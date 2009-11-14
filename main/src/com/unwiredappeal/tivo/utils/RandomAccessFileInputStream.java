@@ -14,14 +14,22 @@ public class RandomAccessFileInputStream extends RandomAccessInputStream {
 	int curBufSize = 0;
 	RandomAccessFile fp;
 	long markPos;
+	long fileLength = -1;
 	byte[] singlebyteb = new byte[1];
 
 	
 	public RandomAccessFileInputStream(File file, int bufferSize)
 			throws FileNotFoundException {
 		fp = new RandomAccessFile(file, "r");
+		try {
+			fileLength = fp.length();
+		} catch(IOException e) { }
 		buf = new byte[bufferSize];
 		resetBuffer();
+	}
+	
+	public int available() {
+		return (int)(fileLength == -1 ? -1 : fileLength - filePos);
 	}
 	
 	public RandomAccessFileInputStream(File file)

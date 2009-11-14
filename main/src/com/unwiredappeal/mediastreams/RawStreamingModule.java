@@ -73,6 +73,7 @@ public class RawStreamingModule extends BaseVideoHandlerModule implements Stream
 			File f = new File(uri);
 			InputStream is = new RandomAccessFileInputStream(f);
 			VideoInputStreamWrapper vis = new VideoInputStreamWrapper(vi.getDuration(), is, vi, mimeType);
+			vis.setLength(is.available());
 			vis.setContentType(contentType);
 			vis.canRandomPosition = false;
 			return vis;

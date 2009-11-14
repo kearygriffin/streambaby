@@ -39,4 +39,8 @@ public class SocketProcessVideoInputStream extends SocketProcessInputStream impl
 		return true;
 	}
 	
+	public long getLength() {
+		return -1;
+	}
+	
 }

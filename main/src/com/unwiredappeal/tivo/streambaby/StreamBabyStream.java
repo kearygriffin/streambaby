@@ -180,6 +180,12 @@ public class StreamBabyStream extends BApplicationPlus implements Cleanupable {
 							String ctype = stream.getContentType();
 							if (ctype != null && ctype.length() > 0) {
 								http.addHeader("Content-Type", ctype);
+								
+							}
+							long len = stream.getLength();
+							if (len > 0) {
+								http.addHeader("Content-Range", "bytes 0-" + (len-1) + "/" + len);
+								http.addHeader("Content-Length", Long.toString(len));
 							}
 		        		 } catch(IOException e) {
 		        			 e.printStackTrace();
