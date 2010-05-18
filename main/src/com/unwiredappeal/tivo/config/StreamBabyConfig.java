@@ -805,7 +805,8 @@ public class StreamBabyConfig extends ConfigurableObject {
 	
 	private static String getCurDir() {
 		String curDir = new File(".").getAbsolutePath();
-		while(curDir != null && curDir.length() > 0 && curDir.lastIndexOf('.') == curDir.length()-1 || curDir.lastIndexOf('/') == curDir.length()-1 || curDir.lastIndexOf('\\') == curDir.length()-1) {
+		
+		while(curDir != null && curDir.length() > 1 && (curDir.lastIndexOf('.') == curDir.length()-1 || curDir.lastIndexOf('/') == curDir.length()-1 || (curDir.lastIndexOf('\\') == curDir.length()-1 && !(curDir.length() == 3 && curDir.charAt(1) == ':')))) {
 			curDir = curDir.substring(0, curDir.length()-1);
 		}
 		return curDir;
