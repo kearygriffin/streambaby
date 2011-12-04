@@ -50,5 +50,9 @@ public class ConfigEntry {
 		return ConfigurationManager.parseInt(value);
 	}
 	
+	public float getFloat() {
+		return ConfigurationManager.parseFloat(value);
+	}
+	
 	
 }
