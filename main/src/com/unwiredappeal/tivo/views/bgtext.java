@@ -1,6 +1,7 @@
 package com.unwiredappeal.tivo.views;
 
 import java.awt.Color;
+import java.lang.reflect.Field;
 
 import com.tivo.hme.bananas.BScreen;
 import com.tivo.hme.bananas.BText;
@@ -16,6 +17,7 @@ public class bgtext {
    BText text;
    BView bg;
    public int x, y, w, h, fontSize;
+   Boolean bgon = true;
 
     public bgtext(BView view, String fontSize, String value) {
 	this(view, VFont.getFontSize(view, fontSize), value);
@@ -24,6 +26,8 @@ public class bgtext {
    public bgtext(BView view, int fontSize, String value) {
 	   this.fontSize = fontSize;
 	   h = fontSize + 2;
+	   if( StreamBabyConfig.cfgCCBackground.getInt() == 0 )
+		   bgon = false;
 	   /*
       fontSize = 20;
       h = 22;
@@ -54,21 +58,42 @@ public class bgtext {
       y = view.getHeight() - StreamBabyConfig.cfgCCYOffset.getInt();
       
       // Text background
-      bg = new BView(view, x, y, w, h);
-      bg.setResource(Color.black);
-      bg.setTransparency((float)0.25);
+      if (bgon) {
+	      bg = new BView(view, x, y, w, h);
+	      bg.setResource(getColor(StreamBabyConfig.cfgCCBackgroundColor.getValue()));
+	      if (StreamBabyConfig.cfgCCBackgroundTransparency.getFloat() != 0.0)
+	    	  bg.setTransparency(StreamBabyConfig.cfgCCBackgroundTransparency.getFloat());
+      }
 
       // Text
-      text = new BText(bg, 0, 0, w, h);
-      text.setColor(Color.white);
+      if (bgon)
+    	  text = new BText(bg, 0, 0, w, h);
+      else
+    	  text = new BText(view, x, y, w, h);
+      text.setColor(getColor(StreamBabyConfig.cfgCCTextColor.getValue()));
       //String fontName = String.format("default-%d.font", fontSize);
       text.setFont(font);
-      text.setValue(value);
+      if (value != null)
+    	  text.setValue(value);
+   }
+   
+   // Returns a Color based on 'colorName' which must be one
+   // of the predefined colors in java.awt.Color.
+   // Returns null if colorName is not valid.
+   private Color getColor(String colorName) {
+	   try {
+		   // Find the field and value of colorName
+		   Field field = Class.forName("java.awt.Color").getField(colorName);
+		   return (Color)field.get(null);
+	   } catch (Exception e) {
+		   return null;
+	   }
    }
    
    public void setVisible(Boolean visible) {
       text.setVisible(visible);
-      bg.setVisible(visible);
+      if (bgon)
+    	  bg.setVisible(visible);
    }
 
 	public int stringLength(String str) {
@@ -79,11 +104,15 @@ public class bgtext {
    
    public void setLocation(int x, int y) {
       text.setLocation(x, y);
-      bg.setLocation(x, y);
+      if (bgon)
+    	  bg.setLocation(x, y);
    }
    
    public void setBounds(int x, int y, int w, int h) {
-      bg.setBounds(x, y, w, h);
+	   if (bgon)
+		   bg.setBounds(x, y, w, h);
+	   else
+		   text.setBounds(x, y, w, h);
    }
    
    public void setValue(String value) {
@@ -104,13 +133,15 @@ public class bgtext {
    
    public void clearResource() {
       text.clearResource();
-      bg.clearResource();
+      if (bgon)
+    	  bg.clearResource();
    }
    
    public void remove() {
       text.setValue(null);
       clearResource();
       text.remove();
-      bg.remove();
+      if (bgon)
+    	  bg.remove();
    }
 }
