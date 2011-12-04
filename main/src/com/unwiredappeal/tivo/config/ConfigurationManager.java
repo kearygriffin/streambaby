@@ -111,6 +111,16 @@ public class ConfigurationManager {
 		return p;
 	}
 	
+	public static float parseFloat(String s) {
+		float p = (float)0.0;
+		try {
+			p = Float.parseFloat(s);
+		} catch(NumberFormatException e) { 
+			return (float)0.0;
+		}
+		return p;
+	}
+	
 	public static boolean parseBool(String val) {
 		return !(val.startsWith("f") || val.compareTo("0") == 0);
 	}
