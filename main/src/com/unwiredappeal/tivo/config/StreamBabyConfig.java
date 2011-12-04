@@ -444,7 +444,36 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"small",
 			"Size of font as either absolute integer, or medium, small, tiny"
 			);
-	
+
+	public static ConfigEntry cfgCCYOffset = new ConfigEntry(
+			"cc.yoff",
+			"24",
+			"Offset from bottom for CC"
+			);	
+
+	public static ConfigEntry cfgCCBackgroundTransparency = new ConfigEntry(
+			"cc.background.transparency",
+			"0.25",
+			"CC background transparency (0=>off)"
+			);	
+
+	public static ConfigEntry cfgCCBackground = new ConfigEntry(
+			"cc.background",
+			"1",
+			"CC background (1=>on 0=>off)"
+			);	
+
+	public static ConfigEntry cfgCCBackgroundColor = new ConfigEntry(
+			"cc.backgroundcolor",
+			"black",
+			"CC background color"
+			);	
+
+	public static ConfigEntry cfgCCTextColor = new ConfigEntry(
+			"cc.textcolor",
+			"white",
+			"CC text color"
+			);	
 
 	public static ConfigEntry cfgDisableVidInfoMeta= new ConfigEntry(
 			"meta.vidinfo.disable",
@@ -506,12 +535,6 @@ public class StreamBabyConfig extends ConfigurableObject {
 			"push.folders",
 			"true",
 			"Push into folders for series"
-			);
-
-	public static ConfigEntry cfgCCYOffset = new ConfigEntry(
-			"cc.yoff",
-			"24",
-			"Offset from bottom for CC"
 			);
 	
 	public static ConfigEntry cfgShowDelete = new ConfigEntry(
