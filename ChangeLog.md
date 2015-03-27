@@ -1,0 +1,186 @@
+For the latest changes in svn, please see: http://code.google.com/p/streambaby/source/browse/trunk/main/changelog.txt
+### V0.25 ###
+  * Force transcoding of MP4's if profile > High or Level > 41
+  * Internal reorg--  Get icon for display from parsed file type (folder, video, dvd, etc)
+  * Changed re-interleaving code to work based on DTS (decoding time stamp) rather than PTS (presentation time stamp)
+  * pytivo-html.xsl supports image : tag with URL to image to use in metadata
+  * Internal changes to possibly support another MP4 pseudo-streaming module
+  * added config option hme.res to set hme resolution to use
+  * Added Yoav's patches to add HD support
+  * Force transcode if audio is not 44100k or 48000k
+  * When transcoding force sample rate of 44100k or 48000k
+  * Change default to HD
+  * Change default xsl for pytivo metadata to HTML version
+
+
+### V0.24 ###
+  * Added stack trace printout to Listener when catching uncaught exceptions
+  * disabled using ffmpeg to gather metadata.
+    * new config: meta.vidinfo.disable=true  set to false to re-enable ffmpeg gathering of metadata
+
+  * Added more exception handling to mp4 metadata parsing code
+### V.023beta ###
+  * Attempt to fix ffmpeg crashes in av\_close\_input\_file (function frees structure, but JNA attempts to read it back after call completes)
+  * Change method of parsing title for pyTivo & tivo XML files
+  * Fixed bug causing crashes if dir.x did not exit (in cache cleanup code)
+  * Optimized & fixed bugs in mp4 metadata reading
+
+### V0.22beta ###
+  * Changed default for quality.2channel to zero, effectively disabling it.  Newer ffmpeg doesn't like to do this for 5.1 aac -> 2 channel ac3
+  * Added support for new ffmpeg, AVStream->sample\_aspect\_ratio
+  * Added 3gp, mov to supported extension
+  * Undid previous mp4 changes to skip reinterleave under certain circumstances.
+  * Added metadata parsing.  Metadata is displayed on "Play" screen and when pressing the info button while playing
+    * Metadata is looked for in the form "filename.mpg.xxx" where xxx the metadata extension.
+    * Metadata is looked for in the same directory of the video file, or in a subdirectory of the directory where the main file is called .meta
+    * Metadata supported:
+    * .txt files-  Either a pyTivo metadata file or a standard txt file (autodetected)
+    * .html
+    * .xml
+    * .gif, .png, .jpg:  Use as straight images.  New config property info.preserveaspect=true to control if img is allowed to be stretched
+    * Metadata is transformed using XSL into either straight txt or html (either is OK)
+    * new INI options: xsl.pytivo= and xsl.txt=
+      * Points to the xslt file to use to transform the respective formats.  Can be chained (so xsl.pytivo=pytivo.xsl,pretty.xsl would apply both xsl stylesheets)
+      * For pytivo the xml fed in is each "key" (value before the colon) is an element, and the text for that key is the text for the element (as cdata).
+        * Whole file is wrapped in 
+
+&lt;pytivo&gt;
+
+  
+
+&lt;/pytivo&gt;
+
+
+      * For txt the xml is the whole text file wrapped in 
+
+&lt;txt&gt;
+
+ 
+
+&lt;/txt&gt;
+
+ (as cdata)
+    * For XML metadata, a config entry is looked for in the form xsl.xxxx where xxx is the name of root element of the xml file
+      * this is the config entry to determine the XSLT chain to use for this type of XML
+      * For tivo this is tvbusenvelope, so the config entry is xsl.tvbusenvelope, and the default is tivo-pyxml.xsl,pytivo-text.xsl (so convert to pytivo xml format, then use pytivo XSL to convert to streambaby format)
+      * If the above config entry is not found, stylesheets/xxxx.xsl is looked for to use (where xxxxx is the name of the root element)
+    * There are two supplied default stylesheets for pytivo (and thus for tivo xml format als)
+      * pytivo-text.xsl:  Transforms the metadata into pure text for display.  Text looks nice.
+      * pytivo-html.xsl:  Transforms the metadata into HTML for display.  Font's can look a bit rough, but more flexible.
+      * the default is pytivo-text.xsl
+    * metadata is also read from MP4 files into xml in the format 
+
+&lt;meta&gt;
+
+ 
+
+&lt;tag&gt;
+
+xxx
+
+&lt;/tag&gt;
+
+  
+
+&lt;tag&gt;
+
+xxx
+
+&lt;/tag&gt;
+
+  
+
+&lt;/meta&gt;
+
+
+      * xsl.meta determines the XSL to use.  Default=meta-html.xsl.  meta-text.xsl is also available
+        * Supports artwork, which is why meta-html is the default
+    * mp4 metadata processing can be turned off with meta.mp4.disable=true
+    * config entry use.title.cachedonly= (default true), only use metadata for titles if the metadata has already been processed and cached
+    * Pressing the enter key on selection screen causes streambaby to try and cache all metadata for the directory.
+  * INI entry use.title= (default true) to use the title from the metadata instead of filename for listings
+  * INI entry sort.filename= (default false).  If true, streambaby will sort entries in the selection screen by filename instead of metadata title
+    * If set to false, tivo use metadata title for sort.
+    * Sorting by metadata title causes a longer delay (could be very long if there are alot of movies in the directory) before rendering the selection screen if set to false
+  * Switch to current jmdns from sourceforge
+    * Required changes to build process, removal of simulator.jar from main dist, addition of hme-host-sb.jar
+    * JmDNS shutdown hook is broken (always hangs).  Hack to remove the shutdown hook
+  * Added HTML rendering code for Cobra (from lobo project), flyingsaucer xhtmlrenderer, and HTMLEditKit (built-in to java)
+    * Can set the render by setting html.renderer= in the INI file
+      * com.unwiredappeal.tivo.html.cobra.CobraRenderer for cobra (default)
+      * com.unwiredappeal.tivo.html.htmlkit.HtmlKitRenderer
+  * New INI option, info.tidy (default: true) which runs jtidy on all HTML input before passing to renderer
+  * New INI option, info.tidy.xhtml (default: true) which tells tidy to generate xhtml output.
+  * New INI option html.css to set default css for html rendering.  relative to stylesheets directory (or abs)
+    * default=streambaby.css, which doesn't exist by default (and so won't be loaded)
+  * Added new location to look for streambaby.ini.   ${user.home}/.streambaby/streambaby.ini
+  * Fixed config loading to look for streambaby.ini in ${user.home} (was ${user.dir}, which was incorrect)
+  * Added coded from moyekj for support SRT files for closed captioning/subtitles.
+    * If movie name is movie.mpg, subtitles should be in movie.srt
+    * Added new config options cc.mintime, and cc.minchartime
+      * both are in milliseconds and control the minimum time a CC is displayed on the screen (unless it needs to be erased to display another one)
+    * added new INI cc.fontsize to configure fontsize for CC.  default=20
+    * Aspect button currently turns CC on/off.  It is ON by default if a SRT file exists.
+
+
+### V0.20beta ###
+  * Added initial support for .tivo files
+    * Thanks to work by davidblackledge & wmcbrine
+    * Due to streaming bandwidth issues, tivo may have a hard time keeping up.
+    * No support for random positioning within a .tivo file--  Must always start from the beginning.
+    * Because of the above, there is no support for rebuffering at 1.1G point (and .tivo files are usually large)
+    * Due to all of the above, streaming .tivo files is not really that useful ;-)
+  * Fixed audio channels parsing support for ffmpegexe
+  * Modified MP4 streaming code to not interleave if initial audio/video chunks are with 4 megabytes of each other.
+  * If MP4 pseudo-streaming can't perform the correct positioning, try again at beginning
+    * This usually happens at the beginning of a file anyway
+  * Drop -ac parameter from default for ffmpegexe transcode
+  * Moved all assets (icons/images) into asset directory
+  * Changed icon theme.  Icons are searched in assets directory
+  * Added icon/bkg config options icon.icon=, icon.folder=, icon.movie=
+    * Files are relative to the assets directory
+  * Added new config option ignore.dotfiles.  Set to false if you want files/folders with a dot included
+  * Added new config option remember.password.  Set to false to not remember password from session to session
+  * Added support for testing-- ".raw" files
+    * Will stream to tivo without any processing
+    * Assumes video/mpeg for mimeType and Content-Type by default
+    * if file videofile.raw.fmt exists, the first line is taken as the mime type to use, and the second as the Content-Type
+  * Support for EDL file cutlists.  Looks for movie.ext.edl (so movie.mpg.edl for example)
+    * TiVo doesn't seem to really like jumping around in MP4's too much.  Not sure how good this will work for MP4
+    * MPG seems better, but I still am not sure how accurate the timings are.
+    * cut.startoffset, cut.endoffset can be used to adjust the timings in milliseconds.  Defaults are 0
+      * startoffset will wait this long after seeing a cut point to jump
+      * endoffset will jump this many milliseconds before the cut point says the end should be
+  * Changed default port to 7290
+  * Changed IDLE/timeout code, thanks to wmcbrine
+  * Added support for different transcoding qualities.  If a quality other than SAME is chosen, it may force transcoding.
+  * Added FLV container support, and changed defaults for ffmpeg preview/transcode to try and work with all containers `(*)`
+  * Added config option to skip top-level folders screen if there is only one accessible directory (toplevel.skip=true)
+  * Streambaby looks for property streambaby.dir and uses that as the rootdir for streambaby if set
+    * Can be used (for instance) in galleon wrapper.conf file to set where streambabby looks for files
+  * Also Added config option streambaby.dir to set up where the streambaby directory is.  Also changed the way native path is initialized.
+  * When transcoding, find the closest allowable mpeg frame rate.
+
+
+### V0.19 ###
+  * Added MKV to default list of extensions to scan
+  * Catch NumberFormatExceptions and return default values while trying to parse ffmpeg output
+  * cahoon/KG:  Fix off-by-one issue (causing ArrayIndexOutOfbounds) in MP4 psuedo-streaming
+  * Changed preview cache cleanup code to work faster/use less memory & deal with recursive symlinks
+  * Added additional debugging for loading of native ffmpeg libraries
+  * Fixed bug where saved bookmark position ended up negative (caused Play/Replay screen to not have correct text positioning)
+  * TiVo doesn't seem to report correct duration for MP4's (always seems to report ~8secs less).
+    * Added code to work-around by using my own calculated duration if I receive RSRC\_EVENT\_COMPLETE from tivo and its duration is shorter than expected
+    * Still some weirdness around end of MP4s--  Shuttle bar will stop moving around 8 seconds before end...
+  * Fixed centering of shuttlebar -- Also made it wider while I was at it.
+
+### V0.18 ###
+  * Made changes to compile under JDK1.5, and marked as JDK1.5 compatible
+  * Added ability to gather video information (length/type/etc) without ffmpeg, enabling running without ffmpeg installed (but minus some features)
+  * Ignore files/directories that begin with a dot (.)
+  * Added liba52 as synonym for AC3 in ffmpegexe module
+  * Added hints for the list, so you can visually see if there are more entries than fit on the screen
+  * Advance key moves back and from bottom to top of list in selection view
+  * Fixed issue with ffmpeg native integration where libavcodec was V51, and libavformat was V52 (used to assume major versions would be equal)
+    * NOTE:  FFmpeg revisions `r10939-r11109` (Nov 7 2007 - Nov 28 2007) will not work, and will also not report any errors.
+  * Implement new codec detection code for ffmpegjava video module, should have less problems detecting which codecs are in use.
